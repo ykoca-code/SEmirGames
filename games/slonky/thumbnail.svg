@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1a1d29"/>
+      <stop offset="1" stop-color="#0d0f18"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+
+  <!-- Pegs (triangular grid) -->
+  <g fill="#cbd5e1">
+    <circle cx="40"  cy="60"  r="3"/>
+    <circle cx="80"  cy="60"  r="3"/>
+    <circle cx="120" cy="60"  r="3"/>
+    <circle cx="160" cy="60"  r="3"/>
+    <circle cx="200" cy="60"  r="3"/>
+
+    <circle cx="60"  cy="90"  r="3"/>
+    <circle cx="100" cy="90"  r="3"/>
+    <circle cx="140" cy="90"  r="3"/>
+    <circle cx="180" cy="90"  r="3"/>
+
+    <circle cx="40"  cy="120" r="3"/>
+    <circle cx="80"  cy="120" r="3"/>
+    <circle cx="120" cy="120" r="3"/>
+    <circle cx="160" cy="120" r="3"/>
+    <circle cx="200" cy="120" r="3"/>
+
+    <circle cx="60"  cy="150" r="3"/>
+    <circle cx="100" cy="150" r="3"/>
+    <circle cx="140" cy="150" r="3"/>
+    <circle cx="180" cy="150" r="3"/>
+  </g>
+
+  <!-- Ball mid-fall -->
+  <g>
+    <circle cx="118" cy="105" r="9" fill="#ffb400"/>
+    <circle cx="115" cy="102" r="3" fill="rgba(255,255,255,0.6)"/>
+  </g>
+
+  <!-- Trail dots -->
+  <g fill="#ffb400" opacity="0.5">
+    <circle cx="120" cy="40" r="3"/>
+    <circle cx="119" cy="70" r="4"/>
+  </g>
+
+  <!-- Slots row -->
+  <g>
+    <rect x="0"   y="180" width="48" height="60" fill="#ef4444" opacity="0.85"/>
+    <rect x="48"  y="180" width="48" height="60" fill="#f59e0b" opacity="0.85"/>
+    <rect x="96"  y="180" width="48" height="60" fill="#10b981" opacity="0.85"/>
+    <rect x="144" y="180" width="48" height="60" fill="#f59e0b" opacity="0.85"/>
+    <rect x="192" y="180" width="48" height="60" fill="#ef4444" opacity="0.85"/>
+  </g>
+  <g font-family="Helvetica, Arial, sans-serif" font-weight="800" text-anchor="middle" fill="#fff" font-size="18">
+    <text x="24"  y="218">10</text>
+    <text x="72"  y="218">50</text>
+    <text x="120" y="218">500</text>
+    <text x="168" y="218">50</text>
+    <text x="216" y="218">10</text>
+  </g>
+</svg>

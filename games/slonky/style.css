@@ -1,0 +1,133 @@
+/* Slonky — fits on a phone screen without scrolling */
+
+body.slonky-page {
+  overflow: hidden;
+}
+.slonky-page .site-header { display: none; }
+
+.slonky-page .slonky-container {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
+}
+
+.slonky-container .game-header { display: none; }
+
+/* ---------- Top stats ---------- */
+.slonky-top {
+  display: flex;
+  gap: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
+.s-stat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.s-stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.s-stat-value {
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+/* ---------- Stage ---------- */
+.slonky-stage {
+  position: relative;
+  background: #0d0f18;
+  padding: 3px;
+  border-radius: 8px;
+  margin: 0 auto;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+#board {
+  display: block;
+  background: #1a1d29;
+  border-radius: 6px;
+  height: 100%;
+  width: auto;
+  max-width: calc(100vw - 28px);
+  aspect-ratio: 2 / 3;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 15, 24, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
+.overlay-content {
+  text-align: center;
+  color: #fff;
+  padding: 20px;
+  max-width: 280px;
+}
+
+.overlay-content h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  background: linear-gradient(90deg, var(--color-primary), #00b8d9, var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.overlay-content p {
+  margin: 0 0 16px;
+  color: #cbd5e1;
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+/* ---------- Action row ---------- */
+.action-row {
+  display: flex;
+  gap: 6px;
+  max-width: 360px;
+  width: 100%;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.action-row .btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
