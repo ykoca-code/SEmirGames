@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#faf8ef"/>
+  <g transform="translate(20 20)" font-family="Helvetica, Arial, sans-serif" font-weight="800" text-anchor="middle">
+    <rect width="200" height="200" rx="10" fill="#bbada0"/>
+    <!-- Row 1 -->
+    <rect x="10" y="10" width="40" height="40" rx="4" fill="#eee4da"/>
+    <text x="30" y="38" font-size="18" fill="#776e65">2</text>
+    <rect x="55" y="10" width="40" height="40" rx="4" fill="#ede0c8"/>
+    <text x="75" y="38" font-size="18" fill="#776e65">4</text>
+    <rect x="100" y="10" width="40" height="40" rx="4" fill="#cdc1b4"/>
+    <rect x="145" y="10" width="40" height="40" rx="4" fill="#f2b179"/>
+    <text x="165" y="38" font-size="18" fill="#fff">8</text>
+    <!-- Row 2 -->
+    <rect x="10" y="55" width="40" height="40" rx="4" fill="#cdc1b4"/>
+    <rect x="55" y="55" width="40" height="40" rx="4" fill="#f59563"/>
+    <text x="75" y="83" font-size="16" fill="#fff">16</text>
+    <rect x="100" y="55" width="40" height="40" rx="4" fill="#f67c5f"/>
+    <text x="120" y="83" font-size="16" fill="#fff">32</text>
+    <rect x="145" y="55" width="40" height="40" rx="4" fill="#f65e3b"/>
+    <text x="165" y="83" font-size="16" fill="#fff">64</text>
+    <!-- Row 3 - big number -->
+    <rect x="10" y="100" width="175" height="85" rx="6" fill="#edc850"/>
+    <text x="97.5" y="158" font-size="56" fill="#fff">2048</text>
+  </g>
+</svg>

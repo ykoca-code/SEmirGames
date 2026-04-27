@@ -25,6 +25,39 @@
       "thumbnail": "games/sudoku/thumbnail.svg",
       "path": "games/sudoku/index.html",
       "tags": ["bulmaca", "sudoku", "zeka", "mantık"]
+    },
+    {
+      "id": "tetris",
+      "title": "Tetris",
+      "description": "Klasik blok yığma oyunu. Düşen parçaları döndürerek tam satırlar oluştur.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "7+",
+      "thumbnail": "games/tetris/thumbnail.svg",
+      "path": "games/tetris/index.html",
+      "tags": ["arcade", "tetris", "klasik", "blok"]
+    },
+    {
+      "id": "2048",
+      "title": "2048",
+      "description": "Aynı sayıları birleştirerek 2048'e ulaşmaya çalış.",
+      "category": "puzzle",
+      "categoryLabel": "Bulmaca",
+      "ageRating": "7+",
+      "thumbnail": "games/2048/thumbnail.svg",
+      "path": "games/2048/index.html",
+      "tags": ["bulmaca", "2048", "sayı", "klasik"]
+    },
+    {
+      "id": "memory",
+      "title": "Hafıza",
+      "description": "Kartları çevir, eşleşen sembolleri bul. Hafızanı geliştir!",
+      "category": "educational",
+      "categoryLabel": "Eğitici",
+      "ageRating": "4+",
+      "thumbnail": "games/memory/thumbnail.svg",
+      "path": "games/memory/index.html",
+      "tags": ["hafıza", "eşleştirme", "konsantrasyon", "çocuk"]
     }
   ]
 }

@@ -121,6 +121,9 @@ Filtre, seçilen yaş grubu ve daha düşük yaş gruplarını birlikte gösteri
 ## Mevcut Oyunlar
 
 - **Sudoku** — Klasik 9x9 mantık bulmacası (Mantık · 7+)
+- **Tetris** — Klasik blok yığma oyunu (Arcade · 7+)
+- **2048** — Aynı sayıları birleştirerek 2048'e ulaş (Bulmaca · 7+)
+- **Hafıza** — Kart eşleştirme oyunu (Eğitici · 4+)
 
 ## Lisans
 

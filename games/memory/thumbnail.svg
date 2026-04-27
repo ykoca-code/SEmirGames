@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="240" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6c5ce7"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <g transform="translate(20 20)" font-family="Helvetica, Arial, sans-serif" font-weight="800" text-anchor="middle">
+    <!-- 4 cards: 2 face down, 2 face up matching -->
+    <g>
+      <rect x="0" y="0" width="95" height="95" rx="10" fill="#fff"/>
+      <text x="47" y="68" font-size="50" fill="#ef4444">★</text>
+    </g>
+    <g>
+      <rect x="105" y="0" width="95" height="95" rx="10" fill="#1a1d29"/>
+      <text x="152" y="62" font-size="40" fill="#6c5ce7">?</text>
+    </g>
+    <g>
+      <rect x="0" y="105" width="95" height="95" rx="10" fill="#1a1d29"/>
+      <text x="47" y="167" font-size="40" fill="#6c5ce7">?</text>
+    </g>
+    <g>
+      <rect x="105" y="105" width="95" height="95" rx="10" fill="#fff"/>
+      <text x="152" y="173" font-size="50" fill="#ef4444">★</text>
+    </g>
+  </g>
+</svg>

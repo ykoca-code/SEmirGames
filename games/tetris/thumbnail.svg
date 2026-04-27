@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="240" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1a1d29"/>
+      <stop offset="1" stop-color="#3b3f5c"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <g transform="translate(40 24)">
+    <!-- I piece (cyan) -->
+    <g fill="#00b8d9" stroke="#0d8aa8" stroke-width="2">
+      <rect x="0" y="120" width="40" height="40" rx="4"/>
+      <rect x="40" y="120" width="40" height="40" rx="4"/>
+      <rect x="80" y="120" width="40" height="40" rx="4"/>
+      <rect x="120" y="120" width="40" height="40" rx="4"/>
+    </g>
+    <!-- L piece (orange) -->
+    <g fill="#f97316" stroke="#c2570f" stroke-width="2">
+      <rect x="120" y="40" width="40" height="40" rx="4"/>
+      <rect x="120" y="80" width="40" height="40" rx="4"/>
+      <rect x="80" y="80" width="40" height="40" rx="4"/>
+      <rect x="40" y="80" width="40" height="40" rx="4"/>
+    </g>
+    <!-- T piece (purple) -->
+    <g fill="#a855f7" stroke="#7e22ce" stroke-width="2">
+      <rect x="40" y="40" width="40" height="40" rx="4"/>
+      <rect x="80" y="40" width="40" height="40" rx="4"/>
+      <rect x="80" y="0" width="40" height="40" rx="4"/>
+    </g>
+    <!-- O piece (yellow) -->
+    <g fill="#ffb400" stroke="#c98a00" stroke-width="2">
+      <rect x="0" y="40" width="40" height="40" rx="4"/>
+      <rect x="0" y="80" width="40" height="40" rx="4"/>
+    </g>
+  </g>
+</svg>
