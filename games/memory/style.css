@@ -115,16 +115,24 @@
 .card.matched .card-front {
   background: #d4f9ed;
   border-color: var(--color-success);
+  box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.5);
+  animation: matchGlow 600ms ease;
 }
 
-.card.matched {
-  animation: matchPulse 320ms ease;
+.card.matched .card-inner {
+  animation: matchPulse 360ms ease 200ms;
 }
 
 @keyframes matchPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.06); }
-  100% { transform: scale(1); }
+  0% { transform: rotateY(180deg) scale(1); }
+  50% { transform: rotateY(180deg) scale(1.08); }
+  100% { transform: rotateY(180deg) scale(1); }
+}
+
+@keyframes matchGlow {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.5); }
+  60%  { box-shadow: 0 0 0 12px rgba(0, 184, 148, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 184, 148, 0); }
 }
 
 .card[disabled] {

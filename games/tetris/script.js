@@ -71,6 +71,7 @@
     paused: false,
     gameOver: false,
     bag: [],
+    flashRows: null, // {rows: number[], until: ts} during clear flash
   };
 
   // ---- DOM ----
@@ -206,33 +207,50 @@
         state.board[nr][nc] = p.type;
       }
     }
-    clearLines();
-    spawn();
+    state.current = null;
+
+    // Identify full rows
+    const fullRows = [];
+    for (let r = 0; r < ROWS; r++) {
+      if (state.board[r].every((v) => v !== null)) fullRows.push(r);
+    }
+
+    if (fullRows.length === 0) {
+      spawn();
+      return;
+    }
+
+    // Trigger flash, then resolve clear after a short delay.
+    state.flashRows = fullRows;
+    setTimeout(() => {
+      finalizeClear(fullRows);
+      state.flashRows = null;
+      spawn();
+    }, 140);
   }
 
-  function clearLines() {
-    let cleared = 0;
-    for (let r = ROWS - 1; r >= 0; r--) {
-      if (state.board[r].every((v) => v !== null)) {
+  function finalizeClear(fullRows) {
+    // Remove rows from highest index to lowest to keep indices valid.
+    fullRows
+      .slice()
+      .sort((a, b) => b - a)
+      .forEach((r) => {
         state.board.splice(r, 1);
         state.board.unshift(Array(COLS).fill(null));
-        cleared++;
-        r++;
-      }
+      });
+
+    const cleared = fullRows.length;
+    const points = [0, 100, 300, 500, 800][cleared] * state.level;
+    state.score += points;
+    state.lines += cleared;
+    const newLevel = Math.floor(state.lines / 10) + 1;
+    if (newLevel !== state.level) {
+      state.level = newLevel;
+      state.dropInterval = Math.max(80, 1000 - (state.level - 1) * 90);
     }
-    if (cleared > 0) {
-      const points = [0, 100, 300, 500, 800][cleared] * state.level;
-      state.score += points;
-      state.lines += cleared;
-      const newLevel = Math.floor(state.lines / 10) + 1;
-      if (newLevel !== state.level) {
-        state.level = newLevel;
-        state.dropInterval = Math.max(80, 1000 - (state.level - 1) * 90);
-      }
-      els.score.textContent = state.score;
-      els.lines.textContent = state.lines;
-      els.level.textContent = state.level;
-    }
+    els.score.textContent = state.score;
+    els.lines.textContent = state.lines;
+    els.level.textContent = state.level;
   }
 
   // ---- Render ----
@@ -267,11 +285,18 @@
       ctx.stroke();
     }
 
-    // settled blocks
+    // settled blocks (with optional flash on rows about to clear)
+    const flashSet = state.flashRows ? new Set(state.flashRows) : null;
     for (let r = 0; r < ROWS; r++) {
+      const isFlashing = flashSet && flashSet.has(r);
       for (let c = 0; c < COLS; c++) {
         const t = state.board[r][c];
-        if (t) drawCell(ctx, c * CELL, r * CELL, COLORS[t]);
+        if (!t) continue;
+        if (isFlashing) {
+          drawCell(ctx, c * CELL, r * CELL, "#ffffff");
+        } else {
+          drawCell(ctx, c * CELL, r * CELL, COLORS[t]);
+        }
       }
     }
 
@@ -331,9 +356,9 @@
     const dt = ts - state.lastTs;
     state.lastTs = ts;
 
-    if (!state.paused && !state.gameOver) {
+    if (!state.paused && !state.gameOver && state.current) {
       state.dropAccum += dt;
-      while (state.dropAccum >= state.dropInterval) {
+      while (state.dropAccum >= state.dropInterval && state.current) {
         state.dropAccum -= state.dropInterval;
         if (!collides(state.current, 1, 0, state.current.shape)) {
           state.current.row++;
