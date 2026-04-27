@@ -1,0 +1,162 @@
+/* Tetris-specific styles */
+
+.tetris-container {
+  max-width: 760px;
+}
+
+.tetris-layout {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.tetris-stage {
+  position: relative;
+  background: #0d0f18;
+  padding: 6px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+}
+
+#board {
+  display: block;
+  background: #1a1d29;
+  border-radius: 6px;
+  width: 300px;
+  max-width: 90vw;
+  height: auto;
+  aspect-ratio: 1 / 2;
+  image-rendering: pixelated;
+}
+
+.tetris-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 160px;
+}
+
+.info-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.info-card h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.info-card canvas {
+  background: #1a1d29;
+  border-radius: 6px;
+  display: block;
+  margin: 0 auto;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 12px;
+  border-radius: var(--radius-md);
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+.action-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 15, 24, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+}
+
+.overlay-content {
+  text-align: center;
+  color: #fff;
+  padding: 24px;
+}
+
+.overlay-content h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+
+.overlay-content p {
+  margin: 0 0 16px;
+  color: #cbd5e1;
+}
+
+.touch-controls {
+  display: none;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  max-width: 540px;
+  margin: 0 auto 12px;
+}
+
+.touch-btn {
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 800;
+  padding: 14px 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.touch-btn:hover, .touch-btn:active {
+  background: #eeebff;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+@media (max-width: 720px) {
+  .tetris-layout { flex-direction: column; align-items: center; }
+  .tetris-sidebar { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .info-card, .stat-grid { flex: 1 1 140px; }
+  .touch-controls { display: grid; }
+}

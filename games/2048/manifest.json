@@ -1,0 +1,14 @@
+{
+  "id": "2048",
+  "title": "2048",
+  "description": "Aynı sayıları birleştirerek 2048'e ulaşmaya çalış.",
+  "version": "1.0.0",
+  "category": "puzzle",
+  "categoryLabel": "Bulmaca",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["bulmaca", "2048", "sayı", "klasik"],
+  "author": "SEmirK Games",
+  "controls": ["Klavye: ← → ↑ ↓", "Dokunmatik: kaydır"]
+}

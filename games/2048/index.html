@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2048 - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../index.html" class="logo">
+        <img src="../../assets/icons/logo.svg" alt="SEmirK Games" class="logo-img" />
+        <span class="logo-text">SEmirK <span class="logo-accent">Games</span></span>
+      </a>
+      <div></div>
+      <nav class="header-actions">
+        <a href="../../index.html" class="header-link">← Tüm Oyunlar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container game-container g2048-container">
+    <header class="game-header">
+      <h1 class="game-name">2048</h1>
+      <p class="game-meta">Bulmaca · 7+ yaş</p>
+    </header>
+
+    <section class="g2048-toolbar">
+      <div class="score-card">
+        <span class="score-label">Skor</span>
+        <span id="score" class="score-value">0</span>
+      </div>
+      <div class="score-card best">
+        <span class="score-label">En İyi</span>
+        <span id="best" class="score-value">0</span>
+      </div>
+      <div class="toolbar-actions">
+        <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+      </div>
+    </section>
+
+    <section class="g2048-stage">
+      <div id="board" class="g2048-board" aria-label="2048 tahtası"></div>
+      <div id="overlay" class="g2048-overlay hidden">
+        <h2 id="overlayTitle">Tebrikler!</h2>
+        <p id="overlayText">2048'e ulaştın!</p>
+        <div class="overlay-actions">
+          <button type="button" id="continueBtn" class="btn">Devam Et</button>
+          <button type="button" id="restartBtn" class="btn btn-primary">Yeni Oyun</button>
+        </div>
+      </div>
+    </section>
+
+    <p class="hint-text">
+      <kbd>← → ↑ ↓</kbd> ile karoları kaydır. Aynı sayılar birleşir.
+      Mobilde parmağınla kaydır.
+    </p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

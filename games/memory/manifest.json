@@ -1,0 +1,14 @@
+{
+  "id": "memory",
+  "title": "Hafıza",
+  "description": "Kartları çevir, eşleşen sembolleri bul. Hafızanı geliştir!",
+  "version": "1.0.0",
+  "category": "educational",
+  "categoryLabel": "Eğitici",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["hafıza", "eşleştirme", "konsantrasyon", "çocuk"],
+  "author": "SEmirK Games",
+  "controls": ["Mouse / Dokunmatik"]
+}

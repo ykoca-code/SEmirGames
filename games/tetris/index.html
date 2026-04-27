@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tetris - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../index.html" class="logo">
+        <img src="../../assets/icons/logo.svg" alt="SEmirK Games" class="logo-img" />
+        <span class="logo-text">SEmirK <span class="logo-accent">Games</span></span>
+      </a>
+      <div></div>
+      <nav class="header-actions">
+        <a href="../../index.html" class="header-link">← Tüm Oyunlar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container game-container tetris-container">
+    <header class="game-header">
+      <h1 class="game-name">Tetris</h1>
+      <p class="game-meta">Arcade · 7+ yaş</p>
+    </header>
+
+    <div class="tetris-layout">
+      <div class="tetris-stage">
+        <canvas id="board" width="300" height="600" aria-label="Tetris tahtası"></canvas>
+        <div id="overlay" class="overlay hidden">
+          <div class="overlay-content">
+            <h2 id="overlayTitle">Hazır mısın?</h2>
+            <p id="overlayText">Başlamak için "Yeni Oyun" tuşuna bas.</p>
+            <button type="button" id="overlayBtn" class="btn btn-primary">Yeni Oyun</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="tetris-sidebar">
+        <div class="info-card">
+          <h3>Sıradaki</h3>
+          <canvas id="next" width="120" height="120"></canvas>
+        </div>
+        <div class="info-card">
+          <h3>Bekleyen</h3>
+          <canvas id="hold" width="120" height="120"></canvas>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><span class="stat-label">Skor</span><span id="score" class="stat-value">0</span></div>
+          <div class="stat"><span class="stat-label">Satır</span><span id="lines" class="stat-value">0</span></div>
+          <div class="stat"><span class="stat-label">Seviye</span><span id="level" class="stat-value">1</span></div>
+        </div>
+        <div class="action-stack">
+          <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+          <button type="button" id="pauseBtn" class="btn">Duraklat</button>
+        </div>
+      </aside>
+    </div>
+
+    <section class="touch-controls" aria-label="Dokunmatik kontroller">
+      <button type="button" data-action="left" class="touch-btn">←</button>
+      <button type="button" data-action="rotate" class="touch-btn">⟳</button>
+      <button type="button" data-action="right" class="touch-btn">→</button>
+      <button type="button" data-action="soft" class="touch-btn">↓</button>
+      <button type="button" data-action="hard" class="touch-btn">⤓</button>
+      <button type="button" data-action="hold" class="touch-btn">B</button>
+    </section>
+
+    <p class="hint-text">
+      <kbd>←</kbd> <kbd>→</kbd> hareket · <kbd>↓</kbd> yumuşak düşür ·
+      <kbd>↑</kbd> / <kbd>X</kbd> döndür · <kbd>Boşluk</kbd> sert düşür ·
+      <kbd>C</kbd> beklet · <kbd>P</kbd> duraklat
+    </p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+/* Memory game styles */
+
+.memory-container {
+  max-width: 720px;
+}
+
+.memory-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: var(--color-surface);
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  margin-bottom: 16px;
+}
+
+.timer, .moves, .pairs {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+.memory-board {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+  perspective: 1000px;
+}
+
+.memory-board.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.memory-board.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.memory-board.cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+.card {
+  aspect-ratio: 1 / 1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  perspective: 1000px;
+  padding: 0;
+  position: relative;
+}
+
+.card-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 350ms ease;
+  border-radius: var(--radius-md);
+}
+
+.card.flipped .card-inner,
+.card.matched .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  font-size: clamp(28px, 6vw, 56px);
+  font-weight: 800;
+  user-select: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-back {
+  background: linear-gradient(135deg, #6c5ce7, #00b8d9);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(24px, 5vw, 38px);
+}
+
+.card-back::before {
+  content: "?";
+}
+
+.card-front {
+  background: #ffffff;
+  border: 2px solid var(--color-border);
+  transform: rotateY(180deg);
+}
+
+.card.matched .card-front {
+  background: #d4f9ed;
+  border-color: var(--color-success);
+}
+
+.card.matched {
+  animation: matchPulse 320ms ease;
+}
+
+@keyframes matchPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.card[disabled] {
+  cursor: default;
+}

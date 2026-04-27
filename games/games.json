@@ -1,0 +1,63 @@
+{
+  "categories": [
+    { "id": "all", "label": "Tümü" },
+    { "id": "puzzle", "label": "Bulmaca" },
+    { "id": "logic", "label": "Mantık" },
+    { "id": "arcade", "label": "Arcade" },
+    { "id": "board", "label": "Masa Oyunu" },
+    { "id": "educational", "label": "Eğitici" }
+  ],
+  "ageGroups": [
+    { "id": "all", "label": "Tüm Yaşlar" },
+    { "id": "4+", "label": "4+" },
+    { "id": "7+", "label": "7+" },
+    { "id": "12+", "label": "12+" },
+    { "id": "16+", "label": "16+" }
+  ],
+  "games": [
+    {
+      "id": "sudoku",
+      "title": "Sudoku",
+      "description": "Klasik 9x9 mantık bulmacası. Her satır, sütun ve 3x3 kutuda 1-9 rakamlarını bir kez kullan.",
+      "category": "logic",
+      "categoryLabel": "Mantık",
+      "ageRating": "7+",
+      "thumbnail": "games/sudoku/thumbnail.svg",
+      "path": "games/sudoku/index.html",
+      "tags": ["bulmaca", "sudoku", "zeka", "mantık"]
+    },
+    {
+      "id": "tetris",
+      "title": "Tetris",
+      "description": "Klasik blok yığma oyunu. Düşen parçaları döndürerek tam satırlar oluştur.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "7+",
+      "thumbnail": "games/tetris/thumbnail.svg",
+      "path": "games/tetris/index.html",
+      "tags": ["arcade", "tetris", "klasik", "blok"]
+    },
+    {
+      "id": "2048",
+      "title": "2048",
+      "description": "Aynı sayıları birleştirerek 2048'e ulaşmaya çalış.",
+      "category": "puzzle",
+      "categoryLabel": "Bulmaca",
+      "ageRating": "7+",
+      "thumbnail": "games/2048/thumbnail.svg",
+      "path": "games/2048/index.html",
+      "tags": ["bulmaca", "2048", "sayı", "klasik"]
+    },
+    {
+      "id": "memory",
+      "title": "Hafıza",
+      "description": "Kartları çevir, eşleşen sembolleri bul. Hafızanı geliştir!",
+      "category": "educational",
+      "categoryLabel": "Eğitici",
+      "ageRating": "4+",
+      "thumbnail": "games/memory/thumbnail.svg",
+      "path": "games/memory/index.html",
+      "tags": ["hafıza", "eşleştirme", "konsantrasyon", "çocuk"]
+    }
+  ]
+}

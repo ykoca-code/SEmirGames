@@ -1,0 +1,14 @@
+{
+  "id": "tetris",
+  "title": "Tetris",
+  "description": "Klasik blok yığma oyunu. Düşen parçaları döndürerek tam satırlar oluştur.",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "tetris", "klasik", "blok"],
+  "author": "SEmirK Games",
+  "controls": ["Klavye: ← → ↓ döndür: ↑ veya X, sert düşür: Boşluk, beklet: C, duraklat: P"]
+}

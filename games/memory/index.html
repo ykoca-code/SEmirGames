@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hafıza - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../index.html" class="logo">
+        <img src="../../assets/icons/logo.svg" alt="SEmirK Games" class="logo-img" />
+        <span class="logo-text">SEmirK <span class="logo-accent">Games</span></span>
+      </a>
+      <div></div>
+      <nav class="header-actions">
+        <a href="../../index.html" class="header-link">← Tüm Oyunlar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container game-container memory-container">
+    <header class="game-header">
+      <h1 class="game-name">Hafıza</h1>
+      <p class="game-meta">Eğitici · 4+ yaş</p>
+    </header>
+
+    <section class="memory-toolbar">
+      <div class="toolbar-group">
+        <label for="size" class="toolbar-label">Boyut:</label>
+        <select id="size" class="toolbar-select">
+          <option value="3x4">3 × 4 (Kolay)</option>
+          <option value="4x4" selected>4 × 4 (Orta)</option>
+          <option value="4x6">4 × 6 (Zor)</option>
+        </select>
+      </div>
+
+      <div class="toolbar-group">
+        <span class="toolbar-label">Süre:</span>
+        <span id="timer" class="timer">00:00</span>
+      </div>
+
+      <div class="toolbar-group">
+        <span class="toolbar-label">Hamle:</span>
+        <span id="moves" class="moves">0</span>
+      </div>
+
+      <div class="toolbar-group">
+        <span class="toolbar-label">Eşleşen:</span>
+        <span id="pairs" class="pairs">0</span>
+      </div>
+
+      <div class="toolbar-actions">
+        <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+      </div>
+    </section>
+
+    <section class="memory-board" id="board" aria-label="Hafıza kartları"></section>
+
+    <p class="hint-text">
+      İki kartı çevir. Aynı sembol gelirse eşleşir, farklıysa kapanır.
+    </p>
+  </main>
+
+  <div id="winModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>🎉 Tebrikler!</h2>
+      <p id="winText">Tüm kartları eşleştirdin!</p>
+      <button type="button" id="modalNewBtn" class="btn btn-primary">Yeni Oyun</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sudoku - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../../index.html" class="logo">
+        <img src="../../assets/icons/logo.svg" alt="SEmirK Games" class="logo-img" />
+        <span class="logo-text">SEmirK <span class="logo-accent">Games</span></span>
+      </a>
+      <div></div>
+      <nav class="header-actions">
+        <a href="../../index.html" class="header-link">← Tüm Oyunlar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container game-container">
+    <header class="game-header">
+      <h1 class="game-name">Sudoku</h1>
+      <p class="game-meta">Mantık · 7+ yaş</p>
+    </header>
+
+    <section class="game-toolbar">
+      <div class="toolbar-group">
+        <label for="difficulty" class="toolbar-label">Zorluk:</label>
+        <select id="difficulty" class="toolbar-select">
+          <option value="easy">Kolay</option>
+          <option value="medium" selected>Orta</option>
+          <option value="hard">Zor</option>
+        </select>
+      </div>
+
+      <div class="toolbar-group">
+        <span class="toolbar-label">Süre:</span>
+        <span id="timer" class="timer">00:00</span>
+      </div>
+
+      <div class="toolbar-group">
+        <span class="toolbar-label">Hata:</span>
+        <span id="mistakes" class="mistakes">0 / 3</span>
+      </div>
+
+      <div class="toolbar-actions">
+        <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+        <button type="button" id="checkBtn" class="btn">Kontrol Et</button>
+        <button type="button" id="hintBtn" class="btn">İpucu</button>
+      </div>
+    </section>
+
+    <section class="board-wrap">
+      <div id="board" class="sudoku-board" role="grid" aria-label="Sudoku tahtası"></div>
+    </section>
+
+    <section class="numpad" aria-label="Sayı tuş takımı">
+      <button type="button" class="num-btn" data-num="1">1</button>
+      <button type="button" class="num-btn" data-num="2">2</button>
+      <button type="button" class="num-btn" data-num="3">3</button>
+      <button type="button" class="num-btn" data-num="4">4</button>
+      <button type="button" class="num-btn" data-num="5">5</button>
+      <button type="button" class="num-btn" data-num="6">6</button>
+      <button type="button" class="num-btn" data-num="7">7</button>
+      <button type="button" class="num-btn" data-num="8">8</button>
+      <button type="button" class="num-btn" data-num="9">9</button>
+      <button type="button" class="num-btn num-erase" data-num="0">Sil</button>
+    </section>
+
+    <p class="hint-text">
+      İpucu: Bir kareye tıkla, sonra alt taraftan veya klavyeden (1-9) sayı gir. Silmek için
+      <kbd>Backspace</kbd> veya 0.
+    </p>
+  </main>
+
+  <div id="winModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>🎉 Tebrikler!</h2>
+      <p id="winText">Sudoku'yu tamamladın.</p>
+      <button type="button" id="modalNewBtn" class="btn btn-primary">Yeni Oyun</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
