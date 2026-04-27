@@ -11,7 +11,7 @@
   const COLS = 10;
   const ROWS = 20;
   const CELL = 30; // logical px; canvas is 300x600
-  const PREVIEW_CELL = 24;
+  const PREVIEW_CELL = 16;
 
   const COLORS = {
     I: "#00b8d9",
