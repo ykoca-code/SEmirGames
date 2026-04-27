@@ -6,7 +6,7 @@
 
 .g2048-toolbar {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: stretch;
   margin-bottom: 16px;
   flex-wrap: wrap;
@@ -16,14 +16,30 @@
   background: #bbada0;
   color: #fff;
   border-radius: var(--radius-sm);
-  padding: 8px 16px;
+  padding: 8px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 90px;
+  min-width: 84px;
+  flex: 1 1 auto;
 }
 
 .score-card.best { background: #8b7d72; }
+
+@media (max-width: 540px) {
+  .g2048-toolbar { gap: 8px; }
+  .score-card { padding: 6px 10px; min-width: 70px; }
+  .score-label { font-size: 10px; }
+  .score-value { font-size: 18px; }
+  .g2048-toolbar .toolbar-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+  .g2048-toolbar .toolbar-actions .btn {
+    width: 100%;
+    padding: 12px;
+  }
+}
 
 .score-label {
   font-size: 11px;
