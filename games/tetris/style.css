@@ -1,113 +1,123 @@
-/* Tetris - mobile-first portrait layout */
+/* Tetris — fits on a phone screen without scrolling */
 
-.tetris-container {
+body.tetris-page {
+  overflow: hidden;
+}
+.tetris-page .site-header { display: none; }
+
+.tetris-page .tetris-container {
   max-width: 460px;
-  padding: 12px 10px 24px;
-}
-
-.tetris-container .game-header {
-  margin-bottom: 8px;
-}
-
-.tetris-container .game-name {
-  font-size: 20px;
-}
-
-.tetris-container .game-meta {
-  font-size: 12px;
-}
-
-/* ---------- Top bar: stats + previews ---------- */
-.tetris-top {
+  margin: 0 auto;
+  padding: 6px 8px 8px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
+}
+
+.tetris-container .game-header { display: none; }
+
+/* ---------- Top: stats + tiny previews on one row ---------- */
+.tetris-top {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  flex-shrink: 0;
 }
 
 .tetris-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  display: flex;
+  flex: 1;
+  gap: 4px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 8px;
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
 }
 
 .t-stat {
   display: flex;
   flex-direction: column;
+  flex: 1;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  gap: 0;
 }
 
 .t-stat-label {
-  font-size: 10px;
+  font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
   font-weight: 700;
+  line-height: 1;
 }
 
 .t-stat-value {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--color-primary);
+  line-height: 1.2;
 }
 
 .tetris-previews {
   display: flex;
-  gap: 8px;
-  justify-content: center;
+  gap: 4px;
 }
 
 .preview-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 1px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  flex: 1;
-  max-width: 110px;
+  padding: 2px 4px;
+  width: 56px;
 }
 
 .preview-label {
-  font-size: 10px;
+  font-size: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--color-text-muted);
   font-weight: 700;
+  line-height: 1;
 }
 
 .preview-block canvas {
   background: #1a1d29;
-  border-radius: 4px;
+  border-radius: 3px;
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 40px;
+  height: 40px;
 }
 
 /* ---------- Stage ---------- */
 .tetris-stage {
   position: relative;
   background: #0d0f18;
-  padding: 4px;
-  border-radius: 8px;
-  margin: 0 auto 10px;
-  width: fit-content;
+  padding: 3px;
+  border-radius: 6px;
+  margin: 0 auto;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
 }
 
 #board {
   display: block;
   background: #1a1d29;
   border-radius: 4px;
-  width: min(300px, calc(100vw - 28px));
-  height: auto;
+  height: 100%;
+  width: auto;
+  max-width: calc(100vw - 28px);
   aspect-ratio: 1 / 2;
   image-rendering: pixelated;
   touch-action: none;
@@ -116,50 +126,44 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(13, 15, 24, 0.88);
+  background: rgba(13, 15, 24, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 6px;
   backdrop-filter: blur(4px);
 }
 
 .overlay-content {
   text-align: center;
   color: #fff;
-  padding: 20px;
+  padding: 16px;
 }
 
-.overlay-content h2 {
-  margin: 0 0 8px;
-  font-size: 22px;
-}
+.overlay-content h2 { margin: 0 0 6px; font-size: 20px; }
+.overlay-content p { margin: 0 0 12px; color: #cbd5e1; font-size: 13px; }
 
-.overlay-content p {
-  margin: 0 0 16px;
-  color: #cbd5e1;
-  font-size: 14px;
-}
-
-/* ---------- Touch controls (always visible) ---------- */
+/* ---------- Touch controls ---------- */
 .touch-controls {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
   max-width: 360px;
-  margin: 0 auto 10px;
+  width: 100%;
+  margin: 0 auto;
+  flex-shrink: 0;
 }
 
 .touch-btn {
   font-family: inherit;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   padding: 0;
-  height: 64px;
+  height: 52px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background 60ms ease, color 60ms ease, transform 60ms ease;
   user-select: none;
@@ -171,21 +175,32 @@
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: #fff;
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
 /* ---------- Action row ---------- */
 .action-row {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   max-width: 360px;
+  width: 100%;
   margin: 0 auto;
+  flex-shrink: 0;
 }
 
 .action-row .btn {
   flex: 1;
-  padding: 12px;
-  font-size: 15px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* On bigger phones, allow more breathing room */
+@media (min-height: 740px) {
+  .touch-btn { height: 60px; font-size: 24px; }
+  .preview-block canvas { width: 48px; height: 48px; }
+  .preview-block { width: 64px; }
+  .t-stat-value { font-size: 18px; }
 }
 
 /* Hide leftover desktop bits if encountered */
