@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SEmirK Games - Zararsız, eğlenceli oyunlar. Sudoku, bulmaca, zeka oyunları ve daha fazlası." />
+  <title>SEmirK Games - Eğlenceli ve Zararsız Oyunlar</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <img src="assets/icons/logo.svg" alt="SEmirK Games" class="logo-img" />
+        <span class="logo-text">SEmirK <span class="logo-accent">Games</span></span>
+      </a>
+
+      <div class="search-wrap">
+        <input
+          type="search"
+          id="searchInput"
+          class="search-input"
+          placeholder="Oyun ara..."
+          aria-label="Oyun ara"
+        />
+      </div>
+
+      <nav class="header-actions">
+        <a href="#about" class="header-link">Hakkında</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1 class="hero-title">Eğlen, Öğren, Oyna</h1>
+      <p class="hero-subtitle">Zararsız ve seçilmiş oyunlar — her yaşa uygun.</p>
+    </section>
+
+    <section class="filters" aria-label="Filtreler">
+      <div class="filter-group">
+        <span class="filter-label">Kategori:</span>
+        <div class="chip-row" id="categoryChips" role="tablist"></div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Yaş:</span>
+        <div class="chip-row" id="ageChips" role="tablist"></div>
+      </div>
+    </section>
+
+    <section class="games-section">
+      <h2 class="section-title" id="sectionTitle">Tüm Oyunlar</h2>
+      <div class="games-grid" id="gamesGrid"></div>
+      <p class="empty-state hidden" id="emptyState">
+        Bu filtrelere uygun oyun bulunamadı.
+      </p>
+    </section>
+
+    <section class="about" id="about">
+      <h2>SEmirK Games Hakkında</h2>
+      <p>
+        SEmirK Games; çocuklar ve aileler için seçilmiş, zararsız ve eğitici
+        oyunlar sunan bir platformdur. Her oyun kategoriye ve yaş grubuna göre
+        sınıflandırılmıştır.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> SEmirK Games. Tüm hakları saklıdır.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

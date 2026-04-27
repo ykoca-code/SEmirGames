@@ -1,0 +1,14 @@
+{
+  "id": "sudoku",
+  "title": "Sudoku",
+  "description": "Klasik 9x9 Sudoku bulmacası. Her satır, sütun ve 3x3 kutuda 1-9 rakamlarını bir kez kullan.",
+  "version": "1.0.0",
+  "category": "logic",
+  "categoryLabel": "Mantık",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["bulmaca", "sudoku", "zeka", "mantık"],
+  "author": "SEmirK Games",
+  "controls": ["Mouse", "Klavye 1-9"]
+}

@@ -1,0 +1,30 @@
+{
+  "categories": [
+    { "id": "all", "label": "Tümü" },
+    { "id": "puzzle", "label": "Bulmaca" },
+    { "id": "logic", "label": "Mantık" },
+    { "id": "arcade", "label": "Arcade" },
+    { "id": "board", "label": "Masa Oyunu" },
+    { "id": "educational", "label": "Eğitici" }
+  ],
+  "ageGroups": [
+    { "id": "all", "label": "Tüm Yaşlar" },
+    { "id": "4+", "label": "4+" },
+    { "id": "7+", "label": "7+" },
+    { "id": "12+", "label": "12+" },
+    { "id": "16+", "label": "16+" }
+  ],
+  "games": [
+    {
+      "id": "sudoku",
+      "title": "Sudoku",
+      "description": "Klasik 9x9 mantık bulmacası. Her satır, sütun ve 3x3 kutuda 1-9 rakamlarını bir kez kullan.",
+      "category": "logic",
+      "categoryLabel": "Mantık",
+      "ageRating": "7+",
+      "thumbnail": "games/sudoku/thumbnail.svg",
+      "path": "games/sudoku/index.html",
+      "tags": ["bulmaca", "sudoku", "zeka", "mantık"]
+    }
+  ]
+}
