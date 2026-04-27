@@ -1,0 +1,14 @@
+{
+  "id": "slonky",
+  "title": "Slonky",
+  "description": "Topu düşür, çivilere çarpa çarpa yüksek puanlı kutuya isabet ettir. 10 topla en yüksek skoru yapmaya çalış.",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "plinko", "top", "şans", "fizik"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: top düşür"]
+}
