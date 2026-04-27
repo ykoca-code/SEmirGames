@@ -24,11 +24,11 @@
   display: block;
   background: #1a1d29;
   border-radius: 6px;
-  width: 300px;
-  max-width: 90vw;
+  width: min(300px, calc(100vw - 32px));
   height: auto;
   aspect-ratio: 1 / 2;
   image-rendering: pixelated;
+  touch-action: none;
 }
 
 .tetris-sidebar {
@@ -127,36 +127,45 @@
 
 .touch-controls {
   display: none;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  max-width: 540px;
+  max-width: 360px;
   margin: 0 auto 12px;
 }
 
 .touch-btn {
   font-family: inherit;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
-  padding: 14px 0;
+  padding: 16px 0;
+  min-height: 56px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all var(--transition);
+  transition: background 80ms ease, color 80ms ease;
   user-select: none;
+  -webkit-user-select: none;
   touch-action: manipulation;
 }
 
-.touch-btn:hover, .touch-btn:active {
-  background: #eeebff;
+.touch-btn:active {
+  background: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: #fff;
 }
 
 @media (max-width: 720px) {
-  .tetris-layout { flex-direction: column; align-items: center; }
-  .tetris-sidebar { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-  .info-card, .stat-grid { flex: 1 1 140px; }
+  .tetris-layout { flex-direction: column; align-items: center; gap: 12px; }
+  .tetris-sidebar { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .info-card { flex: 1 1 100px; padding: 8px; }
+  .info-card canvas { width: 80px; height: 80px; }
+  .info-card h3 { font-size: 11px; margin-bottom: 4px; }
+  .stat-grid { flex: 1 1 100%; padding: 10px; flex-direction: row; gap: 12px; display: flex; }
+  .stat-grid .stat { flex-direction: column; gap: 2px; }
+  .stat-value { font-size: 18px; }
+  .action-stack { flex: 1 1 100%; flex-direction: row; }
+  .action-stack .btn { flex: 1; }
   .touch-controls { display: grid; }
 }

@@ -428,7 +428,30 @@
     });
 
     els.touchBtns.forEach((btn) => {
-      btn.addEventListener("click", () => handleAction(btn.dataset.action));
+      const action = btn.dataset.action;
+      const repeats = action === "left" || action === "right" || action === "soft";
+      let holdTimeout = null;
+      let holdInterval = null;
+
+      const start = (e) => {
+        if (e) e.preventDefault();
+        handleAction(action);
+        if (!repeats) return;
+        holdTimeout = setTimeout(() => {
+          holdInterval = setInterval(() => handleAction(action), 90);
+        }, 220);
+      };
+      const stop = () => {
+        if (holdTimeout) { clearTimeout(holdTimeout); holdTimeout = null; }
+        if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
+      };
+
+      btn.addEventListener("touchstart", start, { passive: false });
+      btn.addEventListener("touchend", stop);
+      btn.addEventListener("touchcancel", stop);
+      btn.addEventListener("mousedown", start);
+      btn.addEventListener("mouseup", stop);
+      btn.addEventListener("mouseleave", stop);
     });
 
     document.addEventListener("keydown", (e) => {

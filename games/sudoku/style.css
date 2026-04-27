@@ -25,14 +25,29 @@
 .game-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
   justify-content: space-between;
   background: var(--color-surface);
-  padding: 14px 16px;
+  padding: 12px 14px;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   margin-bottom: 16px;
+}
+
+@media (max-width: 540px) {
+  .game-toolbar {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .toolbar-actions {
+    width: 100%;
+    margin-left: 0 !important;
+    justify-content: stretch;
+  }
+  .toolbar-actions .btn {
+    flex: 1;
+  }
 }
 
 .toolbar-group {
@@ -126,13 +141,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(18px, 4vw, 26px);
+  font-size: clamp(18px, 5vw, 26px);
   font-weight: 700;
   color: var(--color-primary);
   border: 1px solid #e3e7f0;
   cursor: pointer;
   transition: background var(--transition), color var(--transition);
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
 .cell.given {
@@ -185,14 +203,17 @@
   font-weight: 700;
   font-size: 18px;
   padding: 10px 0;
+  min-height: 44px;
   border: 1px solid var(--color-border);
   background: #fff;
   border-radius: var(--radius-sm);
   color: var(--color-text);
   transition: all var(--transition);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.num-btn:hover {
+.num-btn:hover, .num-btn:active {
   border-color: var(--color-primary);
   color: var(--color-primary);
   background: #eeebff;
@@ -206,10 +227,20 @@
 
 @media (max-width: 540px) {
   .numpad {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 360px;
+    gap: 8px;
+  }
+  .num-btn {
+    font-size: 22px;
+    padding: 14px 0;
+    min-height: 56px;
   }
   .num-erase {
-    grid-column: span 5;
+    grid-column: span 3;
+    font-size: 15px;
+    padding: 12px 0;
+    min-height: 48px;
   }
 }
 
