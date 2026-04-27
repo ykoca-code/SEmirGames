@@ -79,7 +79,7 @@
   user-select: none;
 }
 
-.g2048-bg, .g2048-tile {
+.g2048-bg, .g2048-tile-face {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,23 +94,41 @@
 
 .g2048-tile {
   position: absolute;
-  width: calc((100% - 24px - 36px) / 4);
-  aspect-ratio: 1 / 1;
+  top: 0;
+  left: 0;
+  transition: transform 140ms ease-in-out;
+  will-change: transform;
+  z-index: 1;
+}
+
+.g2048-tile.merge { z-index: 2; }
+
+.g2048-tile-face {
+  width: 100%;
+  height: 100%;
   font-size: clamp(24px, 6vw, 42px);
-  transition: transform 120ms ease;
+  transform-origin: center;
   will-change: transform;
 }
 
-.g2048-tile.spawn { animation: spawn 160ms ease; }
-.g2048-tile.merge { animation: merge 180ms ease; }
-
-@keyframes spawn {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
+.g2048-tile.appear .g2048-tile-face {
+  /* Wait for the slide phase (140ms) before popping in. */
+  animation: faceAppear 180ms ease 140ms both;
 }
-@keyframes merge {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.18); }
+
+.g2048-tile.merge .g2048-tile-face {
+  animation: faceMerge 220ms ease;
+}
+
+@keyframes faceAppear {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes faceMerge {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.22); }
   100% { transform: scale(1); }
 }
 
