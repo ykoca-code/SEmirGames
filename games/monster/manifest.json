@@ -1,0 +1,14 @@
+{
+  "id": "monster",
+  "title": "Canavar Eşleştir",
+  "description": "Komşu canavarları yer değiştir, 3 veya daha fazla aynı türü yan yana getir, patlat ve puan kazan!",
+  "version": "1.0.0",
+  "category": "puzzle",
+  "categoryLabel": "Bulmaca",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["bulmaca", "match-3", "eşleştirme", "canavar"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: seç + komşuya dokun: yer değiştir"]
+}

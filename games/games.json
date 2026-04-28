@@ -69,6 +69,17 @@
       "thumbnail": "games/slonky/thumbnail.svg",
       "path": "games/slonky/index.html",
       "tags": ["arcade", "plinko", "top", "şans", "fizik"]
+    },
+    {
+      "id": "monster",
+      "title": "Canavar Eşleştir",
+      "description": "Komşu canavarları yer değiştir, 3 veya daha fazla aynı türü yan yana getir, patlat ve puan kazan!",
+      "category": "puzzle",
+      "categoryLabel": "Bulmaca",
+      "ageRating": "4+",
+      "thumbnail": "games/monster/thumbnail.svg",
+      "path": "games/monster/index.html",
+      "tags": ["bulmaca", "match-3", "eşleştirme", "canavar"]
     }
   ]
 }
