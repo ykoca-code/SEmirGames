@@ -1,0 +1,14 @@
+{
+  "id": "emoji",
+  "title": "Emoji Quiz",
+  "description": "Emoji ipuçlarından kelimeyi tahmin et. Türk yemekleri, şehirleri, filmleri, deyimleri ve daha fazlası!",
+  "version": "1.0.0",
+  "category": "educational",
+  "categoryLabel": "Eğitici",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["bulmaca", "kelime", "emoji", "tahmin", "eğlence"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: cevabı seç"]
+}
