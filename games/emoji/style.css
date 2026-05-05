@@ -105,6 +105,35 @@ body.emoji-page { overflow: hidden; }
   font-weight: 600;
 }
 
+/* ---------- Timer bar ---------- */
+.timer-bar-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #6c5ce7, #00b8d9);
+  transform-origin: left center;
+  transition: transform 100ms linear, background 200ms;
+  will-change: transform;
+}
+
+.timer-bar.warning {
+  background: linear-gradient(90deg, #ffb400, #f97316);
+}
+
+.timer-bar.danger {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
 /* ---------- Choices ---------- */
 .choices {
   display: grid;
@@ -163,6 +192,14 @@ body.emoji-page { overflow: hidden; }
   opacity: 1;
 }
 
+.choice.eliminated {
+  background: #4a4d59 !important;
+  border-color: #4a4d59 !important;
+  color: #888c97 !important;
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
 @keyframes correctPulse {
   0%   { transform: scale(1); }
   40%  { transform: scale(1.04); }
@@ -191,6 +228,21 @@ body.emoji-page { overflow: hidden; }
   padding: 12px;
   font-size: 15px;
   font-weight: 700;
+}
+
+.action-row .hint-btn {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #57360c;
+}
+
+.action-row .hint-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.action-row .hint-btn:not(:disabled):active {
+  transform: scale(0.97);
 }
 
 /* ---------- Overlay ---------- */
@@ -224,11 +276,59 @@ body.emoji-page { overflow: hidden; }
 }
 
 .overlay-content p {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   color: #cbd5e1;
   font-size: 14px;
   white-space: pre-line;
   line-height: 1.5;
+}
+
+.category-select {
+  margin: 6px 0 16px;
+  text-align: center;
+}
+
+.cat-label {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.cat-chip {
+  font-family: inherit;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.cat-chip:active { transform: scale(0.95); }
+.cat-chip:hover { border-color: var(--color-primary); }
+
+.cat-chip.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
 }
 
 /* Score float when correct */
