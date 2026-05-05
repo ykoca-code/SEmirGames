@@ -47,6 +47,9 @@
       <div class="category-pill" id="categoryPill">…</div>
       <div class="emoji-display" id="emojiDisplay">🎮</div>
       <div class="prompt-text">Bu ne olabilir?</div>
+      <div class="timer-bar-wrap">
+        <div id="timerBar" class="timer-bar"></div>
+      </div>
     </div>
 
     <div class="choices" id="choices">
@@ -57,6 +60,7 @@
     </div>
 
     <div class="action-row">
+      <button type="button" id="hintBtn" class="btn hint-btn">💡 İpucu (−10)</button>
       <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
     </div>
 
@@ -64,6 +68,10 @@
       <div class="overlay-content">
         <h2 id="overlayTitle">Emoji Quiz</h2>
         <p id="overlayText">Türk yemekleri, şehirleri, filmleri, deyimleri ve daha fazlası. Emoji ipuçlarından doğru cevabı seç!</p>
+        <div class="category-select">
+          <div class="cat-label">Kategori</div>
+          <div class="cat-chips" id="catChips"></div>
+        </div>
         <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
       </div>
     </div>
