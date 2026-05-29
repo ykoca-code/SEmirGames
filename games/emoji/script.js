@@ -11,8 +11,8 @@
   "use strict";
 
   const QUESTIONS_PER_ROUND = 10;
-  const QUESTION_TIME = 15; // seconds
-  const HINT_COST = 10;
+  const QUESTION_TIME = 10; // seconds (was 15 — harder)
+  const HINT_COST = 15; // points (was 10 — harder)
   const STORAGE_KEY = "semirk_emoji_best";
   const CAT_PREF_KEY = "semirk_emoji_cat";
 
