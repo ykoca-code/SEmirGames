@@ -94,11 +94,33 @@ button {
   font-weight: 800;
   font-size: 20px;
   color: var(--color-text);
+  text-decoration: none;
 }
 
+.logo picture { display: inline-flex; }
+
 .logo-img {
-  width: 36px;
-  height: 36px;
+  width: auto;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* The new pixel logo already contains the brand text; hide the inline
+   label visually but keep it in DOM for screen readers. */
+.logo-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .logo-accent {
@@ -401,7 +423,6 @@ button {
 }
 
 @media (max-width: 420px) {
-  .logo-text { font-size: 16px; }
-  .logo-img { width: 30px; height: 30px; }
+  .logo-img { height: 44px; }
   .header-link { font-size: 13px; }
 }
