@@ -1,91 +1,44 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEmirGames Logo</title>
-    <style>
-        body {
-            background-color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Courier New', Courier, monospace;
-        }
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="100%" height="100%">
+  <path d="M 230 330 L 300 390 L 370 330 Z" fill="#0c192c" />
+  <path d="M 240 320 L 300 375 L 360 320 Z" fill="#e2e8f0" />
+  
+  <rect x="110" y="50" width="120" height="90" fill="#0054b4" rx="10" />
+  <rect x="110" y="50" width="120" height="90" stroke="#0c192c" stroke-width="6" fill="none" rx="10" />
+  <rect x="125" y="90" width="100" height="70" fill="#fca5a5" />
+  <rect x="175" y="115" width="8" height="12" fill="#0c192c" />
+  <rect x="200" y="115" width="8" height="12" fill="#0c192c" />
+  <path d="M 175 140 Q 190 155 205 140 Z" fill="#b91c1c" stroke="#0c192c" stroke-width="4" />
+  <path d="M 100 160 L 220 160 L 220 280 L 100 280 Z" fill="#0066cc" stroke="#0c192c" stroke-width="6" stroke-linejoin="round" />
+  <path d="M 145 195 H 175 V 210 H 145 V 235 H 175 M 145 235 H 175" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="square" />
 
-        /* Logo Ana Konteyner */
-        .logo-container {
-            position: relative;
-            width: 400px;
-            height: 300px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+  <rect x="365" y="60" width="120" height="90" fill="#a16207" rx="10" />
+  <rect x="365" y="60" width="120" height="90" stroke="#0c192c" stroke-width="6" fill="none" rx="10" />
+  <rect x="475" y="120" width="15" height="15" fill="#dc2626" stroke="#0c192c" stroke-width="4" />
+  <rect x="375" y="90" width="100" height="70" fill="#fca5a5" />
+  <rect x="370" y="105" width="40" height="20" fill="#0c192c" rx="4" />
+  <rect x="415" y="105" width="40" height="20" fill="#0c192c" rx="4" />
+  <line x1="410" y1="115" x2="415" y2="115" stroke="#0c192c" stroke-width="4" />
+  <path d="M 390 140 Q 405 155 420 140 Z" fill="#b91c1c" stroke="#0c192c" stroke-width="4" />
+  <path d="M 375 160 L 495 160 L 495 280 L 375 280 Z" fill="#801538" stroke="#0c192c" stroke-width="6" stroke-linejoin="round" />
+  <circle cx="420" cy="225" r="10" fill="#dc2626" />
+  <circle cx="440" cy="225" r="10" fill="#dc2626" />
+  <path d="M 420 215 Q 430 195 440 215" fill="none" stroke="#16a34a" stroke-width="4" />
 
-        /* Karakterlerin ve Yüksek Beşli Kolların Şablonu */
-        .characters {
-            position: relative;
-            width: 320px;
-            height: 180px;
-            margin-bottom: -10px;
-            z-index: 1;
-        }
+  <path d="M 210 170 L 290 80 L 310 95 L 230 185 Z" fill="#0066cc" stroke="#0c192c" stroke-width="6" stroke-linejoin="round" />
+  <path d="M 385 170 L 310 80 L 290 95 L 365 185 Z" fill="#801538" stroke="#0c192c" stroke-width="6" stroke-linejoin="round" />
+  <rect x="285" y="65" width="30" height="35" fill="#fca5a5" stroke="#0c192c" stroke-width="5" rx="5" />
+  <line x1="300" y1="65" x2="300" y2="85" stroke="#0c192c" stroke-width="3" />
 
-        /* Mavi Tişörtlü Çocuk */
-        .boy {
-            position: absolute;
-            left: 20px;
-            bottom: 0;
-            width: 90px;
-            height: 140px;
-            background: #0055b7; /* Mavi tişört */
-            border-radius: 10px 10px 0 0;
-            border: 4px solid #08142c;
-        }
-        .boy::before { /* Kafa ve Saç */
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: 5px;
-            width: 70px;
-            height: 60px;
-            background: #ffad87; /* Ten rengi */
-            border: 4px solid #08142c;
-            box-shadow: inset 0 15px 0 #0033aa; /* Mavi Saç */
-        }
-        .boy::after { /* Tişört Üzerindeki S Harfi */
-            content: 'S';
-            position: absolute;
-            top: 30px;
-            left: 25px;
-            font-size: 35px;
-            font-weight: bold;
-            color: #ff9900;
-        }
-
-        /* Bordo Tişörtlü ve Gözlüklü Kız */
-        .girl {
-            position: absolute;
-            right: 20px;
-            bottom: 0;
-            width: 90px;
-            height: 140px;
-            background: #6b1232; /* Bordo tişört */
-            border-radius: 10px 10px 0 0;
-            border: 4px solid #08142c;
-        }
-        .girl::before { /* Kafa ve Gözlük */
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: 5px;
-            width: 70px;
-            height: 60px;
-            background: #ffad87;
-            border: 4px solid #08142c;
-            box-shadow: inset 0 15px 0 #a0522d, /* Kahverengi Saç */
-                        inset 10px 25px 0 #08142c, inset 25px 25px 0 #08142c; /* Güneş G
+  <rect x="130" y="250" width="340" height="65" fill="#e2e8f0" stroke="#0c192c" stroke-width="8" rx="6" />
+  <path d="M 134 315 L 466 315 L 450 325 L 150 325 Z" fill="#cbd5e1" />
+  
+  <text x="300" y="296" 
+        font-family="'Courier New', Courier, monospace" 
+        font-size="42" 
+        font-weight="900" 
+        fill="#0c192c" 
+        text-anchor="middle" 
+        letter-spacing="1">
+    SEmirKGames
+  </text>
+</svg>
