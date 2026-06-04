@@ -1,17 +1,91 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#6c5ce7"/>
-      <stop offset="0.55" stop-color="#00b8d9"/>
-      <stop offset="1" stop-color="#ffb400"/>
-    </linearGradient>
-  </defs>
-  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#g)"/>
-  <g fill="#ffffff">
-    <circle cx="22" cy="32" r="4"/>
-    <circle cx="34" cy="22" r="4"/>
-    <circle cx="34" cy="42" r="4"/>
-    <circle cx="46" cy="32" r="4"/>
-    <path d="M22 32 L34 22 L46 32 L34 42 Z" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.6"/>
-  </g>
-</svg>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEmirGames Logo</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Logo Ana Konteyner */
+        .logo-container {
+            position: relative;
+            width: 400px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Karakterlerin ve Yüksek Beşli Kolların Şablonu */
+        .characters {
+            position: relative;
+            width: 320px;
+            height: 180px;
+            margin-bottom: -10px;
+            z-index: 1;
+        }
+
+        /* Mavi Tişörtlü Çocuk */
+        .boy {
+            position: absolute;
+            left: 20px;
+            bottom: 0;
+            width: 90px;
+            height: 140px;
+            background: #0055b7; /* Mavi tişört */
+            border-radius: 10px 10px 0 0;
+            border: 4px solid #08142c;
+        }
+        .boy::before { /* Kafa ve Saç */
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 5px;
+            width: 70px;
+            height: 60px;
+            background: #ffad87; /* Ten rengi */
+            border: 4px solid #08142c;
+            box-shadow: inset 0 15px 0 #0033aa; /* Mavi Saç */
+        }
+        .boy::after { /* Tişört Üzerindeki S Harfi */
+            content: 'S';
+            position: absolute;
+            top: 30px;
+            left: 25px;
+            font-size: 35px;
+            font-weight: bold;
+            color: #ff9900;
+        }
+
+        /* Bordo Tişörtlü ve Gözlüklü Kız */
+        .girl {
+            position: absolute;
+            right: 20px;
+            bottom: 0;
+            width: 90px;
+            height: 140px;
+            background: #6b1232; /* Bordo tişört */
+            border-radius: 10px 10px 0 0;
+            border: 4px solid #08142c;
+        }
+        .girl::before { /* Kafa ve Gözlük */
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 5px;
+            width: 70px;
+            height: 60px;
+            background: #ffad87;
+            border: 4px solid #08142c;
+            box-shadow: inset 0 15px 0 #a0522d, /* Kahverengi Saç */
+                        inset 10px 25px 0 #08142c, inset 25px 25px 0 #08142c; /* Güneş G
