@@ -288,6 +288,7 @@
     spawnTile();
     spawnTile();
     hideOverlay();
+    clearLBSlot();
     // First render: we want spawn animations on initial tiles.
     render();
   }
@@ -300,12 +301,34 @@
     els.overlay.classList.remove("hidden");
   }
 
-  function showGameOver() {
+  async function showGameOver() {
     state.over = true;
     els.overlayTitle.textContent = "Oyun Bitti";
-    els.overlayText.textContent = `Skor: ${state.score}`;
+    let text = "Skor: " + state.score;
+    if (window.Leaderboard && state.score > 0 && Leaderboard.qualifies("2048", state.score)) {
+      const name = await Leaderboard.promptName({
+        message: state.score + " skorla ilk 10'a girdin!",
+      });
+      if (name) {
+        const rank = Leaderboard.add("2048", name, state.score);
+        if (rank) text += " · Liderlik: #" + rank;
+      }
+    }
+    els.overlayText.textContent = text;
     els.continueBtn.classList.add("hidden");
+    renderLBSlot();
     els.overlay.classList.remove("hidden");
+  }
+
+  function renderLBSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (!slot || !window.Leaderboard) return;
+    slot.innerHTML = '<div class="lb-title">🏆 İlk 10</div>' + Leaderboard.renderHTML("2048");
+  }
+
+  function clearLBSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (slot) slot.innerHTML = "";
   }
 
   function hideOverlay() {

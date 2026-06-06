@@ -354,18 +354,40 @@
     state.busy = false;
     state.finished = false;
     hideOverlay();
+    clearLBSlot();
     render({ spawnNew: false });
   }
 
-  function finishGame() {
+  async function finishGame() {
     state.finished = true;
-    setTimeout(() => {
-      const isNewBest = state.score > 0 && state.score >= state.best;
-      els.overlayTitle.textContent = isNewBest ? "🏆 Yeni Rekor!" : "Süre Doldu";
-      els.overlayText.textContent = `Toplam: ${state.score}\nRekor: ${state.best}`;
-      els.overlayBtn.textContent = "Tekrar Oyna";
-      els.overlay.classList.remove("hidden");
-    }, 400);
+    await new Promise((r) => setTimeout(r, 400));
+    const isNewBest = state.score > 0 && state.score >= state.best;
+    els.overlayTitle.textContent = isNewBest ? "🏆 Yeni Rekor!" : "Süre Doldu";
+    let text = "Toplam: " + state.score + "\nRekor: " + state.best;
+    if (window.Leaderboard && state.score > 0 && Leaderboard.qualifies("monster", state.score)) {
+      const name = await Leaderboard.promptName({
+        message: state.score + " puanla ilk 10'a girdin!",
+      });
+      if (name) {
+        const rank = Leaderboard.add("monster", name, state.score);
+        if (rank) text += "\nLiderlik: #" + rank;
+      }
+    }
+    els.overlayText.textContent = text;
+    renderLBSlot();
+    els.overlayBtn.textContent = "Tekrar Oyna";
+    els.overlay.classList.remove("hidden");
+  }
+
+  function renderLBSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (!slot || !window.Leaderboard) return;
+    slot.innerHTML = '<div class="lb-title">🏆 İlk 10</div>' + Leaderboard.renderHTML("monster");
+  }
+
+  function clearLBSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (slot) slot.innerHTML = "";
   }
 
   function hideOverlay() {

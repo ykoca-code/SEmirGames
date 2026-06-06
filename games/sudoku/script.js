@@ -343,21 +343,66 @@
     state.finished = true;
     els.winText.textContent = "Maalesef hata sınırını aştın. Yeni bir oyuna ne dersin?";
     els.winModal.querySelector("h2").textContent = "Oyun Bitti";
+    clearLBSlot();
     els.winModal.classList.remove("hidden");
   }
 
-  function win() {
+  async function win() {
     stopTimer();
     state.finished = true;
-    // Highlight all as solved
     els.board.querySelectorAll(".cell").forEach((c) => c.classList.add("solved"));
-    els.winText.textContent = `Sudoku'yu ${els.timer.textContent} sürede tamamladın! Hata: ${state.mistakes}`;
+
+    const sec = Math.floor((Date.now() - state.startedAt) / 1000);
+    const diffMul = els.difficulty.value === "hard" ? 2 :
+                    els.difficulty.value === "medium" ? 1.5 : 1;
+    // Higher = faster + fewer mistakes + harder difficulty.
+    const score = Math.max(
+      0,
+      Math.floor((5000 - sec * 5 - state.mistakes * 300) * diffMul)
+    );
+
+    let extra = "";
+    if (window.Leaderboard && score > 0 && Leaderboard.qualifies("sudoku", score)) {
+      const name = await Leaderboard.promptName({
+        message: score + " puanla ilk 10'a girdin!",
+      });
+      if (name) {
+        const rank = Leaderboard.add("sudoku", name, score, {
+          time: els.timer.textContent,
+          mistakes: state.mistakes,
+          difficulty: els.difficulty.value,
+        });
+        if (rank) extra = " · Liderlik: #" + rank;
+      }
+    }
+
+    els.winText.textContent =
+      "Süre: " + els.timer.textContent +
+      " · Hata: " + state.mistakes +
+      " · Skor: " + score + extra;
     els.winModal.querySelector("h2").textContent = "🎉 Tebrikler!";
+    renderLBSlot();
     els.winModal.classList.remove("hidden");
   }
 
   function hideWinModal() {
     els.winModal.classList.add("hidden");
+  }
+
+  function renderLBSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (!slot || !window.Leaderboard) return;
+    slot.innerHTML =
+      '<div class="lb-title">🏆 İlk 10</div>' +
+      Leaderboard.renderHTML("sudoku", (e) =>
+        e.score + " <span style=\"opacity:.55;font-size:.8em;font-weight:400\">(" +
+        (e.time || "") + ")</span>"
+      );
+  }
+
+  function clearLBSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (slot) slot.innerHTML = "";
   }
 
   function flashMessage(msg) {

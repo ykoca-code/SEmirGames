@@ -426,3 +426,141 @@ button {
   .logo-img { height: 44px; }
   .header-link { font-size: 13px; }
 }
+
+/* ==========================================================================
+   Leaderboard (shared across games)
+   ========================================================================== */
+.lb-slot { margin: 12px 0 4px; text-align: left; }
+
+.lb-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-accent);
+  margin: 0 0 8px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lb-empty {
+  color: #94a3b8;
+  font-size: 13px;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.lb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.lb-row {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 6px;
+}
+
+.lb-row:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lb-rank {
+  font-weight: 800;
+  color: #f1f5f9;
+  text-align: center;
+  font-size: 14px;
+}
+
+.lb-name {
+  color: #f1f5f9;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-score {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+}
+
+/* Name prompt modal */
+.lb-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(13, 15, 24, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+  animation: lbFade 160ms ease;
+}
+
+@keyframes lbFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lb-prompt {
+  background: linear-gradient(135deg, #2a2d49, #1a1d29);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.lb-prompt h3 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+.lb-prompt p {
+  margin: 0 0 16px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+#lbNameInput {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-family: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  box-sizing: border-box;
+  outline: none;
+  text-align: center;
+}
+
+#lbNameInput:focus {
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.lb-prompt-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.lb-prompt-actions .btn {
+  flex: 1;
+  padding: 10px;
+  font-weight: 700;
+}

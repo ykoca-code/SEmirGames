@@ -298,15 +298,39 @@
     }, correct ? 700 : 1100);
   }
 
-  function finishRound() {
+  async function finishRound() {
     state.finished = true;
     stopTimer();
     const isNewBest = state.score > 0 && state.score >= state.best;
     els.overlayTitle.textContent = isNewBest ? "🏆 Yeni Rekor!" : "Tur Bitti";
-    els.overlayText.textContent =
-      `Toplam: ${state.score}\nRekor: ${state.best}\nDoğru: ${state.correct}/${state.pool.length}`;
+    let lines = [
+      "Toplam: " + state.score,
+      "Rekor: " + state.best,
+      "Doğru: " + state.correct + "/" + state.pool.length,
+    ];
+
+    // Leaderboard
+    let rank = null;
+    if (window.Leaderboard && state.score > 0 && Leaderboard.qualifies("emoji", state.score)) {
+      const name = await Leaderboard.promptName({
+        message: state.score + " puanla ilk 10'a girdin!",
+      });
+      if (name) rank = Leaderboard.add("emoji", name, state.score);
+    }
+    if (rank) lines.push("Liderlik: #" + rank);
+    els.overlayText.textContent = lines.join("\n");
+
+    renderLeaderboardSlot();
+    document.getElementById("catSelectWrap").style.display = "none";
     els.overlayBtn.textContent = "Tekrar Oyna";
     showOverlay();
+  }
+
+  function renderLeaderboardSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (!slot || !window.Leaderboard) return;
+    slot.innerHTML =
+      '<div class="lb-title">🏆 İlk 10</div>' + Leaderboard.renderHTML("emoji");
   }
 
   function showOverlay() { els.overlay.classList.remove("hidden"); }
@@ -345,8 +369,11 @@
       state.finished = true;
       renderCategoryChips();
       els.overlayTitle.textContent = "Emoji Quiz";
-      els.overlayText.textContent = "Kategori seç ve başla. Her sorunun süresi 15 saniye.";
+      els.overlayText.textContent = "Kategori seç ve başla. Her sorunun süresi 10 saniye.";
       els.overlayBtn.textContent = "Başla";
+      const slot = document.getElementById("leaderboardSlot");
+      if (slot) slot.innerHTML = "";
+      document.getElementById("catSelectWrap").style.display = "";
       showOverlay();
     });
     els.overlayBtn.addEventListener("click", startRound);
