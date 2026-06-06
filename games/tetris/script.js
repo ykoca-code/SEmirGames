@@ -396,6 +396,7 @@
     els.level.textContent = "1";
     els.pauseBtn.textContent = "Duraklat";
     hideOverlay();
+    clearLBSlot();
     spawn();
     requestAnimationFrame(tick);
   }
@@ -411,14 +412,36 @@
     }
   }
 
-  function gameOver() {
+  async function gameOver() {
     state.gameOver = true;
     state.running = false;
+    let extra = "";
+    if (window.Leaderboard && state.score > 0 && Leaderboard.qualifies("tetris", state.score)) {
+      const name = await Leaderboard.promptName({
+        message: state.score + " skorla ilk 10'a girdin!",
+      });
+      if (name) {
+        const rank = Leaderboard.add("tetris", name, state.score, { lines: state.lines, level: state.level });
+        if (rank) extra = " · Liderlik: #" + rank;
+      }
+    }
     showOverlay(
       "Oyun Bitti",
-      `Skor: ${state.score} · Satır: ${state.lines}`,
+      "Skor: " + state.score + " · Satır: " + state.lines + extra,
       "Tekrar Oyna"
     );
+    renderLBSlot();
+  }
+
+  function renderLBSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (!slot || !window.Leaderboard) return;
+    slot.innerHTML = '<div class="lb-title">🏆 İlk 10</div>' + Leaderboard.renderHTML("tetris");
+  }
+
+  function clearLBSlot() {
+    const slot = document.getElementById("leaderboardSlot");
+    if (slot) slot.innerHTML = "";
   }
 
   function showOverlay(title, text, btn) {

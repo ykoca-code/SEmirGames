@@ -6,7 +6,7 @@
 
 (function () {
   "use strict";
-  const VERSION = "1.7.2";
+  const VERSION = "1.8.0";
   const DEPLOYED = "2026-05-07";
 
   function apply() {
