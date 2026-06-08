@@ -1,0 +1,14 @@
+{
+  "id": "wheel",
+  "title": "Çekiliş Çarkı",
+  "description": "İsimleri çarka koy, döndür. 101 Okey masası, takım kurma veya kim oynayacak gibi çekilişler için pratik araç!",
+  "version": "1.0.0",
+  "category": "board",
+  "categoryLabel": "Masa Oyunu",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["çekiliş", "çark", "101 okey", "araç", "rastgele", "takım"],
+  "author": "SEmirK Games",
+  "controls": ["İsimleri ekle, çarkı çevir"]
+}

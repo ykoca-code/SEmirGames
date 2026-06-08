@@ -190,6 +190,17 @@
       "thumbnail": "games/pong/thumbnail.svg",
       "path": "games/pong/index.html",
       "tags": ["arcade", "klasik", "pong", "masa tenisi"]
+    },
+    {
+      "id": "wheel",
+      "title": "Çekiliş Çarkı",
+      "description": "İsimleri çarka koy, döndür. 101 Okey masası, takım kurma veya kim oynayacak gibi çekilişler için pratik araç!",
+      "category": "board",
+      "categoryLabel": "Masa Oyunu",
+      "ageRating": "4+",
+      "thumbnail": "games/wheel/thumbnail.svg",
+      "path": "games/wheel/index.html",
+      "tags": ["çekiliş", "çark", "101 okey", "araç", "rastgele"]
     }
   ]
 }
