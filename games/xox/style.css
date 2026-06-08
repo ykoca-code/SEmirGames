@@ -39,20 +39,20 @@ body.xox-page { overflow: hidden; }
 
 .mode-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .mode-btn {
   font-family: inherit;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  padding: 8px 6px;
+  padding: 12px 8px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 100ms;
   touch-action: manipulation;
@@ -62,6 +62,49 @@ body.xox-page { overflow: hidden; }
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: #fff;
+}
+
+.diff-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+}
+
+.diff-row.hidden { display: none; }
+
+.diff-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-right: 4px;
+}
+
+.diff-btn {
+  flex: 1;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 6px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 100ms;
+  touch-action: manipulation;
+}
+
+.diff-btn.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #422006;
 }
 
 .xox-stage {

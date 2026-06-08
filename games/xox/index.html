@@ -15,16 +15,20 @@
     <div class="xox-top">
       <h1 class="xox-title">XOX</h1>
       <div class="xox-scores">
-        <span class="xs-x">Sen: <b id="xWins">0</b></span>
+        <span class="xs-x" id="xLabel">Sen: <b id="xWins">0</b></span>
         <span class="xs-tie">Berabere: <b id="ties">0</b></span>
-        <span class="xs-o">Rakip: <b id="oWins">0</b></span>
+        <span class="xs-o" id="oLabel">Rakip: <b id="oWins">0</b></span>
       </div>
     </div>
 
     <div class="mode-row">
-      <button type="button" class="mode-btn active" data-mode="bot-easy">Kolay Bot</button>
-      <button type="button" class="mode-btn" data-mode="bot-hard">Zor Bot</button>
-      <button type="button" class="mode-btn" data-mode="two-player">2 Kişilik</button>
+      <button type="button" class="mode-btn active" data-mode="bot">🤖 Bilgisayara Karşı</button>
+      <button type="button" class="mode-btn" data-mode="two-player">👥 2 Kişilik</button>
+    </div>
+    <div class="diff-row" id="diffRow">
+      <span class="diff-label">Zorluk:</span>
+      <button type="button" class="diff-btn active" data-diff="easy">Kolay</button>
+      <button type="button" class="diff-btn" data-diff="hard">Zor</button>
     </div>
 
     <div class="xox-stage">
@@ -38,7 +42,7 @@
     </div>
   </main>
 
-  <script src="../../js/version.js?v=1.11.0"></script>
+  <script src="../../js/version.js?v=1.11.1"></script>
   <script src="script.js"></script>
 </body>
 </html>
