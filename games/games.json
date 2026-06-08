@@ -168,6 +168,17 @@
       "thumbnail": "games/worldle/thumbnail.svg",
       "path": "games/worldle/index.html",
       "tags": ["eğitici", "ülke", "coğrafya", "tahmin"]
+    },
+    {
+      "id": "target",
+      "title": "Hedef Sayı",
+      "description": "Tabloda rastgele rakamlar var. Bilgisayar bir hedef söyler. Komşu kareleri seçerek topladığında hedefe ulaşırsan o kadar puan kazanırsın!",
+      "category": "logic",
+      "categoryLabel": "Mantık",
+      "ageRating": "7+",
+      "thumbnail": "games/target/thumbnail.svg",
+      "path": "games/target/index.html",
+      "tags": ["mantık", "matematik", "iki-kişilik", "toplama"]
     }
   ]
 }

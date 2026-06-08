@@ -1,0 +1,14 @@
+{
+  "id": "target",
+  "title": "Hedef Sayı",
+  "description": "Tabloda rastgele rakamlar var. Bilgisayar bir hedef söyler. Komşu kareleri seçerek topladığında hedefe ulaşırsan o kadar puan kazanırsın!",
+  "version": "1.0.0",
+  "category": "logic",
+  "categoryLabel": "Mantık",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["mantık", "matematik", "iki-kişilik", "toplama"],
+  "author": "SEmirK Games",
+  "controls": ["Komşu kareyi dokun, sonraki için yine dokun"]
+}

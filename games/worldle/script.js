@@ -22,6 +22,7 @@
     best: +(localStorage.getItem(STORAGE_KEY) || 0),
   };
 
+  const MAP_PREF_KEY = "semirk_worldle_map";
   const els = {
     guesses: document.getElementById("guesses"),
     search: document.getElementById("search"),
@@ -34,6 +35,9 @@
     overlayTitle: document.getElementById("overlayTitle"),
     overlayText: document.getElementById("overlayText"),
     overlayBtn: document.getElementById("overlayBtn"),
+    mapToggle: document.getElementById("mapToggle"),
+    mapWrap: document.getElementById("mapWrap"),
+    mapGuesses: document.getElementById("mapGuesses"),
   };
 
   // ==========================================================================
@@ -133,6 +137,44 @@
       '<span class="g-temp">' + tempFor(g.distance) + '</span>';
     els.guesses.appendChild(row);
     els.guesses.scrollTop = els.guesses.scrollHeight;
+    renderMap();
+  }
+
+  // Equirectangular projection -> 360×180 SVG viewBox
+  function projLon(lon) { return (lon + 180) * (360 / 360); }
+  function projLat(lat) { return (90 - lat) * (180 / 180); }
+
+  function renderMap() {
+    if (!els.mapGuesses) return;
+    els.mapGuesses.innerHTML = "";
+    const fragments = [];
+    for (const g of state.guesses) {
+      const cx = projLon(g.country.lon);
+      const cy = projLat(g.country.lat);
+      const color = g.won ? "#10b981" : tempColor(g.distance);
+      fragments.push(
+        '<circle class="map-dot" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) +
+        '" r="2.6" fill="' + color + '" stroke="#fff" stroke-width="0.4"/>'
+      );
+    }
+    // Reveal target after game finishes
+    if (state.finished && state.target) {
+      const tx = projLon(state.target.lon);
+      const ty = projLat(state.target.lat);
+      fragments.push(
+        '<circle class="map-dot target" cx="' + tx.toFixed(1) + '" cy="' + ty.toFixed(1) +
+        '" r="4" fill="#fbbf24" stroke="#1a1d29" stroke-width="0.6"/>'
+      );
+    }
+    els.mapGuesses.innerHTML = fragments.join("");
+  }
+
+  function tempColor(dist) {
+    if (dist < 500)   return "#ef4444";
+    if (dist < 1500)  return "#f97316";
+    if (dist < 3000)  return "#fbbf24";
+    if (dist < 6000)  return "#60a5fa";
+    return "#1e3a8a";
   }
 
   async function finishGame(won) {
@@ -171,6 +213,7 @@
       (won ? "\nSkor: " + score + extra : "");
     els.overlayBtn.textContent = "Yeni Oyun";
     renderLBSlot();
+    renderMap();
     els.overlay.classList.remove("hidden");
   }
 
@@ -228,6 +271,16 @@
   }
 
   function boot() {
+    // Map toggle (persisted)
+    const savedMap = localStorage.getItem(MAP_PREF_KEY) === "1";
+    els.mapToggle.checked = savedMap;
+    els.mapWrap.classList.toggle("hidden", !savedMap);
+    els.mapToggle.addEventListener("change", () => {
+      els.mapWrap.classList.toggle("hidden", !els.mapToggle.checked);
+      localStorage.setItem(MAP_PREF_KEY, els.mapToggle.checked ? "1" : "0");
+      if (els.mapToggle.checked) renderMap();
+    });
+
     els.search.addEventListener("input", (e) => showSuggest(e.target.value));
     els.search.addEventListener("focus", (e) => {
       if (e.target.value) showSuggest(e.target.value);

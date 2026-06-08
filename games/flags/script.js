@@ -3,6 +3,7 @@
   "use strict";
 
   const ROUND = 10;
+  const QUESTION_TIME = 12; // seconds (harder mode)
   const STORAGE_KEY = "semirk_flags_best";
   const REGION_KEY = "semirk_flags_region";
 
@@ -25,6 +26,8 @@
     region: localStorage.getItem(REGION_KEY) || "all",
     locked: false,
     finished: true,
+    timeLeft: 0,
+    timerId: null,
   };
 
   const els = {
@@ -32,8 +35,8 @@
     score: document.getElementById("score"),
     streak: document.getElementById("streak"),
     best: document.getElementById("best"),
-    catPill: document.getElementById("catPill"),
     flagDisplay: document.getElementById("flagDisplay"),
+    timerBar: document.getElementById("timerBar"),
     choices: Array.from(document.querySelectorAll(".choice")),
     newGameBtn: document.getElementById("newGameBtn"),
     overlay: document.getElementById("overlay"),
@@ -59,19 +62,20 @@
   }
 
   function distractors(country, all) {
-    const sameRegion = all.filter((c) => c.region === country.region && c.code !== country.code);
-    const pool = shuffle(sameRegion);
+    // Harder mode: when region is "all", mix distractors across the world so
+    // players can't narrow down by continent. When a region is filtered, stay
+    // inside that region (otherwise the answer would always be obvious).
+    let pool;
+    if (state.region === "all") {
+      pool = all.filter((c) => c.code !== country.code);
+    } else {
+      pool = all.filter((c) => c.region === country.region && c.code !== country.code);
+    }
+    pool = shuffle(pool);
     const picks = [];
     for (const c of pool) {
       if (!picks.find((p) => p.code === c.code)) picks.push(c);
       if (picks.length >= 3) break;
-    }
-    if (picks.length < 3) {
-      const rest = shuffle((window.COUNTRIES || []).filter((c) => c.code !== country.code));
-      for (const c of rest) {
-        if (!picks.find((p) => p.code === c.code)) picks.push(c);
-        if (picks.length >= 3) break;
-      }
     }
     return picks;
   }
@@ -119,6 +123,7 @@
   }
 
   function nextQuestion() {
+    stopTimer();
     if (state.qIndex >= state.pool.length) return finishRound();
     const c = state.pool[state.qIndex];
     const dis = distractors(c, window.COUNTRIES);
@@ -127,7 +132,6 @@
     state.current = { country: c, choices: allChoices, correctIdx };
     state.locked = false;
 
-    els.catPill.textContent = REGION_LABELS[c.region] || c.region;
     els.flagDisplay.textContent = c.flag;
     els.flagDisplay.style.animation = "none";
     void els.flagDisplay.offsetWidth;
@@ -139,11 +143,48 @@
       btn.classList.remove("correct", "wrong");
     });
     updateStats();
+    startTimer();
+  }
+
+  function startTimer() {
+    state.timeLeft = QUESTION_TIME;
+    setTimerBar(1);
+    state.timerId = setInterval(() => {
+      state.timeLeft -= 0.1;
+      const ratio = Math.max(0, state.timeLeft / QUESTION_TIME);
+      setTimerBar(ratio);
+      if (state.timeLeft <= 0) {
+        stopTimer();
+        timeOut();
+      }
+    }, 100);
+  }
+
+  function stopTimer() {
+    if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
+  }
+
+  function setTimerBar(ratio) {
+    if (!els.timerBar) return;
+    els.timerBar.style.transform = "scaleX(" + ratio + ")";
+    els.timerBar.classList.toggle("warning", ratio < 0.5 && ratio >= 0.25);
+    els.timerBar.classList.toggle("danger", ratio < 0.25);
+  }
+
+  function timeOut() {
+    if (state.locked || state.finished) return;
+    state.locked = true;
+    state.streak = 0;
+    els.choices[state.current.correctIdx].classList.add("correct");
+    els.choices.forEach((b) => (b.disabled = true));
+    updateStats();
+    setTimeout(() => { state.qIndex += 1; nextQuestion(); }, 1100);
   }
 
   function answer(idx) {
     if (state.locked || state.finished) return;
     state.locked = true;
+    stopTimer();
     const ok = idx === state.current.correctIdx;
     const correctBtn = els.choices[state.current.correctIdx];
     const pickedBtn = els.choices[idx];
@@ -173,6 +214,7 @@
 
   async function finishRound() {
     state.finished = true;
+    stopTimer();
     const isBest = state.score > 0 && state.score >= state.best;
     els.overlayTitle.textContent = isBest ? "🏆 Yeni Rekor!" : "Tur Bitti";
     let lines = [

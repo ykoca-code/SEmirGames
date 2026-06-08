@@ -62,7 +62,31 @@ body.flags-page { overflow: hidden; }
   justify-content: center;
   gap: 12px;
   min-height: 0;
+  position: relative;
+  overflow: hidden;
 }
+
+.timer-bar-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  background: #fde047;
+  transform-origin: left center;
+  transition: transform 100ms linear, background 200ms;
+}
+
+.timer-bar.warning { background: #fb923c; }
+.timer-bar.danger { background: #1a1d29; }
 
 .cat-pill {
   background: rgba(255, 255, 255, 0.2);
