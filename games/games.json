@@ -179,6 +179,17 @@
       "thumbnail": "games/target/thumbnail.svg",
       "path": "games/target/index.html",
       "tags": ["mantık", "matematik", "iki-kişilik", "toplama"]
+    },
+    {
+      "id": "pong",
+      "title": "Pong",
+      "description": "Klasik masa tenisi! Paleti hareket ettir, topu kaçırma. Bilgisayara karşı veya 2 kişilik oyna.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/pong/thumbnail.svg",
+      "path": "games/pong/index.html",
+      "tags": ["arcade", "klasik", "pong", "masa tenisi"]
     }
   ]
 }

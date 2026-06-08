@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Pong - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="pong-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <main class="container game-container pong-container">
+    <div class="pong-top">
+      <div class="pong-score top">
+        <span class="ps-label" id="topLabel">Rakip</span>
+        <span class="ps-value" id="topScore">0</span>
+      </div>
+      <div class="pong-target">
+        <span class="pt-label">Hedef</span>
+        <span class="pt-value" id="targetScore">7</span>
+      </div>
+      <div class="pong-score bot">
+        <span class="ps-label">Sen</span>
+        <span class="ps-value" id="botScore">0</span>
+      </div>
+    </div>
+
+    <div class="mode-row">
+      <button type="button" class="mode-btn active" data-mode="bot-easy">Kolay</button>
+      <button type="button" class="mode-btn" data-mode="bot-medium">Orta</button>
+      <button type="button" class="mode-btn" data-mode="bot-hard">Zor</button>
+      <button type="button" class="mode-btn" data-mode="two-player">2 Kişi</button>
+    </div>
+
+    <div class="pong-stage">
+      <canvas id="board" width="300" height="500" aria-label="Pong sahası"></canvas>
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-content">
+          <h2 id="overlayTitle">Pong</h2>
+          <p id="overlayText">Paleti parmağınla kaydır. 7 sayı yapan kazanır!</p>
+          <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+      <button type="button" id="pauseBtn" class="btn">Duraklat</button>
+    </div>
+  </main>
+
+  <script src="../../js/version.js?v=1.11.0"></script>
+  <script src="script.js"></script>
+</body>
+</html>
