@@ -47,6 +47,7 @@
 
   const maxSpins = 6;
   let spinCount = 0;
+  let currentRotation = 0; // cumulative degrees so each spin builds on the last
 
   const seatPlayers = [null, null, null, null];
   const seatExtras = [null, null];
@@ -106,6 +107,7 @@
     ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
     wheelCanvas.style.transition = "transform 0s";
     wheelCanvas.style.transform = "rotate(0deg)";
+    currentRotation = 0;
     wheelMeta = null;
   }
 
@@ -278,6 +280,7 @@
 
     wheelCanvas.style.transition = "transform 0s";
     wheelCanvas.style.transform = "rotate(0deg)";
+    currentRotation = 0;
 
     wheelReady = true;
     pendingWinnerIndex = null;
@@ -438,11 +441,23 @@
     const randFactor = Math.random();
     const targetAngleDeg = minAngle + randFactor * (maxAngle - minAngle);
 
-    const extraSpins = 3 + Math.floor(Math.random() * 4);
-    const baseRotation = 270 - targetAngleDeg + 360 * extraSpins;
+    // Final rotation must satisfy (finalRotation % 360) === (270 - targetAngleDeg) mod 360
+    // AND finalRotation - currentRotation >= MIN_EXTRA_SPINS * 360 so each spin keeps spinning
+    // forward by at least the requested number of full turns.
+    const MIN_EXTRA_SPINS = 3;        // sertçe garanti edilen tur sayısı
+    const RANDOM_EXTRA_SPINS = 3;     // üzerine eklenecek rastgele tur (0..3)
+    const normalizedTarget =
+      (((270 - targetAngleDeg) % 360) + 360) % 360;
+    const minRotation = currentRotation + MIN_EXTRA_SPINS * 360;
+    // Smallest multiple of 360 + normalizedTarget that's >= minRotation
+    let finalRotation =
+      Math.ceil((minRotation - normalizedTarget) / 360) * 360 + normalizedTarget;
+    if (finalRotation < minRotation) finalRotation += 360;
+    finalRotation += Math.floor(Math.random() * (RANDOM_EXTRA_SPINS + 1)) * 360;
+    currentRotation = finalRotation;
 
     wheelCanvas.style.transition = "transform 7s cubic-bezier(0.1, 0.7, 0.1, 1)";
-    wheelCanvas.style.transform = "rotate(" + baseRotation + "deg)";
+    wheelCanvas.style.transform = "rotate(" + finalRotation + "deg)";
   });
 
   resetAllBtn.addEventListener("click", function () {
@@ -471,6 +486,7 @@
 
     wheelCanvas.style.transition = "transform 0.5s ease-out";
     wheelCanvas.style.transform = "rotate(0deg)";
+    currentRotation = 0;
 
     activeNames = names.slice();
     drawWheel(activeNames);
