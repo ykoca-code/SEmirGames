@@ -43,6 +43,59 @@ body.worldle-page { overflow: hidden; }
   color: var(--color-primary); line-height: 1.2;
 }
 
+.map-toggle-row {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.map-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.map-toggle input { margin: 0; }
+
+.w-map {
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: #0c2a3f;
+}
+
+.w-map.hidden { display: none; }
+
+.w-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+}
+
+.map-dot {
+  transition: r 200ms ease;
+}
+
+.map-dot.target {
+  animation: targetPulse 1.2s ease infinite;
+}
+
+@keyframes targetPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
 .w-stage {
   flex: 1 1 auto;
   display: flex;

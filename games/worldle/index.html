@@ -18,6 +18,30 @@
       <div class="w-stat"><span class="w-stat-label">Rekor</span><span id="best" class="w-stat-value">0</span></div>
     </div>
 
+    <div class="map-toggle-row">
+      <label class="map-toggle">
+        <input type="checkbox" id="mapToggle" />
+        <span>🗺️ Haritada göster</span>
+      </label>
+    </div>
+
+    <div class="w-map hidden" id="mapWrap">
+      <svg id="mapSvg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid meet" aria-label="Dünya haritası">
+        <rect x="0" y="0" width="360" height="180" fill="#0c2a3f"/>
+        <!-- Simple stylised land masses -->
+        <g fill="#1e4a5e" stroke="#0c2a3f" stroke-width="0.4">
+          <path d="M55,40 L75,32 L120,30 L150,38 L165,55 L160,72 L145,75 L120,72 L100,80 L78,72 L60,60 Z"/>
+          <path d="M170,42 L210,38 L230,46 L240,60 L250,70 L255,90 L245,108 L230,115 L215,112 L200,98 L195,80 L180,68 L175,55 Z"/>
+          <path d="M168,75 L188,82 L198,100 L195,118 L185,134 L175,140 L160,132 L155,118 L160,98 Z"/>
+          <path d="M82,90 L100,95 L115,108 L115,130 L100,140 L88,130 L78,118 Z"/>
+          <path d="M256,30 L308,28 L335,40 L340,58 L325,70 L298,72 L275,65 L260,52 Z"/>
+          <path d="M285,80 L320,85 L325,98 L310,110 L290,108 L278,95 Z"/>
+          <path d="M275,135 L308,138 L322,150 L308,160 L290,158 L278,148 Z"/>
+        </g>
+        <g id="mapGuesses"></g>
+      </svg>
+    </div>
+
     <div class="w-stage">
       <div class="w-guesses" id="guesses"></div>
     </div>
@@ -41,9 +65,9 @@
     </div>
   </main>
 
-  <script src="../../js/version.js?v=1.9.0"></script>
-  <script src="../../js/leaderboard.js?v=1.9.0"></script>
-  <script src="../flags/countries.js?v=1.9.0"></script>
+  <script src="../../js/version.js?v=1.10.0"></script>
+  <script src="../../js/leaderboard.js?v=1.10.0"></script>
+  <script src="../flags/countries.js?v=1.10.0"></script>
   <script src="script.js"></script>
 </body>
 </html>
