@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Çekiliş Çarkı - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="wheel-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <div class="app">
+    <div>
+      <div class="title-bar">
+        <h1>101Cep</h1>
+        <span class="app-badge">Çekiliş Çarkı</span>
+      </div>
+      <p class="subtitle">İsimleri ekle, çarkı oluştur ve 101 masası için hızlı bir çekiliş yap.</p>
+
+      <div class="panel">
+        <label for="nameInput">İsim ekle</label>
+        <div class="input-row">
+          <input
+            type="text"
+            id="nameInput"
+            placeholder="Örn: Farklı isimler ekleyebilirsin..."
+            autocomplete="off"
+          />
+          <button id="addNameBtn" type="button">Ekle</button>
+        </div>
+        <p class="hint">
+          Her satırda bir isim ekleyerek istediğin kadar katılımcı girebilirsin.
+          Varsayılan listeyi silebilir, kendi listenle devam edebilirsin.
+        </p>
+
+        <ul id="nameList" class="names-list"></ul>
+
+        <div class="actions-row">
+          <button id="buildWheelBtn" type="button" class="secondary">Çarkı Oluştur</button>
+          <button id="spinBtn" type="button" disabled>Çarkı Çevir</button>
+          <button id="restartSameBtn" type="button" class="secondary">Bu isimlerle baştan başla</button>
+          <button id="resetAllBtn" type="button" class="secondary">Varsayılanlara dön</button>
+        </div>
+
+        <div id="result" class="result">
+          Varsayılan isimler eklendi. İstersen düzenleyip <strong>Çarkı Oluştur</strong> butonuna bas.
+        </div>
+      </div>
+    </div>
+
+    <div class="wheel-panel">
+      <div class="wheel-header">
+        <div>
+          <strong class="wh-title">Çark Görünümü</strong>
+          <div class="wh-sub">
+            İsimler eşit dilimlere bölünür. Her isim için belirlenen renk sabittir;
+            çark yeniden oluşturulsa bile aynı isme aynı renk verilir.
+          </div>
+        </div>
+        <div class="status-chip">
+          <span class="status-dot"></span>
+          <span id="statusText">Hazır değil</span>
+        </div>
+      </div>
+
+      <div class="wheel-wrapper">
+        <div class="pointer"></div>
+        <div class="wheel-container">
+          <canvas id="wheelCanvas" width="500" height="500"></canvas>
+        </div>
+      </div>
+
+      <div class="legend">
+        <strong>İpucu:</strong> Turuncu imleç çarkın en üstünde sabit durur, sivri ucu aşağı bakar.
+        Çark döndükten sonra imlecin altındaki dilim kazananı gösterir. Her isim yalnızca bir kez seçilebilir.
+      </div>
+
+      <div class="okey-panel">
+        <div class="okey-header">
+          <span><strong>101 Masası</strong></span>
+          <span class="okey-subtitle">Toplam 6 çevrim: 4 oyuncu + 2 yancı</span>
+        </div>
+        <div class="okey-table-wrapper">
+          <div class="okey-table">
+            <div class="seat seat-top empty" id="seatPlayer0">Oyuncu 1</div>
+            <div class="seat seat-right empty" id="seatPlayer1">Oyuncu 2</div>
+            <div class="seat seat-bottom empty" id="seatPlayer2">Oyuncu 3</div>
+            <div class="seat seat-left empty" id="seatPlayer3">Oyuncu 4</div>
+
+            <div class="seat seat-extra-tl empty" id="seatExtra0">Yancı 1</div>
+            <div class="seat seat-extra-br empty" id="seatExtra1">Yancı 2</div>
+
+            <div class="table-center">101</div>
+          </div>
+        </div>
+        <div class="okey-info">
+          <div><strong>Tur:</strong> <span id="spinCounter">0</span> / 6</div>
+          <div class="non-players"><strong>Oynamayanlar:</strong> <span id="nonPlayersList">—</span></div>
+          <div class="players-list"><strong>Masada oturanlar:</strong> <span id="seatedList">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/version.js?v=1.12.0"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#020617"/>
+  <!-- wheel slices -->
+  <g transform="translate(120 120)">
+    <path d="M 0 0 L 90 0 A 90 90 0 0 1 63.6 63.6 Z" fill="#ef4444"/>
+    <path d="M 0 0 L 63.6 63.6 A 90 90 0 0 1 0 90 Z" fill="#f59e0b"/>
+    <path d="M 0 0 L 0 90 A 90 90 0 0 1 -63.6 63.6 Z" fill="#10b981"/>
+    <path d="M 0 0 L -63.6 63.6 A 90 90 0 0 1 -90 0 Z" fill="#3b82f6"/>
+    <path d="M 0 0 L -90 0 A 90 90 0 0 1 -63.6 -63.6 Z" fill="#a855f7"/>
+    <path d="M 0 0 L -63.6 -63.6 A 90 90 0 0 1 0 -90 Z" fill="#ec4899"/>
+    <path d="M 0 0 L 0 -90 A 90 90 0 0 1 63.6 -63.6 Z" fill="#06b6d4"/>
+    <path d="M 0 0 L 63.6 -63.6 A 90 90 0 0 1 90 0 Z" fill="#fbbf24"/>
+    <circle cx="0" cy="0" r="90" fill="none" stroke="#111827" stroke-width="4"/>
+    <circle cx="0" cy="0" r="12" fill="#020617" stroke="#e5e7eb" stroke-width="2"/>
+  </g>
+  <!-- pointer -->
+  <path d="M 120 14 L 108 38 L 132 38 Z" fill="#f97316"/>
+  <!-- 101 chip -->
+  <g font-family="Helvetica,Arial,sans-serif" font-weight="900" text-anchor="middle">
+    <rect x="78" y="200" width="84" height="30" rx="15" fill="#fbbf24"/>
+    <text x="120" y="221" font-size="16" fill="#422006">101 ÇEKİLİŞ</text>
+  </g>
+</svg>
