@@ -1,0 +1,14 @@
+{
+  "id": "snake",
+  "title": "Yılan",
+  "description": "Klasik yılan oyunu. Yemleri ye, büyü, duvarlara ve kendine çarpma!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "klasik", "yılan", "snake"],
+  "author": "SEmirK Games",
+  "controls": ["Kaydır veya yön tuşları"]
+}

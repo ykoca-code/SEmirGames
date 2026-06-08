@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Canavar Eşleştir - SEmirK Games</title>
+  <title>Mayın Tarlası - SEmirK Games</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="monster-page">
+<body class="mines-page">
   <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
   <header class="site-header">
     <div class="header-inner">
@@ -27,36 +27,42 @@
     </div>
   </header>
 
-  <main class="container game-container monster-container">
-    <div class="monster-top">
+  <main class="container game-container mines-container">
+    <div class="mines-top">
       <div class="m-stat">
-        <span class="m-stat-label">Skor</span>
-        <span id="score" class="m-stat-value">0</span>
+        <span class="m-stat-label">Süre</span>
+        <span id="timer" class="m-stat-value">00:00</span>
       </div>
       <div class="m-stat">
-        <span class="m-stat-label">Hamle</span>
-        <span id="moves" class="m-stat-value">25</span>
+        <span class="m-stat-label">Mayın</span>
+        <span id="minesLeft" class="m-stat-value">10</span>
       </div>
-      <div class="m-stat">
-        <span class="m-stat-label">Rekor</span>
-        <span id="best" class="m-stat-value">0</span>
-      </div>
+      <button type="button" id="flagToggle" class="flag-toggle" aria-label="Bayrak modu">
+        <span class="ft-icon">🔍</span>
+        <span class="ft-label">Aç</span>
+      </button>
     </div>
 
-    <div class="board-wrap">
-      <div id="board" class="monster-board" aria-label="Canavar tahtası"></div>
-      <div id="overlay" class="overlay hidden">
-        <div class="overlay-content">
-          <h2 id="overlayTitle">Canavar Eşleştir</h2>
-          <p id="overlayText">Komşu canavarları yer değiştir, 3 ya da daha fazlasını yan yana getir!</p>
-          <div class="lb-slot" id="leaderboardSlot"></div>
-          <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
-        </div>
-      </div>
+    <div class="mines-board-wrap">
+      <div id="board" class="mines-board" aria-label="Mayın tarlası"></div>
     </div>
 
     <div class="action-row">
+      <select id="difficulty" class="diff-select">
+        <option value="easy">Kolay (9×9 · 10)</option>
+        <option value="medium" selected>Orta (12×12 · 22)</option>
+        <option value="hard">Zor (14×14 · 38)</option>
+      </select>
       <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+    </div>
+
+    <div id="overlay" class="overlay hidden">
+      <div class="overlay-content">
+        <h2 id="overlayTitle">Mayın Tarlası</h2>
+        <p id="overlayText">Tüm güvenli kareleri aç, mayınlara dokunma!</p>
+        <div class="lb-slot" id="leaderboardSlot"></div>
+        <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
+      </div>
     </div>
   </main>
 

@@ -1,0 +1,239 @@
+/* Bayrak Bilmece — same layout family as Emoji Quiz */
+
+body.flags-page { overflow: hidden; }
+.flags-page .site-header { display: none; }
+
+.flags-page .flags-container {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 6px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.flags-top {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 4px;
+  flex-shrink: 0;
+}
+
+.f-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.f-stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.f-stat-value {
+  font-size: 17px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.flags-stage {
+  flex: 1 1 auto;
+  background: linear-gradient(160deg, #dc2626 0%, #991b1b 100%);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 0;
+}
+
+.cat-pill {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.flag-display {
+  font-size: clamp(100px, 32vw, 200px);
+  line-height: 1;
+  animation: flagPop 320ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@keyframes flagPop {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.prompt-text {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.choice {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 10px;
+  min-height: 56px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 80ms, border-color 80ms, transform 80ms, color 80ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.choice:active { transform: scale(0.97); }
+.choice.correct {
+  background: #d4f9ed;
+  border-color: var(--color-success);
+  color: #065f46;
+  animation: correctPulse 380ms ease;
+}
+.choice.wrong {
+  background: #ffe2e2;
+  border-color: var(--color-danger);
+  color: #7f1d1d;
+  animation: wrongShake 400ms ease;
+}
+.choice:disabled { cursor: default; opacity: 0.7; }
+.choice.correct:disabled, .choice.wrong:disabled { opacity: 1; }
+
+@keyframes correctPulse {
+  0%, 100% { transform: scale(1); }
+  40%      { transform: scale(1.05); }
+}
+
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  60% { transform: translateX(5px); }
+}
+
+.action-row {
+  display: flex;
+  gap: 6px;
+  max-width: 360px;
+  width: 100%;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.action-row .btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 15, 24, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  z-index: 20;
+  padding: 16px;
+}
+
+.overlay-content {
+  text-align: center;
+  color: #fff;
+  padding: 22px;
+  max-width: 340px;
+  background: linear-gradient(135deg, #2a2d49, #1a1d29);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.overlay-content h2 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  background: linear-gradient(90deg, #dc2626, #f59e0b, #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.overlay-content p {
+  margin: 0 0 14px;
+  color: #cbd5e1;
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.region-select { margin: 6px 0 14px; }
+.cat-label {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+}
+
+.cat-chip {
+  font-family: inherit;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.cat-chip.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}

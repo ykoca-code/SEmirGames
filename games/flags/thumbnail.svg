@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="240" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#dc2626"/>
+      <stop offset="1" stop-color="#7c1d1d"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <g transform="translate(40 40)">
+    <rect x="0" y="0" width="160" height="100" fill="#e30a17"/>
+    <circle cx="60" cy="50" r="22" fill="#fff"/>
+    <circle cx="68" cy="50" r="18" fill="#e30a17"/>
+    <path d="M 92 38 L 96 47 L 106 47 L 98 53 L 101 62 L 92 56 L 83 62 L 86 53 L 78 47 L 88 47 Z" fill="#fff"/>
+  </g>
+  <g font-family="Helvetica,Arial,sans-serif" font-weight="900" text-anchor="middle" fill="#fff">
+    <text x="120" y="180" font-size="22">BAYRAK</text>
+    <text x="120" y="208" font-size="18" opacity="0.85">= ?</text>
+  </g>
+</svg>

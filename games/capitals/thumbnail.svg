@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="240" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#065f46"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <g font-family="-apple-system,'Apple Color Emoji',sans-serif" text-anchor="middle">
+    <text x="120" y="80" font-size="56">🇫🇷</text>
+  </g>
+  <g font-family="Helvetica,Arial,sans-serif" font-weight="900" text-anchor="middle" fill="#fff">
+    <text x="120" y="130" font-size="22">FRANSA</text>
+    <text x="120" y="156" font-size="14" opacity="0.85">başkenti?</text>
+  </g>
+  <g>
+    <rect x="40" y="172" width="160" height="38" rx="8" fill="#fff"/>
+    <text x="120" y="196" font-family="Helvetica,Arial,sans-serif" font-weight="800" font-size="20" fill="#10b981" text-anchor="middle">PARİS</text>
+  </g>
+</svg>

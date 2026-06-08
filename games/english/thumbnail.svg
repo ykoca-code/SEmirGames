@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="240" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#bg)"/>
+  <g font-family="-apple-system,'Apple Color Emoji',sans-serif" text-anchor="middle">
+    <text x="120" y="70" font-size="48">🐕</text>
+  </g>
+  <g font-family="Helvetica,Arial,sans-serif" font-weight="900" text-anchor="middle" fill="#fff">
+    <text x="120" y="118" font-size="26">DOG</text>
+    <text x="120" y="148" font-size="14" opacity="0.85">= ?</text>
+  </g>
+  <g>
+    <rect x="20"  y="170" width="90" height="32" rx="8" fill="#fff"/>
+    <text x="65"  y="192" font-family="Helvetica,Arial,sans-serif" font-weight="800" font-size="14" fill="#3b82f6" text-anchor="middle">Köpek</text>
+    <rect x="130" y="170" width="90" height="32" rx="8" fill="rgba(255,255,255,0.25)"/>
+    <text x="175" y="192" font-family="Helvetica,Arial,sans-serif" font-weight="700" font-size="14" fill="#fff" text-anchor="middle">Kedi</text>
+    <rect x="20"  y="206" width="90" height="26" rx="8" fill="rgba(255,255,255,0.25)"/>
+    <text x="65"  y="224" font-family="Helvetica,Arial,sans-serif" font-weight="700" font-size="13" fill="#fff" text-anchor="middle">Kuş</text>
+    <rect x="130" y="206" width="90" height="26" rx="8" fill="rgba(255,255,255,0.25)"/>
+    <text x="175" y="224" font-family="Helvetica,Arial,sans-serif" font-weight="700" font-size="13" fill="#fff" text-anchor="middle">Balık</text>
+  </g>
+</svg>

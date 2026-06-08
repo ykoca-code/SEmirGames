@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#1a1d29"/>
+  <g stroke="#cbd5e1" stroke-width="6" stroke-linecap="round">
+    <line x1="90" y1="40" x2="90" y2="200"/>
+    <line x1="150" y1="40" x2="150" y2="200"/>
+    <line x1="40" y1="90" x2="200" y2="90"/>
+    <line x1="40" y1="150" x2="200" y2="150"/>
+  </g>
+  <g stroke-width="8" stroke-linecap="round" fill="none">
+    <!-- X in top-left -->
+    <g stroke="#ef4444">
+      <line x1="45" y1="45" x2="80" y2="80"/>
+      <line x1="80" y1="45" x2="45" y2="80"/>
+    </g>
+    <!-- O in middle -->
+    <circle cx="120" cy="120" r="20" stroke="#3b82f6"/>
+    <!-- X in bottom-right -->
+    <g stroke="#ef4444">
+      <line x1="165" y1="165" x2="195" y2="195"/>
+      <line x1="195" y1="165" x2="165" y2="195"/>
+    </g>
+    <!-- O in top-right -->
+    <circle cx="175" cy="65" r="18" stroke="#3b82f6"/>
+    <!-- X bottom-left winning line -->
+    <g stroke="#10b981" stroke-width="6">
+      <line x1="30" y1="40" x2="210" y2="210" opacity="0.4"/>
+    </g>
+  </g>
+</svg>

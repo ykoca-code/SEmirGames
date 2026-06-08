@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Tetris - SEmirK Games</title>
+  <title>Yılan - SEmirK Games</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="tetris-page">
+<body class="snake-page">
   <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
   <header class="site-header">
     <div class="header-inner">
@@ -27,44 +27,39 @@
     </div>
   </header>
 
-  <main class="container game-container tetris-container">
-    <div class="tetris-top">
-      <div class="tetris-stats">
-        <div class="t-stat"><span class="t-stat-label">Skor</span><span id="score" class="t-stat-value">0</span></div>
-        <div class="t-stat"><span class="t-stat-label">Satır</span><span id="lines" class="t-stat-value">0</span></div>
-        <div class="t-stat"><span class="t-stat-label">Sev</span><span id="level" class="t-stat-value">1</span></div>
+  <main class="container game-container snake-container">
+    <div class="snake-top">
+      <div class="sn-stat">
+        <span class="sn-stat-label">Skor</span>
+        <span id="score" class="sn-stat-value">0</span>
       </div>
-      <div class="tetris-previews">
-        <div class="preview-block">
-          <span class="preview-label">Sıradaki</span>
-          <canvas id="next" width="80" height="80"></canvas>
-        </div>
-        <div class="preview-block">
-          <span class="preview-label">Bekleyen</span>
-          <canvas id="hold" width="80" height="80"></canvas>
-        </div>
+      <div class="sn-stat">
+        <span class="sn-stat-label">Uzunluk</span>
+        <span id="length" class="sn-stat-value">3</span>
+      </div>
+      <div class="sn-stat">
+        <span class="sn-stat-label">Rekor</span>
+        <span id="best" class="sn-stat-value">0</span>
       </div>
     </div>
 
-    <div class="tetris-stage">
-      <canvas id="board" width="300" height="600" aria-label="Tetris tahtası"></canvas>
+    <div class="snake-stage">
+      <canvas id="board" width="420" height="420" aria-label="Yılan tahtası"></canvas>
       <div id="overlay" class="overlay hidden">
         <div class="overlay-content">
-          <h2 id="overlayTitle">Hazır mısın?</h2>
-          <p id="overlayText">Başlamak için "Yeni Oyun" tuşuna bas.</p>
+          <h2 id="overlayTitle">Yılan</h2>
+          <p id="overlayText">Kaydır veya yön tuşlarıyla yönlendir. Yemleri ye, büyü, duvarlara ve kendine çarpma!</p>
           <div class="lb-slot" id="leaderboardSlot"></div>
-          <button type="button" id="overlayBtn" class="btn btn-primary">Yeni Oyun</button>
+          <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
         </div>
       </div>
     </div>
 
     <section class="touch-controls" aria-label="Dokunmatik kontroller">
-      <button type="button" data-action="left" class="touch-btn">←</button>
-      <button type="button" data-action="rotate" class="touch-btn">⟳</button>
-      <button type="button" data-action="right" class="touch-btn">→</button>
-      <button type="button" data-action="soft" class="touch-btn">↓</button>
-      <button type="button" data-action="hard" class="touch-btn">⤓</button>
-      <button type="button" data-action="hold" class="touch-btn">B</button>
+      <button type="button" data-dir="up" class="touch-btn touch-up">↑</button>
+      <button type="button" data-dir="left" class="touch-btn touch-left">←</button>
+      <button type="button" data-dir="down" class="touch-btn touch-down">↓</button>
+      <button type="button" data-dir="right" class="touch-btn touch-right">→</button>
     </section>
 
     <div class="action-row">

@@ -1,0 +1,14 @@
+{
+  "id": "mines",
+  "title": "Mayın Tarlası",
+  "description": "Klasik mantık bulmacası. Mayınlara dokunmadan tüm güvenli kareleri aç!",
+  "version": "1.0.0",
+  "category": "logic",
+  "categoryLabel": "Mantık",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["mantık", "bulmaca", "mayın", "minesweeper", "klasik"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: aç", "Bayrak modu: bayrakla işaretle"]
+}
