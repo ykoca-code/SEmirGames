@@ -1,0 +1,14 @@
+{
+  "id": "pong",
+  "title": "Pong",
+  "description": "Klasik masa tenisi! Paleti hareket ettir, topu kaçırma. Bilgisayara karşı veya 2 kişilik oyna.",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "klasik", "pong", "masa tenisi"],
+  "author": "SEmirK Games",
+  "controls": ["Parmağını kaydır veya yön tuşları"]
+}

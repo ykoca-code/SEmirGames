@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#0d0f18"/>
+  <!-- center line dashed -->
+  <line x1="20" y1="120" x2="220" y2="120" stroke="#23273a" stroke-width="2" stroke-dasharray="8 8"/>
+  <!-- top paddle (bot) -->
+  <rect x="80" y="38" width="80" height="10" rx="4" fill="#ef4444"/>
+  <!-- bottom paddle (player) -->
+  <rect x="80" y="192" width="80" height="10" rx="4" fill="#3b82f6"/>
+  <!-- ball with trail -->
+  <circle cx="120" cy="120" r="10" fill="#fbbf24"/>
+  <circle cx="130" cy="105" r="6" fill="#fbbf24" opacity="0.5"/>
+  <circle cx="138" cy="92" r="4" fill="#fbbf24" opacity="0.25"/>
+  <!-- score -->
+  <g font-family="Helvetica,Arial,sans-serif" font-weight="900" text-anchor="middle" fill="#fff">
+    <text x="40" y="70" font-size="28">2</text>
+    <text x="200" y="70" font-size="28">3</text>
+  </g>
+</svg>
