@@ -36,7 +36,7 @@
   const nonPlayersListEl = document.getElementById("nonPlayersList");
   const seatedListEl = document.getElementById("seatedList");
 
-  const defaultNames = ["Ayaz", "Akif", "Yunus", "Selçuk", "Bekir", "Hocam", "Tufan", "İsmail"];
+  const defaultNames = ["Ayaz", "Akif", "Yunus", "Selçuk", "Bekir", "Hocam", "Memo", "İsmail"];
 
   let names = defaultNames.slice();
   let activeNames = [];
