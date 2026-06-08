@@ -1,0 +1,14 @@
+{
+  "id": "xox",
+  "title": "XOX",
+  "description": "Klasik 3 taş yan yana getirme oyunu. Bilgisayara karşı veya arkadaşınla oyna.",
+  "version": "1.0.0",
+  "category": "board",
+  "categoryLabel": "Masa Oyunu",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["masa", "klasik", "xox", "tic-tac-toe"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: hücreye işaret koy"]
+}

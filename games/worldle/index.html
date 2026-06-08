@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Sıcak Soğuk Ülke - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="worldle-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <main class="container game-container worldle-container">
+    <div class="w-top">
+      <div class="w-stat"><span class="w-stat-label">Tahmin</span><span id="guessNum" class="w-stat-value">0/6</span></div>
+      <div class="w-stat"><span class="w-stat-label">Skor</span><span id="score" class="w-stat-value">0</span></div>
+      <div class="w-stat"><span class="w-stat-label">Rekor</span><span id="best" class="w-stat-value">0</span></div>
+    </div>
+
+    <div class="w-stage">
+      <div class="w-guesses" id="guesses"></div>
+    </div>
+
+    <div class="w-input-wrap">
+      <input type="text" id="search" class="w-search" placeholder="Ülke yaz..." autocomplete="off" />
+      <div id="suggest" class="w-suggest hidden"></div>
+    </div>
+
+    <div class="action-row">
+      <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+    </div>
+
+    <div id="overlay" class="overlay hidden">
+      <div class="overlay-content">
+        <h2 id="overlayTitle">Sıcak Soğuk Ülke</h2>
+        <p id="overlayText">Bilgisayar bir ülke seçer. Her tahminde sana mesafe ve yön söylenir. 6 hakkın var, en az tahminle bul!</p>
+        <div class="lb-slot" id="leaderboardSlot"></div>
+        <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../js/version.js?v=1.9.0"></script>
+  <script src="../../js/leaderboard.js?v=1.9.0"></script>
+  <script src="../flags/countries.js?v=1.9.0"></script>
+  <script src="script.js"></script>
+</body>
+</html>

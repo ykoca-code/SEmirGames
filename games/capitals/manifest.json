@@ -1,0 +1,14 @@
+{
+  "id": "capitals",
+  "title": "Başkent Bilmece",
+  "description": "Ülkenin bayrağını gör, başkentini bul. Coğrafya öğrenmenin en eğlenceli yolu!",
+  "version": "1.0.0",
+  "category": "educational",
+  "categoryLabel": "Eğitici",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["eğitici", "başkent", "ülke", "coğrafya"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: cevabı seç"]
+}

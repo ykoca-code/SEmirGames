@@ -1,0 +1,14 @@
+{
+  "id": "english",
+  "title": "İngilizce Kelimeler",
+  "description": "İlkokul seviyesi İngilizce kelime oyunu. Resme bak, kelimenin Türkçesini seç!",
+  "version": "1.0.0",
+  "category": "educational",
+  "categoryLabel": "Eğitici",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["eğitici", "ingilizce", "kelime", "çocuk", "okul"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: cevabı seç"]
+}

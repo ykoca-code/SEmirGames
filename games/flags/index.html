@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Bayrak Bilmece - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="flags-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <main class="container game-container flags-container">
+    <div class="flags-top">
+      <div class="f-stat"><span class="f-stat-label">Soru</span><span id="qNum" class="f-stat-value">0/10</span></div>
+      <div class="f-stat"><span class="f-stat-label">Skor</span><span id="score" class="f-stat-value">0</span></div>
+      <div class="f-stat"><span class="f-stat-label">Seri</span><span id="streak" class="f-stat-value">0</span></div>
+      <div class="f-stat"><span class="f-stat-label">Rekor</span><span id="best" class="f-stat-value">0</span></div>
+    </div>
+
+    <div class="flags-stage">
+      <div class="cat-pill" id="catPill">…</div>
+      <div class="flag-display" id="flagDisplay">🏳️</div>
+      <div class="prompt-text">Bu hangi ülke?</div>
+    </div>
+
+    <div class="choices" id="choices">
+      <button type="button" class="choice" data-idx="0">…</button>
+      <button type="button" class="choice" data-idx="1">…</button>
+      <button type="button" class="choice" data-idx="2">…</button>
+      <button type="button" class="choice" data-idx="3">…</button>
+    </div>
+
+    <div class="action-row">
+      <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+    </div>
+
+    <div id="overlay" class="overlay hidden">
+      <div class="overlay-content">
+        <h2 id="overlayTitle">Bayrak Bilmece</h2>
+        <p id="overlayText">Bayrağı gör, hangi ülke olduğunu bul!</p>
+        <div class="region-select">
+          <div class="cat-label">Kıta</div>
+          <div class="cat-chips" id="regionChips"></div>
+        </div>
+        <div class="lb-slot" id="leaderboardSlot"></div>
+        <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../js/version.js?v=1.9.0"></script>
+  <script src="../../js/leaderboard.js?v=1.9.0"></script>
+  <script src="countries.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

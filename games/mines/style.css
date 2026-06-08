@@ -1,0 +1,208 @@
+/* Mayın Tarlası — fits a phone screen */
+
+body.mines-page { overflow: hidden; }
+.mines-page .site-header { display: none; }
+
+.mines-page .mines-container {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
+}
+
+.mines-container .game-header { display: none; }
+
+.mines-top {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+.m-stat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+}
+
+.m-stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.m-stat-value {
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.flag-toggle {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 70px;
+  transition: background 80ms, border-color 80ms;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.flag-toggle .ft-icon { font-size: 18px; line-height: 1; }
+.flag-toggle .ft-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.flag-toggle.flag-mode {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.mines-board-wrap {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.mines-board {
+  display: grid;
+  background: #0d0f18;
+  padding: 4px;
+  border-radius: 8px;
+  gap: 2px;
+  width: min(calc(100vw - 28px), calc(100dvh - 200px), 460px);
+  height: min(calc(100vw - 28px), calc(100dvh - 200px), 460px);
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.cell {
+  background: linear-gradient(180deg, #6c5ce7, #5848c2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: clamp(11px, 3.5vw, 18px);
+  color: #fff;
+  transition: background 80ms, transform 60ms;
+  touch-action: manipulation;
+}
+
+.cell:active { transform: scale(0.92); }
+
+.cell.revealed {
+  background: #cbd5e1;
+  cursor: default;
+  transform: none;
+}
+
+.cell.revealed.bomb {
+  background: #ef4444;
+  color: #fff;
+}
+
+.cell.revealed[data-n="1"] { color: #3b82f6; }
+.cell.revealed[data-n="2"] { color: #10b981; }
+.cell.revealed[data-n="3"] { color: #ef4444; }
+.cell.revealed[data-n="4"] { color: #7c3aed; }
+.cell.revealed[data-n="5"] { color: #b91c1c; }
+.cell.revealed[data-n="6"] { color: #0891b2; }
+.cell.revealed[data-n="7"] { color: #1f2937; }
+.cell.revealed[data-n="8"] { color: #525252; }
+
+.cell.flagged {
+  background: linear-gradient(180deg, #f97316, #ea580c);
+}
+
+.action-row {
+  display: flex;
+  gap: 6px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.diff-select {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.action-row .btn {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 15, 24, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  padding: 20px;
+}
+
+.overlay-content {
+  background: linear-gradient(135deg, #2a2d49, #1a1d29);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  text-align: center;
+  color: #fff;
+  max-width: 340px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.overlay-content h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+.overlay-content p {
+  margin: 0 0 14px;
+  color: #cbd5e1;
+  font-size: 14px;
+  white-space: pre-line;
+}

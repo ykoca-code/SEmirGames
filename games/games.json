@@ -91,6 +91,83 @@
       "thumbnail": "games/emoji/thumbnail.svg",
       "path": "games/emoji/index.html",
       "tags": ["bulmaca", "kelime", "emoji", "tahmin", "eğlence"]
+    },
+    {
+      "id": "snake",
+      "title": "Yılan",
+      "description": "Klasik yılan oyunu. Yemleri ye, büyü, duvarlara ve kendine çarpma!",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/snake/thumbnail.svg",
+      "path": "games/snake/index.html",
+      "tags": ["arcade", "klasik", "yılan", "snake"]
+    },
+    {
+      "id": "mines",
+      "title": "Mayın Tarlası",
+      "description": "Klasik mantık bulmacası. Mayınlara dokunmadan tüm güvenli kareleri aç!",
+      "category": "logic",
+      "categoryLabel": "Mantık",
+      "ageRating": "7+",
+      "thumbnail": "games/mines/thumbnail.svg",
+      "path": "games/mines/index.html",
+      "tags": ["mantık", "bulmaca", "mayın", "minesweeper"]
+    },
+    {
+      "id": "english",
+      "title": "İngilizce Kelimeler",
+      "description": "İlkokul seviyesi İngilizce kelime oyunu. Resme bak, kelimenin Türkçesini seç!",
+      "category": "educational",
+      "categoryLabel": "Eğitici",
+      "ageRating": "4+",
+      "thumbnail": "games/english/thumbnail.svg",
+      "path": "games/english/index.html",
+      "tags": ["eğitici", "ingilizce", "kelime", "çocuk"]
+    },
+    {
+      "id": "xox",
+      "title": "XOX",
+      "description": "Klasik 3 taş yan yana getirme oyunu. Bilgisayara karşı veya arkadaşınla oyna.",
+      "category": "board",
+      "categoryLabel": "Masa Oyunu",
+      "ageRating": "4+",
+      "thumbnail": "games/xox/thumbnail.svg",
+      "path": "games/xox/index.html",
+      "tags": ["masa", "klasik", "xox", "tic-tac-toe"]
+    },
+    {
+      "id": "flags",
+      "title": "Bayrak Bilmece",
+      "description": "Bayrağı gör, hangi ülkenin olduğunu bul. 80+ ülke!",
+      "category": "educational",
+      "categoryLabel": "Eğitici",
+      "ageRating": "7+",
+      "thumbnail": "games/flags/thumbnail.svg",
+      "path": "games/flags/index.html",
+      "tags": ["eğitici", "bayrak", "ülke", "coğrafya"]
+    },
+    {
+      "id": "capitals",
+      "title": "Başkent Bilmece",
+      "description": "Ülkenin bayrağını gör, başkentini bul. Coğrafya öğrenmenin en eğlenceli yolu!",
+      "category": "educational",
+      "categoryLabel": "Eğitici",
+      "ageRating": "7+",
+      "thumbnail": "games/capitals/thumbnail.svg",
+      "path": "games/capitals/index.html",
+      "tags": ["eğitici", "başkent", "coğrafya"]
+    },
+    {
+      "id": "worldle",
+      "title": "Sıcak Soğuk Ülke",
+      "description": "Bilgisayar bir ülke seçer. Her tahminde mesafe ve yön söylenir. 6 hakla bul!",
+      "category": "educational",
+      "categoryLabel": "Eğitici",
+      "ageRating": "10+",
+      "thumbnail": "games/worldle/thumbnail.svg",
+      "path": "games/worldle/index.html",
+      "tags": ["eğitici", "ülke", "coğrafya", "tahmin"]
     }
   ]
 }

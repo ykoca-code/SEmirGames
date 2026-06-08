@@ -1,0 +1,14 @@
+{
+  "id": "worldle",
+  "title": "Sıcak Soğuk Ülke",
+  "description": "Bilgisayar bir ülke seçer. Her tahminde mesafe ve yön söylenir. 6 hakla bul!",
+  "version": "1.0.0",
+  "category": "educational",
+  "categoryLabel": "Eğitici",
+  "ageRating": "10+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["eğitici", "ülke", "coğrafya", "tahmin", "worldle"],
+  "author": "SEmirK Games",
+  "controls": ["Ülke adını seç"]
+}

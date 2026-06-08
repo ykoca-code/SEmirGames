@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>XOX - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="xox-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <main class="container game-container xox-container">
+    <div class="xox-top">
+      <h1 class="xox-title">XOX</h1>
+      <div class="xox-scores">
+        <span class="xs-x">Sen: <b id="xWins">0</b></span>
+        <span class="xs-tie">Berabere: <b id="ties">0</b></span>
+        <span class="xs-o">Rakip: <b id="oWins">0</b></span>
+      </div>
+    </div>
+
+    <div class="mode-row">
+      <button type="button" class="mode-btn active" data-mode="bot-easy">Kolay Bot</button>
+      <button type="button" class="mode-btn" data-mode="bot-hard">Zor Bot</button>
+      <button type="button" class="mode-btn" data-mode="two-player">2 Kişilik</button>
+    </div>
+
+    <div class="xox-stage">
+      <div id="board" class="xox-board" aria-label="XOX tahtası"></div>
+      <div class="turn-line" id="turnLine">Sıra sende (X)</div>
+    </div>
+
+    <div class="action-row">
+      <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+      <button type="button" id="resetScoreBtn" class="btn">Skoru Sıfırla</button>
+    </div>
+  </main>
+
+  <script src="../../js/version.js?v=1.9.0"></script>
+  <script src="script.js"></script>
+</body>
+</html>
