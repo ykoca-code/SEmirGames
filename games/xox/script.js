@@ -15,10 +15,14 @@
 
   const STORAGE_KEY = "semirk_xox_scores";
 
+  const MODE_KEY = "semirk_xox_mode";
+  const DIFF_KEY = "semirk_xox_diff";
+
   const state = {
     board: Array(9).fill(""),
     turn: "X",
-    mode: "bot-easy",
+    mode: localStorage.getItem(MODE_KEY) || "bot",      // "bot" | "two-player"
+    diff: localStorage.getItem(DIFF_KEY) || "easy",      // "easy" | "hard"
     finished: false,
     scores: { x: 0, o: 0, tie: 0 },
   };
@@ -29,9 +33,13 @@
     xWins: document.getElementById("xWins"),
     oWins: document.getElementById("oWins"),
     ties: document.getElementById("ties"),
+    xLabel: document.getElementById("xLabel"),
+    oLabel: document.getElementById("oLabel"),
     newGameBtn: document.getElementById("newGameBtn"),
     resetScoreBtn: document.getElementById("resetScoreBtn"),
     modeBtns: document.querySelectorAll(".mode-btn"),
+    diffBtns: document.querySelectorAll(".diff-btn"),
+    diffRow: document.getElementById("diffRow"),
   };
 
   function loadScores() {
@@ -73,7 +81,7 @@
       cell.textContent = v;
       cell.className = "xox-cell" + (v === "X" ? " x" : v === "O" ? " o" : "");
       cell.disabled = !!v || state.finished ||
-        (state.mode !== "two-player" && state.turn === "O");
+        (state.mode === "bot" && state.turn === "O");
     }
   }
 
@@ -158,7 +166,7 @@
   // ==========================================================================
   function onCellClick(i) {
     if (state.finished || state.board[i]) return;
-    if (state.mode !== "two-player" && state.turn !== "X") return;
+    if (state.mode === "bot" && state.turn !== "X") return;
 
     state.board[i] = state.turn;
     afterMove();
@@ -172,9 +180,9 @@
     state.turn = state.turn === "X" ? "O" : "X";
     setTurnLine();
 
-    if (state.mode !== "two-player" && state.turn === "O" && !state.finished) {
+    if (state.mode === "bot" && state.turn === "O" && !state.finished) {
       setTimeout(() => {
-        const move = state.mode === "bot-hard"
+        const move = state.diff === "hard"
           ? botMoveHard(state.board.slice())
           : botMoveEasy(state.board);
         if (move >= 0) state.board[move] = "O";
@@ -186,7 +194,7 @@
   function setTurnLine() {
     els.turnLine.className = "turn-line";
     if (state.mode === "two-player") {
-      els.turnLine.textContent = "Sıra: " + state.turn;
+      els.turnLine.textContent = state.turn === "X" ? "1. Oyuncu (X)" : "2. Oyuncu (O)";
     } else {
       els.turnLine.textContent = state.turn === "X" ? "Sıra sende (X)" : "Rakip düşünüyor… (O)";
     }
@@ -197,12 +205,12 @@
     if (result.winner === "X") {
       state.scores.x++;
       els.turnLine.textContent =
-        state.mode === "two-player" ? "X kazandı! 🎉" : "Kazandın! 🎉";
+        state.mode === "two-player" ? "1. Oyuncu kazandı! 🎉" : "Kazandın! 🎉";
       els.turnLine.classList.add("win");
     } else if (result.winner === "O") {
       state.scores.o++;
       els.turnLine.textContent =
-        state.mode === "two-player" ? "O kazandı! 🎉" : "Rakip kazandı.";
+        state.mode === "two-player" ? "2. Oyuncu kazandı! 🎉" : "Rakip kazandı.";
       els.turnLine.classList.add(state.mode === "two-player" ? "win" : "lose");
     } else {
       state.scores.tie++;
@@ -213,6 +221,32 @@
     updateScoreUI();
     highlightWin(result.line);
     render();
+  }
+
+  function applyMode() {
+    // Update mode button active state
+    els.modeBtns.forEach((b) =>
+      b.classList.toggle("active", b.dataset.mode === state.mode)
+    );
+    // Show/hide difficulty row
+    els.diffRow.classList.toggle("hidden", state.mode !== "bot");
+    // Update player labels
+    if (state.mode === "two-player") {
+      els.xLabel.innerHTML = '1. Oyuncu: <b id="xWins">' + state.scores.x + "</b>";
+      els.oLabel.innerHTML = '2. Oyuncu: <b id="oWins">' + state.scores.o + "</b>";
+    } else {
+      els.xLabel.innerHTML = 'Sen: <b id="xWins">' + state.scores.x + "</b>";
+      els.oLabel.innerHTML = 'Rakip: <b id="oWins">' + state.scores.o + "</b>";
+    }
+    // Re-grab refs since innerHTML replaced them
+    els.xWins = document.getElementById("xWins");
+    els.oWins = document.getElementById("oWins");
+  }
+
+  function applyDiff() {
+    els.diffBtns.forEach((b) =>
+      b.classList.toggle("active", b.dataset.diff === state.diff)
+    );
   }
 
   // ==========================================================================
@@ -232,12 +266,23 @@
       state.scores = { x: 0, o: 0, tie: 0 };
       saveScores();
       updateScoreUI();
+      applyMode();
     });
     els.modeBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
+        if (state.mode === btn.dataset.mode) return;
         state.mode = btn.dataset.mode;
-        els.modeBtns.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
+        localStorage.setItem(MODE_KEY, state.mode);
+        applyMode();
+        newGame();
+      });
+    });
+    els.diffBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (state.diff === btn.dataset.diff) return;
+        state.diff = btn.dataset.diff;
+        localStorage.setItem(DIFF_KEY, state.diff);
+        applyDiff();
         newGame();
       });
     });
@@ -248,6 +293,8 @@
     updateScoreUI();
     buildBoard();
     bindEvents();
+    applyMode();
+    applyDiff();
     newGame();
   }
 
