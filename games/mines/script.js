@@ -33,7 +33,7 @@
     board: document.getElementById("board"),
     timer: document.getElementById("timer"),
     minesLeft: document.getElementById("minesLeft"),
-    flagToggle: document.getElementById("flagToggle"),
+    modeBtns: document.querySelectorAll(".mode-btn"),
     newGameBtn: document.getElementById("newGameBtn"),
     difficulty: document.getElementById("difficulty"),
     overlay: document.getElementById("overlay"),
@@ -312,9 +312,7 @@
     state.flagged = 0;
     state.finished = false;
     state.flagMode = false;
-    els.flagToggle.classList.remove("flag-mode");
-    els.flagToggle.querySelector(".ft-icon").textContent = "🔍";
-    els.flagToggle.querySelector(".ft-label").textContent = "Aç";
+    applyModeBtns();
     stopTimer();
     els.timer.textContent = "00:00";
     buildGrid();
@@ -323,11 +321,18 @@
     clearLBSlot();
   }
 
-  function toggleFlagMode() {
-    state.flagMode = !state.flagMode;
-    els.flagToggle.classList.toggle("flag-mode", state.flagMode);
-    els.flagToggle.querySelector(".ft-icon").textContent = state.flagMode ? "🚩" : "🔍";
-    els.flagToggle.querySelector(".ft-label").textContent = state.flagMode ? "Bayrak" : "Aç";
+  function setMode(mode) {
+    state.flagMode = mode === "flag";
+    applyModeBtns();
+  }
+
+  function applyModeBtns() {
+    els.modeBtns.forEach((btn) => {
+      const active =
+        (btn.dataset.mode === "flag" && state.flagMode) ||
+        (btn.dataset.mode === "reveal" && !state.flagMode);
+      btn.classList.toggle("active", active);
+    });
   }
 
   // ==========================================================================
@@ -336,15 +341,18 @@
   function boot() {
     els.newGameBtn.addEventListener("click", newGame);
     els.overlayBtn.addEventListener("click", newGame);
-    els.flagToggle.addEventListener("click", toggleFlagMode);
+    els.modeBtns.forEach((btn) => {
+      btn.addEventListener("click", () => setMode(btn.dataset.mode));
+    });
     els.difficulty.addEventListener("change", newGame);
 
     newGame();
     // Start overlay
     els.overlayTitle.textContent = "Mayın Tarlası";
     els.overlayText.textContent =
-      "Tüm güvenli kareleri aç, mayınlara dokunma!\n🔍 Aç modunda dokun açar.\n🚩 Bayrak modunda dokun şüpheli karayı işaretler.";
+      "Tüm güvenli kareleri aç, mayınlara dokunma!\n🔍 Aç modunda dokun açar.\n🚩 Bayrak modunda şüpheli kareye dokun, bayrak koyar.";
     els.overlayBtn.textContent = "Başla";
+    renderLBSlot();
     els.overlay.classList.remove("hidden");
   }
 

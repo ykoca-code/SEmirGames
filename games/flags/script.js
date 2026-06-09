@@ -6,6 +6,7 @@
   const QUESTION_TIME = 12; // seconds (harder mode)
   const STORAGE_KEY = "semirk_flags_best";
   const REGION_KEY = "semirk_flags_region";
+  const DIFF_KEY = "semirk_flags_diff";
 
   const REGION_LABELS = {
     europe:  "Avrupa",
@@ -24,6 +25,7 @@
     correct: 0,
     best: +(localStorage.getItem(STORAGE_KEY) || 0),
     region: localStorage.getItem(REGION_KEY) || "all",
+    diff: localStorage.getItem(DIFF_KEY) || "easy",
     locked: false,
     finished: true,
     timeLeft: 0,
@@ -44,6 +46,11 @@
     overlayText: document.getElementById("overlayText"),
     overlayBtn: document.getElementById("overlayBtn"),
     regionChips: document.getElementById("regionChips"),
+    diffChips: document.querySelectorAll("#diffChips .cat-chip"),
+    choicesWrap: document.getElementById("choices"),
+    typeAnswer: document.getElementById("typeAnswer"),
+    answerInput: document.getElementById("answerInput"),
+    submitAnswer: document.getElementById("submitAnswer"),
   };
 
   function shuffle(a) {
@@ -62,14 +69,16 @@
   }
 
   function distractors(country, all) {
-    // Harder mode: when region is "all", mix distractors across the world so
-    // players can't narrow down by continent. When a region is filtered, stay
-    // inside that region (otherwise the answer would always be obvious).
+    // Easy: distractors from across the world (least related)
+    // Medium: distractors from the SAME REGION (look-alike continent)
     let pool;
-    if (state.region === "all") {
-      pool = all.filter((c) => c.code !== country.code);
-    } else {
+    if (state.diff === "medium") {
       pool = all.filter((c) => c.region === country.region && c.code !== country.code);
+      if (pool.length < 3) pool = all.filter((c) => c.code !== country.code);
+    } else if (state.region !== "all") {
+      pool = all.filter((c) => c.region === country.region && c.code !== country.code);
+    } else {
+      pool = all.filter((c) => c.code !== country.code);
     }
     pool = shuffle(pool);
     const picks = [];
@@ -78,6 +87,15 @@
       if (picks.length >= 3) break;
     }
     return picks;
+  }
+
+  // Loose Turkish-aware name match for type-the-answer mode
+  function normalizeName(s) {
+    return String(s || "")
+      .toLocaleLowerCase("tr")
+      .replace(/ı/g, "i").replace(/ş/g, "s").replace(/ç/g, "c")
+      .replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ö/g, "o")
+      .replace(/[^a-z]/g, "");
   }
 
   function renderRegionChips() {
@@ -126,10 +144,7 @@
     stopTimer();
     if (state.qIndex >= state.pool.length) return finishRound();
     const c = state.pool[state.qIndex];
-    const dis = distractors(c, window.COUNTRIES);
-    const allChoices = shuffle([c, ...dis]);
-    const correctIdx = allChoices.findIndex((x) => x.code === c.code);
-    state.current = { country: c, choices: allChoices, correctIdx };
+    state.current = { country: c };
     state.locked = false;
 
     els.flagDisplay.textContent = c.flag;
@@ -137,13 +152,60 @@
     void els.flagDisplay.offsetWidth;
     els.flagDisplay.style.animation = "";
 
-    els.choices.forEach((btn, i) => {
-      btn.textContent = allChoices[i].name;
-      btn.disabled = false;
-      btn.classList.remove("correct", "wrong");
-    });
+    if (state.diff === "hard") {
+      // Type-the-answer mode
+      els.choicesWrap.classList.add("hidden");
+      els.typeAnswer.classList.remove("hidden");
+      els.answerInput.value = "";
+      els.answerInput.disabled = false;
+      els.answerInput.classList.remove("correct", "wrong");
+      els.submitAnswer.disabled = false;
+      setTimeout(() => els.answerInput.focus(), 50);
+    } else {
+      els.choicesWrap.classList.remove("hidden");
+      els.typeAnswer.classList.add("hidden");
+      const dis = distractors(c, window.COUNTRIES);
+      const allChoices = shuffle([c, ...dis]);
+      const correctIdx = allChoices.findIndex((x) => x.code === c.code);
+      state.current.choices = allChoices;
+      state.current.correctIdx = correctIdx;
+      els.choices.forEach((btn, i) => {
+        btn.textContent = allChoices[i].name;
+        btn.disabled = false;
+        btn.classList.remove("correct", "wrong");
+      });
+    }
     updateStats();
     startTimer();
+  }
+
+  function submitTyped() {
+    if (state.locked || state.finished) return;
+    const guess = normalizeName(els.answerInput.value);
+    if (!guess) return;
+    state.locked = true;
+    stopTimer();
+    const target = normalizeName(state.current.country.name);
+    const ok = guess === target;
+    els.answerInput.disabled = true;
+    els.submitAnswer.disabled = true;
+    els.answerInput.classList.add(ok ? "correct" : "wrong");
+
+    if (ok) {
+      const points = 20 + state.streak * 8;
+      state.score += points;
+      state.streak += 1;
+      state.correct += 1;
+    } else {
+      state.streak = 0;
+      els.answerInput.value = els.answerInput.value + " → " + state.current.country.name;
+    }
+    if (state.score > state.best) {
+      state.best = state.score;
+      localStorage.setItem(STORAGE_KEY, String(state.best));
+    }
+    updateStats();
+    setTimeout(() => { state.qIndex += 1; nextQuestion(); }, ok ? 700 : 1300);
   }
 
   function startTimer() {
@@ -231,7 +293,7 @@
     }
     els.overlayText.textContent = lines.join("\n");
     renderLBSlot();
-    document.querySelector(".region-select").style.display = "none";
+    document.querySelectorAll(".region-select").forEach((el) => (el.style.display = "none"));
     els.overlayBtn.textContent = "Tekrar Oyna";
     showOverlay();
   }
@@ -259,18 +321,34 @@
 
   function boot() {
     els.choices.forEach((btn, i) => btn.addEventListener("click", () => answer(i)));
+    els.submitAnswer.addEventListener("click", submitTyped);
+    els.answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); submitTyped(); }
+    });
+    // Difficulty chips
+    els.diffChips.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.diff = btn.dataset.diff;
+        localStorage.setItem(DIFF_KEY, state.diff);
+        els.diffChips.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+      btn.classList.toggle("active", btn.dataset.diff === state.diff);
+    });
     els.newGameBtn.addEventListener("click", () => {
+      stopTimer();
       state.finished = true;
       renderRegionChips();
       els.overlayTitle.textContent = "Bayrak Bilmece";
       els.overlayText.textContent = "Kıtayı seç ve başla!";
       els.overlayBtn.textContent = "Başla";
-      document.querySelector(".region-select").style.display = "";
-      clearLBSlot();
+      document.querySelectorAll(".region-select").forEach((el) => (el.style.display = ""));
+      renderLBSlot();
       showOverlay();
     });
     els.overlayBtn.addEventListener("click", startRound);
     renderRegionChips();
+    renderLBSlot();
     updateStats();
     showOverlay();
   }

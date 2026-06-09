@@ -422,6 +422,7 @@
     els.overlayText.textContent =
       "Komşu canavarları yer değiştir. 3 ya da daha fazla aynı türü yan yana getir.\n25 hamle var, en yüksek skoru topla!";
     els.overlayBtn.textContent = "Başla";
+    renderLBSlot();
     els.overlay.classList.remove("hidden");
   }
 

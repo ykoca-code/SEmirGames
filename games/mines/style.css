@@ -53,30 +53,34 @@ body.mines-page { overflow: hidden; }
   line-height: 1.2;
 }
 
-.flag-toggle {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
-  border-radius: var(--radius-sm);
-  padding: 4px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 700;
-  font-size: 13px;
-  min-width: 70px;
-  transition: background 80ms, border-color 80ms;
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
+.mode-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
-.flag-toggle .ft-icon { font-size: 18px; line-height: 1; }
-.flag-toggle .ft-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.mode-btn {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 12px 10px;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 120ms;
+  touch-action: manipulation;
+}
 
-.flag-toggle.flag-mode {
+.mode-btn[data-mode="reveal"].active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.mode-btn[data-mode="flag"].active {
   background: #ef4444;
   border-color: #ef4444;
   color: #fff;

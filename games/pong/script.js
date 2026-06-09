@@ -132,18 +132,19 @@
   function handleCollisions() {
     const b = state.ball;
     // Side walls
-    if (b.x < BALL_R) { b.x = BALL_R; b.vx = -b.vx; }
-    if (b.x > W - BALL_R) { b.x = W - BALL_R; b.vx = -b.vx; }
+    if (b.x < BALL_R) { b.x = BALL_R; b.vx = Math.abs(b.vx); }
+    if (b.x > W - BALL_R) { b.x = W - BALL_R; b.vx = -Math.abs(b.vx); }
 
-    // Top paddle
+    // Top paddle — preserve speed, set angle by hit position
     const top = state.topPad;
     if (b.y - BALL_R <= top.y + PAD_H && b.y - BALL_R >= top.y && b.vy < 0) {
       if (b.x >= top.x && b.x <= top.x + PAD_W) {
         b.y = top.y + PAD_H + BALL_R;
-        b.vy = -b.vy;
-        // Spin based on hit position
-        const rel = (b.x - (top.x + PAD_W / 2)) / (PAD_W / 2);
-        b.vx += rel * 1.5;
+        const rel = (b.x - (top.x + PAD_W / 2)) / (PAD_W / 2); // -1..1
+        const speed = Math.hypot(b.vx, b.vy);
+        const angle = rel * (Math.PI / 3); // ±60° from straight down
+        b.vx = Math.sin(angle) * speed;
+        b.vy = Math.cos(angle) * speed; // positive (downward)
         nudgeSpeed();
       }
     }
@@ -152,11 +153,20 @@
     if (b.y + BALL_R >= bot.y && b.y + BALL_R <= bot.y + PAD_H && b.vy > 0) {
       if (b.x >= bot.x && b.x <= bot.x + PAD_W) {
         b.y = bot.y - BALL_R;
-        b.vy = -b.vy;
         const rel = (b.x - (bot.x + PAD_W / 2)) / (PAD_W / 2);
-        b.vx += rel * 1.5;
+        const speed = Math.hypot(b.vx, b.vy);
+        const angle = rel * (Math.PI / 3);
+        b.vx = Math.sin(angle) * speed;
+        b.vy = -Math.cos(angle) * speed; // negative (upward)
         nudgeSpeed();
       }
+    }
+
+    // Enforce a minimum vertical speed so the ball can never stay
+    // pinging horizontally between the side walls.
+    const MIN_VY = 1.6;
+    if (Math.abs(b.vy) < MIN_VY) {
+      b.vy = (b.vy >= 0 ? 1 : -1) * MIN_VY;
     }
 
     // Top miss → bottom player scores

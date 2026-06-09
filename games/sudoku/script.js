@@ -13,9 +13,10 @@
   const MAX_MISTAKES = 3;
 
   const DIFFICULTY_HOLES = {
-    easy: 36,
-    medium: 46,
+    easy: 38,
+    medium: 48,
     hard: 54,
+    expert: 58,
   };
 
   // ---- State ----
@@ -353,7 +354,8 @@
     els.board.querySelectorAll(".cell").forEach((c) => c.classList.add("solved"));
 
     const sec = Math.floor((Date.now() - state.startedAt) / 1000);
-    const diffMul = els.difficulty.value === "hard" ? 2 :
+    const diffMul = els.difficulty.value === "expert" ? 3 :
+                    els.difficulty.value === "hard" ? 2 :
                     els.difficulty.value === "medium" ? 1.5 : 1;
     // Higher = faster + fewer mistakes + harder difficulty.
     const score = Math.max(

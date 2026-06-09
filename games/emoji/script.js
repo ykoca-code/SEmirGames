@@ -371,8 +371,7 @@
       els.overlayTitle.textContent = "Emoji Quiz";
       els.overlayText.textContent = "Kategori seç ve başla. Her sorunun süresi 10 saniye.";
       els.overlayBtn.textContent = "Başla";
-      const slot = document.getElementById("leaderboardSlot");
-      if (slot) slot.innerHTML = "";
+      renderLeaderboardSlot();
       document.getElementById("catSelectWrap").style.display = "";
       showOverlay();
     });
@@ -389,6 +388,7 @@
   function boot() {
     bindEvents();
     renderCategoryChips();
+    renderLeaderboardSlot();
     updateStats();
     showOverlay();
   }

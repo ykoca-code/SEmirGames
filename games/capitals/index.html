@@ -33,6 +33,11 @@
       <button type="button" class="choice" data-idx="3">…</button>
     </div>
 
+    <div class="type-answer hidden" id="typeAnswer">
+      <input type="text" id="answerInput" class="answer-input" placeholder="Başkenti yaz..." autocomplete="off" />
+      <button type="button" id="submitAnswer" class="btn btn-primary">Cevapla</button>
+    </div>
+
     <div class="action-row">
       <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
     </div>
@@ -45,15 +50,23 @@
           <div class="cat-label">Kıta</div>
           <div class="cat-chips" id="regionChips"></div>
         </div>
+        <div class="region-select">
+          <div class="cat-label">Zorluk</div>
+          <div class="cat-chips" id="diffChips">
+            <button type="button" class="cat-chip active" data-diff="easy">Kolay</button>
+            <button type="button" class="cat-chip" data-diff="medium">Orta</button>
+            <button type="button" class="cat-chip" data-diff="hard">Zor (yaz)</button>
+          </div>
+        </div>
         <div class="lb-slot" id="leaderboardSlot"></div>
         <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
       </div>
     </div>
   </main>
 
-  <script src="../../js/version.js?v=1.13.0"></script>
-  <script src="../../js/leaderboard.js?v=1.13.0"></script>
-  <script src="../flags/countries.js?v=1.13.0"></script>
+  <script src="../../js/version.js?v=1.14.0"></script>
+  <script src="../../js/leaderboard.js?v=1.14.0"></script>
+  <script src="../flags/countries.js?v=1.14.0"></script>
   <script src="script.js"></script>
 </body>
 </html>

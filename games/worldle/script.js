@@ -299,6 +299,7 @@
     els.overlayBtn.addEventListener("click", newGame);
 
     updateStats();
+    renderLBSlot();
     showOverlay();
   }
 
