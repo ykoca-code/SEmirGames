@@ -161,7 +161,7 @@
     {
       "id": "worldle",
       "title": "Sıcak Soğuk Ülke",
-      "description": "Bilgisayar bir ülke seçer. Her tahminde mesafe ve yön söylenir. 6 hakla bul!",
+      "description": "Bilgisayar bir ülke seçer. Her tahminde mesafe ve yön söylenir. 10 hakla bul!",
       "category": "educational",
       "categoryLabel": "Eğitici",
       "ageRating": "10+",

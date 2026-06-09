@@ -9,9 +9,27 @@
 (function () {
   "use strict";
 
-  const MAX_GUESSES = 6;
+  const MAX_GUESSES = 10;
   const STORAGE_KEY = "semirk_worldle_best";
   const EARTH_R = 6371; // km
+
+  // Tiny / micro island & city states are too small to identify on the
+  // map. They stay searchable as guesses but never get picked as the
+  // hidden target.
+  const TARGET_EXCLUDE = new Set([
+    // Pasifik mikro devletleri
+    "FJ", "SB", "VU", "WS", "TO", "KI", "FM", "MH", "PW",
+    // Karayipler
+    "BB", "GD", "LC", "VC", "KN", "AG", "DM",
+    // Hint Okyanusu / Afrika küçük adalar
+    "MV", "MU", "SC", "KM", "ST", "CV",
+    // Güneydoğu Asya küçük
+    "BN", "SG", "TL",
+    // Avrupa küçük devletler
+    "VA", "MC", "SM", "LI", "AD", "MT",
+    // Körfez küçük
+    "BH",
+  ]);
 
   const state = {
     target: null,
@@ -85,7 +103,8 @@
   function newGame() {
     const all = window.COUNTRIES || [];
     if (all.length === 0) return;
-    state.target = all[Math.floor(Math.random() * all.length)];
+    const pool = all.filter((c) => !TARGET_EXCLUDE.has(c.code));
+    state.target = pool[Math.floor(Math.random() * pool.length)];
     state.guesses = [];
     state.finished = false;
     state.won = false;
