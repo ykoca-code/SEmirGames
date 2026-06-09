@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Dama - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dama-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <main class="container game-container dama-container">
+    <div class="dama-top">
+      <div class="player p1" id="p1Box">
+        <div class="p-label">Beyaz</div>
+        <div class="p-stat"><span id="whiteCount">16</span> taş</div>
+      </div>
+      <div class="turn-indicator" id="turnIndicator">Beyaz başlar</div>
+      <div class="player p2" id="p2Box">
+        <div class="p-label">Siyah</div>
+        <div class="p-stat"><span id="blackCount">16</span> taş</div>
+      </div>
+    </div>
+
+    <div class="board-wrap">
+      <div id="board" class="dama-board" aria-label="Dama tahtası"></div>
+    </div>
+
+    <div class="action-row">
+      <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+      <button type="button" id="rulesBtn" class="btn">Kurallar</button>
+    </div>
+
+    <div id="overlay" class="overlay hidden">
+      <div class="overlay-content">
+        <h2 id="overlayTitle">Türk Daması</h2>
+        <p id="overlayText">2 kişilik klasik dama. Sıra ile oyna. Beyaz aşağıda, siyah yukarıda. Önce tüm karşı taşları yakalayan kazanır!</p>
+        <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
+      </div>
+    </div>
+
+    <div id="rulesModal" class="rules-modal hidden">
+      <div class="rules-content">
+        <h3>Türk Daması Kuralları</h3>
+        <ul>
+          <li><strong>Hareket:</strong> Taşlar ileri veya yan tarafa <strong>bir kare</strong> hareket eder (çapraz değil!).</li>
+          <li><strong>Yiyiş:</strong> Karşı taşın üzerinden atlayarak yer. <strong>Yiyiş varsa zorunlu</strong>!</li>
+          <li><strong>Çoklu yiyiş:</strong> Atladıktan sonra tekrar yiyebilirse devam etmek zorunda.</li>
+          <li><strong>Dame:</strong> Son sıraya ulaşan taş "Dame" olur. Her yöne istediği kadar gidebilir.</li>
+          <li><strong>Kazanma:</strong> Rakibin tüm taşlarını ye veya hareketini engelle.</li>
+        </ul>
+        <button type="button" id="closeRulesBtn" class="btn btn-primary">Anladım</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../js/version.js?v=1.15.0"></script>
+  <script src="script.js"></script>
+</body>
+</html>

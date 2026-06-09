@@ -1,0 +1,14 @@
+{
+  "id": "dama",
+  "title": "Dama",
+  "description": "Türk daması — 2 kişilik klasik strateji oyunu. Düz hareket, zorunlu yiyiş, son sıraya ulaşan taş 'Dame' olur!",
+  "version": "1.0.0",
+  "category": "board",
+  "categoryLabel": "Masa Oyunu",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["masa", "strateji", "dama", "iki-kişilik", "klasik"],
+  "author": "SEmirK Games",
+  "controls": ["Taşa dokun, hedef kareye dokun"]
+}
