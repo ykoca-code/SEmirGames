@@ -140,9 +140,9 @@
     renderMap();
   }
 
-  // Equirectangular projection -> 360×180 SVG viewBox
-  function projLon(lon) { return (lon + 180) * (360 / 360); }
-  function projLat(lat) { return (90 - lat) * (180 / 180); }
+  // Equirectangular projection -> 720×360 SVG viewBox (2 px per degree)
+  function projLon(lon) { return (lon + 180) * 2; }
+  function projLat(lat) { return (90 - lat) * 2; }
 
   function renderMap() {
     if (!els.mapGuesses) return;
@@ -154,7 +154,7 @@
       const color = g.won ? "#10b981" : tempColor(g.distance);
       fragments.push(
         '<circle class="map-dot" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) +
-        '" r="2.6" fill="' + color + '" stroke="#fff" stroke-width="0.4"/>'
+        '" r="4.5" fill="' + color + '" stroke="#fff" stroke-width="0.7"/>'
       );
     }
     // Reveal target after game finishes
@@ -163,7 +163,7 @@
       const ty = projLat(state.target.lat);
       fragments.push(
         '<circle class="map-dot target" cx="' + tx.toFixed(1) + '" cy="' + ty.toFixed(1) +
-        '" r="4" fill="#fbbf24" stroke="#1a1d29" stroke-width="0.6"/>'
+        '" r="7" fill="#fbbf24" stroke="#1a1d29" stroke-width="1"/>'
       );
     }
     els.mapGuesses.innerHTML = fragments.join("");
