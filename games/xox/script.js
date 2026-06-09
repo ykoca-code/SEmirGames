@@ -68,10 +68,16 @@
       const cell = document.createElement("button");
       cell.type = "button";
       cell.className = "xox-cell";
-      cell.dataset.i = i;
-      cell.addEventListener("click", () => onCellClick(i));
+      cell.dataset.i = String(i);
       els.board.appendChild(cell);
     }
+    // Event delegation — survives any re-render and avoids stale closures.
+    els.board.addEventListener("click", (e) => {
+      const cell = e.target.closest(".xox-cell");
+      if (!cell || cell.disabled) return;
+      const i = +cell.dataset.i;
+      if (Number.isInteger(i) && i >= 0 && i < 9) onCellClick(i);
+    });
   }
 
   function render() {

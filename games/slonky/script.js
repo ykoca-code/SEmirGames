@@ -437,6 +437,7 @@
     els.overlayTitle.textContent = "Slonky";
     els.overlayText.textContent = "Topu düşürmek için tahtanın üst kısmına dokun. 10 topla en yüksek skoru yapmaya çalış!";
     els.overlayBtn.textContent = "Başla";
+    renderLBSlot();
     els.overlay.classList.remove("hidden");
 
     requestAnimationFrame(loop);

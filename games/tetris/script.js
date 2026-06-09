@@ -529,6 +529,7 @@
     drawPreview(els.nextCanvas, nextCtx, null);
     drawPreview(els.holdCanvas, holdCtx, null);
     showOverlay("Tetris'e hoş geldin", "Başlamak için butona bas.", "Yeni Oyun");
+    renderLBSlot();
   }
 
   if (document.readyState === "loading") {

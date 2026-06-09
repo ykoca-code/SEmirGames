@@ -279,6 +279,7 @@
   function boot() {
     bindEvents();
     renderCategoryChips();
+    renderLBSlot();
     updateStats();
     showOverlay();
   }
