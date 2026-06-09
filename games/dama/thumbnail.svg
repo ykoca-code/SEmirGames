@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#1a1d29"/>
+  <g>
+    <!-- 4x4 sample board -->
+    <rect x="20"  y="20"  width="50" height="50" fill="#fef3c7"/>
+    <rect x="70"  y="20"  width="50" height="50" fill="#7c4f1e"/>
+    <rect x="120" y="20"  width="50" height="50" fill="#fef3c7"/>
+    <rect x="170" y="20"  width="50" height="50" fill="#7c4f1e"/>
+    <rect x="20"  y="70"  width="50" height="50" fill="#7c4f1e"/>
+    <rect x="70"  y="70"  width="50" height="50" fill="#fef3c7"/>
+    <rect x="120" y="70"  width="50" height="50" fill="#7c4f1e"/>
+    <rect x="170" y="70"  width="50" height="50" fill="#fef3c7"/>
+    <rect x="20"  y="120" width="50" height="50" fill="#fef3c7"/>
+    <rect x="70"  y="120" width="50" height="50" fill="#7c4f1e"/>
+    <rect x="120" y="120" width="50" height="50" fill="#fef3c7"/>
+    <rect x="170" y="120" width="50" height="50" fill="#7c4f1e"/>
+    <rect x="20"  y="170" width="50" height="50" fill="#7c4f1e"/>
+    <rect x="70"  y="170" width="50" height="50" fill="#fef3c7"/>
+    <rect x="120" y="170" width="50" height="50" fill="#7c4f1e"/>
+    <rect x="170" y="170" width="50" height="50" fill="#fef3c7"/>
+  </g>
+  <!-- pieces -->
+  <g stroke="#1a1d29" stroke-width="2">
+    <circle cx="45"  cy="45"  r="18" fill="#ef4444"/>
+    <circle cx="195" cy="45"  r="18" fill="#ef4444"/>
+    <circle cx="145" cy="95"  r="18" fill="#ef4444"/>
+    <circle cx="45"  cy="195" r="18" fill="#fafafa"/>
+    <circle cx="145" cy="195" r="18" fill="#fafafa"/>
+    <circle cx="95"  cy="145" r="18" fill="#fafafa"/>
+    <!-- King (Dame) with crown -->
+    <circle cx="195" cy="195" r="18" fill="#fafafa"/>
+    <text x="195" y="201" font-family="Helvetica,Arial,sans-serif" font-size="16" font-weight="900" fill="#1a1d29" text-anchor="middle">♛</text>
+  </g>
+</svg>

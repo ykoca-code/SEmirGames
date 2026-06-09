@@ -13,6 +13,7 @@
   const QUESTIONS_PER_ROUND = 10;
   const STORAGE_KEY = "semirk_english_best";
   const CAT_PREF_KEY = "semirk_english_cat";
+  const PIC_PREF_KEY = "semirk_english_pic";
 
   const CATEGORY_LABELS = {
     animals: "Hayvanlar",
@@ -37,6 +38,7 @@
     correct: 0,
     best: +(localStorage.getItem(STORAGE_KEY) || 0),
     selectedCategory: localStorage.getItem(CAT_PREF_KEY) || "all",
+    showPic: localStorage.getItem(PIC_PREF_KEY) !== "off",
     locked: false,
     finished: true,
   };
@@ -56,6 +58,7 @@
     overlayText:  document.getElementById("overlayText"),
     overlayBtn:   document.getElementById("overlayBtn"),
     catChips:     document.getElementById("catChips"),
+    picChips:     document.querySelectorAll("#picChips .cat-chip"),
   };
 
   // ==========================================================================
@@ -159,7 +162,8 @@
     state.locked = false;
 
     els.catPill.textContent = CATEGORY_LABELS[w.category] || w.category;
-    els.wordEmoji.textContent = w.emoji;
+    els.wordEmoji.textContent = state.showPic ? w.emoji : "";
+    els.wordEmoji.style.display = state.showPic ? "" : "none";
     els.wordEn.textContent = w.en;
     // Re-trigger animation
     const display = els.wordEmoji.parentElement;
@@ -279,6 +283,17 @@
   function boot() {
     bindEvents();
     renderCategoryChips();
+    // Picture toggle
+    els.picChips.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.showPic = btn.dataset.pic === "on";
+        localStorage.setItem(PIC_PREF_KEY, btn.dataset.pic);
+        els.picChips.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+      btn.classList.toggle("active",
+        (btn.dataset.pic === "on") === state.showPic);
+    });
     renderLBSlot();
     updateStats();
     showOverlay();

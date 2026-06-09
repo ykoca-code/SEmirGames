@@ -69,9 +69,18 @@
     const pairCount = total / 2;
     state.totalPairs = pairCount;
 
-    const symbolIndices = [];
+    // Pick random symbols for THIS round so consecutive games don't reuse
+    // the same first-N symbols. If we need more pairs than the symbol pool
+    // has, we wrap (still shuffled).
+    const allSymbolIdx = SYMBOLS.map((_, i) => i);
+    shuffle(allSymbolIdx);
+    const chosen = [];
     for (let i = 0; i < pairCount; i++) {
-      symbolIndices.push(i % SYMBOLS.length, i % SYMBOLS.length);
+      chosen.push(allSymbolIdx[i % allSymbolIdx.length]);
+    }
+    const symbolIndices = [];
+    for (const idx of chosen) {
+      symbolIndices.push(idx, idx);
     }
     shuffle(symbolIndices);
 
