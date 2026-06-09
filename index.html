@@ -6,6 +6,12 @@
   <meta name="description" content="SEmirK Games - Zararsız, eğlenceli oyunlar. Sudoku, bulmaca, zeka oyunları ve daha fazlası." />
   <title>SEmirK Games - Eğlenceli ve Zararsız Oyunlar</title>
   <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#6c5ce7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SEmirK Games" />
+  <link rel="apple-touch-icon" href="assets/icons/SemirkLogo.png" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -76,7 +82,17 @@
     <p>&copy; <span id="year"></span> SEmirK Games. Tüm hakları saklıdır.</p>
   </footer>
 
-  <script src="js/version.js?v=1.15.2"></script>
+  <script src="js/version.js?v=1.16.0"></script>
   <script src="js/main.js"></script>
+  <script>
+    // PWA service worker — installs the site as an app + works offline.
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker
+          .register("service-worker.js")
+          .catch(function () {});
+      });
+    }
+  </script>
 </body>
 </html>
