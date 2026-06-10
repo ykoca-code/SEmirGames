@@ -6,6 +6,9 @@
   const STORAGE_KEY = "semirk_capitals_best";
   const REGION_KEY = "semirk_capitals_region";
   const DIFF_KEY = "semirk_capitals_diff";
+  // Difficulty score multipliers: easy 1×, medium 1.5×, hard 2×.
+  const DIFF_MUL = { easy: 1, medium: 1.5, hard: 2 };
+
   const REGION_LABELS = {
     europe: "Avrupa", asia: "Asya", africa: "Afrika",
     america: "Amerika", oceania: "Okyanusya",
@@ -164,7 +167,9 @@
     els.answerInput.classList.add(ok ? "correct" : "wrong");
 
     if (ok) {
-      const points = 20 + state.streak * 8;
+      // Type mode is always hard (2× multiplier).
+      const mul = DIFF_MUL[state.diff] || 2;
+      const points = Math.floor((10 + state.streak * 5) * mul);
       state.score += points;
       state.streak += 1;
       state.correct += 1;
@@ -189,7 +194,8 @@
     els.choices.forEach((b) => (b.disabled = true));
 
     if (ok) {
-      const points = 10 + state.streak * 5;
+      const mul = DIFF_MUL[state.diff] || 1;
+      const points = Math.floor((10 + state.streak * 5) * mul);
       state.score += points;
       state.streak += 1;
       state.correct += 1;
