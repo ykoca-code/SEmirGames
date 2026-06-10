@@ -5,7 +5,7 @@
    - Cache key bumps with each release so updates are picked up
    ========================================================================== */
 
-const CACHE_VERSION = "v1.18.0";
+const CACHE_VERSION = "v1.18.1";
 const CACHE_NAME = "semirk-" + CACHE_VERSION;
 
 // Shell files that the catalog needs to load. Game-specific files load on

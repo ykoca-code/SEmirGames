@@ -64,7 +64,8 @@
     state.finished = false;
     state.paused = false;
     state.running = true;
-    state.speed = state.mode === "bot-hard" ? 5.2 : state.mode === "bot-medium" ? 4.5 : 3.8;
+    state.speed = state.mode === "bot-hard" ? 6.4 : state.mode === "bot-medium" ? 5.6 : 5.0;
+    state.rallyTime = 0;
     els.targetScore.textContent = WIN_SCORE;
     els.topLabel.textContent = state.mode === "two-player" ? "Üst Oyuncu" : "Rakip";
     els.pauseBtn.textContent = "Duraklat";
@@ -82,6 +83,7 @@
     state.ball.vx = Math.sin(angle) * state.speed;
     state.ball.vy = Math.cos(angle) * state.speed;
     state.serveTimer = 800; // 800ms grace
+    state.rallyTime = 0;
   }
 
   // ==========================================================================
@@ -106,6 +108,16 @@
       return; // brief pause after each serve so the player can prepare
     }
 
+    // Continuous speed ramp during a rally — direction-preserving boost
+    state.rallyTime += dt;
+    const v = Math.hypot(state.ball.vx, state.ball.vy);
+    const MAX_V = 14;
+    if (v > 0.1 && v < MAX_V) {
+      const k = 1 + 0.00018 * dt; // ≈ +1.1%/sec → noticeable in long rallies
+      state.ball.vx *= k;
+      state.ball.vy *= k;
+    }
+
     // Bot AI for top paddle (if not two-player)
     if (state.mode !== "two-player") {
       const level = BOT_LEVELS[state.mode] || BOT_LEVELS["bot-easy"];
@@ -118,7 +130,7 @@
     }
 
     // Ball motion (substeps for stability)
-    const SUB = 4;
+    const SUB = 6;
     const sx = (state.ball.vx * dt) / 16 / SUB;
     const sy = (state.ball.vy * dt) / 16 / SUB;
     for (let i = 0; i < SUB; i++) {
@@ -188,14 +200,14 @@
   function nudgeSpeed() {
     // Cap the magnitude so balls don't tunnel
     const v = Math.hypot(state.ball.vx, state.ball.vy);
-    const maxV = 9;
+    const maxV = 14;
     if (v > maxV) {
       state.ball.vx = (state.ball.vx / v) * maxV;
       state.ball.vy = (state.ball.vy / v) * maxV;
     } else {
-      // Slight speed up after each rally hit
-      state.ball.vx *= 1.04;
-      state.ball.vy *= 1.04;
+      // Bigger speed-up after each paddle hit
+      state.ball.vx *= 1.08;
+      state.ball.vy *= 1.08;
     }
   }
 
