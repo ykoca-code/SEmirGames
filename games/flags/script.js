@@ -237,10 +237,18 @@
     if (state.locked || state.finished) return;
     state.locked = true;
     state.streak = 0;
-    els.choices[state.current.correctIdx].classList.add("correct");
-    els.choices.forEach((b) => (b.disabled = true));
+    if (state.diff === "hard") {
+      // Type-the-answer mode: no choices, just reveal the answer in the input.
+      els.answerInput.disabled = true;
+      els.submitAnswer.disabled = true;
+      els.answerInput.classList.add("wrong");
+      els.answerInput.value = "⏱ Süre doldu → " + state.current.country.name;
+    } else {
+      els.choices[state.current.correctIdx].classList.add("correct");
+      els.choices.forEach((b) => (b.disabled = true));
+    }
     updateStats();
-    setTimeout(() => { state.qIndex += 1; nextQuestion(); }, 1100);
+    setTimeout(() => { state.qIndex += 1; nextQuestion(); }, 1300);
   }
 
   function answer(idx) {
