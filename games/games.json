@@ -212,6 +212,17 @@
       "thumbnail": "games/dama/thumbnail.svg",
       "path": "games/dama/index.html",
       "tags": ["masa", "strateji", "dama", "iki-kişilik", "klasik"]
+    },
+    {
+      "id": "scooter",
+      "title": "Scooter Yarışı",
+      "description": "Hiç bitmeyen kaçış oyunu! Scooter ile şeritlere kay, altınları topla, engellerden zıpla. Ne kadar uzağa gidebilirsin?",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/scooter/thumbnail.svg",
+      "path": "games/scooter/index.html",
+      "tags": ["arcade", "endless runner", "scooter", "kaçış", "altın"]
     }
   ]
 }

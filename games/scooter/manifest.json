@@ -1,0 +1,14 @@
+{
+  "id": "scooter",
+  "title": "Scooter Yarışı",
+  "description": "Hiç bitmeyen kaçış oyunu! Scooter ile şeritlere kay, altınları topla, engellerden zıpla. Ne kadar uzağa gidebilirsin?",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "endless runner", "scooter", "altın", "kaçış"],
+  "author": "SEmirK Games",
+  "controls": ["Kaydır: şerit değiştir", "Yukarı kaydır / dokun: zıpla"]
+}

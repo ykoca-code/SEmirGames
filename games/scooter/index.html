@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Scooter Yarışı - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="scooter-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <main class="container game-container scooter-container">
+    <div class="sc-top">
+      <div class="sc-stat">
+        <span class="sc-label">Skor</span>
+        <span id="score" class="sc-value">0</span>
+      </div>
+      <div class="sc-stat">
+        <span class="sc-label">Altın</span>
+        <span id="coins" class="sc-value">0</span>
+      </div>
+      <div class="sc-stat">
+        <span class="sc-label">Mesafe</span>
+        <span id="distance" class="sc-value">0m</span>
+      </div>
+      <div class="sc-stat">
+        <span class="sc-label">Rekor</span>
+        <span id="best" class="sc-value">0</span>
+      </div>
+    </div>
+
+    <div class="sc-stage">
+      <canvas id="board" width="300" height="500" aria-label="Yol"></canvas>
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-content">
+          <h2 id="overlayTitle">Scooter Yarışı</h2>
+          <p id="overlayText">Sola/sağa kaydır şerit değiştir. Yukarı kaydır veya tahtaya dokun → zıpla. Altınları topla, engellerden kaç!</p>
+          <div class="lb-slot" id="leaderboardSlot"></div>
+          <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="touch-controls" aria-label="Dokunmatik kontroller">
+      <button type="button" data-action="left" class="touch-btn">←</button>
+      <button type="button" data-action="jump" class="touch-btn jump">⤴ Zıpla</button>
+      <button type="button" data-action="right" class="touch-btn">→</button>
+    </section>
+
+    <div class="action-row">
+      <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+      <button type="button" id="pauseBtn" class="btn">Duraklat</button>
+    </div>
+  </main>
+
+  <script src="../../js/version.js?v=1.17.0"></script>
+  <script src="../../js/leaderboard.js?v=1.17.0"></script>
+  <script src="script.js"></script>
+</body>
+</html>
