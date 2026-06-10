@@ -24,6 +24,17 @@
       </div>
     </div>
 
+    <div class="mode-row">
+      <button type="button" class="mode-btn" data-mode="two-player">👥 2 Kişilik</button>
+      <button type="button" class="mode-btn active" data-mode="bot">🤖 Bilgisayara Karşı</button>
+    </div>
+    <div class="diff-row" id="diffRow">
+      <span class="diff-label">Zorluk:</span>
+      <button type="button" class="diff-btn active" data-diff="easy">Kolay</button>
+      <button type="button" class="diff-btn" data-diff="medium">Orta</button>
+      <button type="button" class="diff-btn" data-diff="hard">Zor</button>
+    </div>
+
     <div class="board-wrap">
       <div id="board" class="dama-board" aria-label="Dama tahtası"></div>
     </div>
@@ -56,7 +67,7 @@
     </div>
   </main>
 
-  <script src="../../js/version.js?v=1.17.0"></script>
+  <script src="../../js/version.js?v=1.17.1"></script>
   <script src="script.js"></script>
 </body>
 </html>

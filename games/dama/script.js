@@ -17,6 +17,9 @@
   const WHITE = "w";
   const BLACK = "b";
 
+  const MODE_KEY = "semirk_dama_mode";
+  const DIFF_KEY = "semirk_dama_diff";
+
   const state = {
     board: [],       // [r][c] = { color, king } | null
     turn: WHITE,
@@ -24,6 +27,9 @@
     moves: [],       // valid moves for selected piece, each { r, c, captures: [{r,c}] }
     mustCapture: false, // true if any piece of current player has a capture
     finished: false,
+    mode: localStorage.getItem(MODE_KEY) || "bot",      // "bot" | "two-player"
+    diff: localStorage.getItem(DIFF_KEY) || "easy",     // "easy" | "medium" | "hard"
+    botThinking: false,
   };
 
   const els = {
@@ -41,6 +47,9 @@
     overlayTitle: document.getElementById("overlayTitle"),
     overlayText: document.getElementById("overlayText"),
     overlayBtn: document.getElementById("overlayBtn"),
+    modeBtns: document.querySelectorAll(".mode-btn"),
+    diffBtns: document.querySelectorAll(".diff-btn"),
+    diffRow: document.getElementById("diffRow"),
   };
 
   // ==========================================================================
@@ -59,6 +68,7 @@
     state.selected = null;
     state.moves = [];
     state.finished = false;
+    state.botThinking = false;
     updateMandatoryCapture();
     render();
     hideOverlay();
@@ -269,6 +279,9 @@
   // ==========================================================================
   function onSquareTap(r, c) {
     if (state.finished) return;
+    // Block player input on bot's turn (black) when in bot mode.
+    if (state.mode === "bot" && state.turn === BLACK) return;
+    if (state.botThinking) return;
     // If selected, try to move to (r,c)
     if (state.selected) {
       const m = state.moves.find((mv) => mv.r === r && mv.c === c);
@@ -324,6 +337,137 @@
     updateMandatoryCapture();
     render();
     checkEndState();
+
+    // Bot's turn in bot mode → schedule its move
+    if (!state.finished && state.mode === "bot" && state.turn === BLACK) {
+      state.botThinking = true;
+      setTimeout(botMove, 600);
+    }
+  }
+
+  // ==========================================================================
+  // Bot
+  // ==========================================================================
+  function allMovesFor(color) {
+    const out = [];
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const p = state.board[r][c];
+        if (!p || p.color !== color) continue;
+        let moves = getMovesFrom(r, c);
+        if (state.mustCapture) moves = moves.filter((m) => m.captures.length > 0);
+        for (const m of moves) out.push({ from: { r, c }, move: m });
+      }
+    }
+    return out;
+  }
+
+  // Simple heuristic: own pieces (king ×2) minus enemy (king ×2)
+  function evalBoard(board, perspective) {
+    let score = 0;
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const p = board[r][c];
+        if (!p) continue;
+        const w = p.king ? 2.4 : 1;
+        score += p.color === perspective ? w : -w;
+      }
+    }
+    return score;
+  }
+
+  function simulateMove(board, from, move) {
+    // Returns a NEW board with the move applied (used by hard-mode lookahead).
+    const next = board.map((row) => row.map((c) => (c ? { color: c.color, king: c.king } : null)));
+    const piece = next[from.r][from.c];
+    next[from.r][from.c] = null;
+    for (const cap of move.captures) next[cap.r][cap.c] = null;
+    const promote = !piece.king &&
+      ((piece.color === WHITE && move.r === 0) ||
+       (piece.color === BLACK && move.r === SIZE - 1));
+    next[move.r][move.c] = { color: piece.color, king: piece.king || promote };
+    return next;
+  }
+
+  function botMove() {
+    state.botThinking = false;
+    if (state.finished) return;
+    if (state.turn !== BLACK) return;
+    const moves = allMovesFor(BLACK);
+    if (moves.length === 0) return; // checkEndState already declared the loss
+
+    // EASY → uniform random
+    if (state.diff === "easy") {
+      const pick = moves[Math.floor(Math.random() * moves.length)];
+      return executeMove(pick.from, pick.move);
+    }
+
+    // Prefer capture moves; among those prefer longest chains.
+    const captures = moves.filter((m) => m.move.captures.length > 0);
+    if (state.diff === "medium") {
+      if (captures.length) {
+        captures.sort((a, b) => b.move.captures.length - a.move.captures.length);
+        const top = captures.filter((m) => m.move.captures.length === captures[0].move.captures.length);
+        const pick = top[Math.floor(Math.random() * top.length)];
+        return executeMove(pick.from, pick.move);
+      }
+      const pick = moves[Math.floor(Math.random() * moves.length)];
+      return executeMove(pick.from, pick.move);
+    }
+
+    // HARD → 1-ply look-ahead minimax: best move by board evaluation.
+    let bestScore = -Infinity;
+    let bestMoves = [];
+    for (const m of moves) {
+      const sim = simulateMove(state.board, m.from, m.move);
+      // Penalize moves that hand the opponent an immediate large capture.
+      let opp = 0;
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          const p = sim[r][c];
+          if (!p || p.color !== WHITE) continue;
+          // Quick capture scan from this cell for white
+          const caps = quickCapturesFrom(sim, r, c, p);
+          if (caps > opp) opp = caps;
+        }
+      }
+      const sc = evalBoard(sim, BLACK) + m.move.captures.length * 1.6 - opp * 1.4;
+      if (sc > bestScore) {
+        bestScore = sc;
+        bestMoves = [m];
+      } else if (sc === bestScore) {
+        bestMoves.push(m);
+      }
+    }
+    const pick = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+    return executeMove(pick.from, pick.move);
+  }
+
+  // Lightweight capture count from a single cell (no chain follow-up).
+  function quickCapturesFrom(board, r, c, piece) {
+    let best = 0;
+    const dirs = piece.king ? [[-1,0],[1,0],[0,-1],[0,1]] : (
+      piece.color === WHITE ? [[-1,0],[0,-1],[0,1]] : [[1,0],[0,-1],[0,1]]
+    );
+    for (const [dr, dc] of dirs) {
+      if (piece.king) {
+        let i = 1;
+        while (inBounds(r + dr*i, c + dc*i) && !board[r + dr*i][c + dc*i]) i++;
+        if (!inBounds(r + dr*i, c + dc*i)) continue;
+        const mid = board[r + dr*i][c + dc*i];
+        if (mid.color === piece.color) continue;
+        if (!inBounds(r + dr*(i+1), c + dc*(i+1)) || board[r + dr*(i+1)][c + dc*(i+1)]) continue;
+        best = Math.max(best, 1);
+      } else {
+        const mr = r + dr, mc = c + dc;
+        const lr = r + dr*2, lc = c + dc*2;
+        if (!inBounds(mr, mc) || !inBounds(lr, lc)) continue;
+        if (!board[mr][mc] || board[mr][mc].color === piece.color) continue;
+        if (board[lr][lc]) continue;
+        best = Math.max(best, 1);
+      }
+    }
+    return best;
   }
 
   function checkEndState() {
@@ -400,6 +544,21 @@
   // ==========================================================================
   // Bind & boot
   // ==========================================================================
+  function applyMode() {
+    els.modeBtns.forEach((b) => b.classList.toggle("active", b.dataset.mode === state.mode));
+    els.diffRow.classList.toggle("hidden", state.mode !== "bot");
+    const p2Label = els.p2Box.querySelector(".p-label");
+    if (state.mode === "bot") {
+      p2Label.textContent = "🤖 Bot";
+    } else {
+      p2Label.textContent = "Siyah";
+    }
+  }
+
+  function applyDiff() {
+    els.diffBtns.forEach((b) => b.classList.toggle("active", b.dataset.diff === state.diff));
+  }
+
   function bindEvents() {
     els.board.addEventListener("click", (e) => {
       const sq = e.target.closest(".sq");
@@ -412,11 +571,32 @@
     els.overlayBtn.addEventListener("click", newGame);
     els.rulesBtn.addEventListener("click", () => els.rulesModal.classList.remove("hidden"));
     els.closeRulesBtn.addEventListener("click", () => els.rulesModal.classList.add("hidden"));
+
+    els.modeBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (state.mode === btn.dataset.mode) return;
+        state.mode = btn.dataset.mode;
+        localStorage.setItem(MODE_KEY, state.mode);
+        applyMode();
+        newGame();
+      });
+    });
+    els.diffBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (state.diff === btn.dataset.diff) return;
+        state.diff = btn.dataset.diff;
+        localStorage.setItem(DIFF_KEY, state.diff);
+        applyDiff();
+        newGame();
+      });
+    });
   }
 
   function boot() {
     buildGrid();
     bindEvents();
+    applyMode();
+    applyDiff();
     newGame();
   }
 
