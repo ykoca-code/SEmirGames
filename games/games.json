@@ -223,6 +223,17 @@
       "thumbnail": "games/scooter/thumbnail.svg",
       "path": "games/scooter/index.html",
       "tags": ["arcade", "endless runner", "scooter", "kaçış", "altın"]
+    },
+    {
+      "id": "bricks",
+      "title": "Tuğla Patlat",
+      "description": "Klasik tuğla kırma! Bombalar, çoklu top, uzun palet ve daha fazla bonus. Tüm tuğlaları parçala, bir sonraki seviyeye geç!",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/bricks/thumbnail.svg",
+      "path": "games/bricks/index.html",
+      "tags": ["arcade", "brick", "breakout", "power-up", "tuğla"]
     }
   ]
 }

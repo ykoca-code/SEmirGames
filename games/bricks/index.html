@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Tuğla Patlat - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bricks-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <main class="container game-container bricks-container">
+    <div class="bricks-top">
+      <div class="b-stat"><span class="b-stat-label">Skor</span><span id="score" class="b-stat-value">0</span></div>
+      <div class="b-stat"><span class="b-stat-label">Sev</span><span id="level" class="b-stat-value">1</span></div>
+      <div class="b-stat"><span class="b-stat-label">Can</span><span id="lives" class="b-stat-value">♥♥♥</span></div>
+      <div class="b-stat"><span class="b-stat-label">Rekor</span><span id="best" class="b-stat-value">0</span></div>
+    </div>
+
+    <div class="bricks-stage">
+      <canvas id="board" width="320" height="500" aria-label="Tuğla tahtası"></canvas>
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-content">
+          <h2 id="overlayTitle">Tuğla Patlat</h2>
+          <p id="overlayText">Paleti parmağınla kaydır. Topu fırlatmak için tahtaya dokun!
+💣 Bomba · 🔵 Çoklu Top · 📏 Uzun Palet · ❤️ Can</p>
+          <div class="lb-slot" id="leaderboardSlot"></div>
+          <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button type="button" id="newGameBtn" class="btn btn-primary">Yeni Oyun</button>
+      <button type="button" id="pauseBtn" class="btn">Duraklat</button>
+    </div>
+  </main>
+
+  <script src="../../js/version.js?v=1.18.0"></script>
+  <script src="../../js/leaderboard.js?v=1.18.0"></script>
+  <script src="script.js"></script>
+</body>
+</html>

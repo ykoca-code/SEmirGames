@@ -1,0 +1,14 @@
+{
+  "id": "bricks",
+  "title": "Tuğla Patlat",
+  "description": "Klasik tuğla kırma! Bombalar, çoklu top, uzun palet ve daha fazla bonus. Tüm tuğlaları parçala, bir sonraki seviyeye geç!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "brick", "breakout", "power-up", "tuğla"],
+  "author": "SEmirK Games",
+  "controls": ["Parmağını kaydır: palet hareket et", "Tahtaya dokun: topu fırlat"]
+}
