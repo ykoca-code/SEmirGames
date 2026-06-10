@@ -185,6 +185,10 @@
 
     state.turn = state.turn === "X" ? "O" : "X";
     setTurnLine();
+    // Re-render so cells reflect the NEW turn's disabled state. Without this
+    // pass, after the bot moves and we flip back to "X" the cells stay
+    // disabled from the previous render (which ran while turn was "O").
+    render();
 
     if (state.mode === "bot" && state.turn === "O" && !state.finished) {
       setTimeout(() => {
