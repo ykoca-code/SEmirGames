@@ -523,7 +523,7 @@
     document.addEventListener("keydown", (e) => {
       keys[e.key] = true;
       if (e.key === " " || e.key === "Enter") {
-        if (state.grounded && state.running && !state.finished) {
+        if (state.wolf.grounded && state.running && !state.finished) {
           state.wolf.vy = JUMP_POWER;
           state.wolf.grounded = false;
         }
