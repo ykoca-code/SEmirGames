@@ -1,0 +1,14 @@
+{
+  "id": "wolf",
+  "title": "Kurt Maceraları",
+  "description": "Sevimli bir kurt ormanda yıldızları toplayarak seviyeleri tamamlıyor. Zıpla, kaç, topla ve çık!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["3d", "platformer", "macera", "çocuk", "kurt"],
+  "author": "SEmirK Games",
+  "controls": ["OK tuşları / sürükle: hareket et", "Space/Tap: zıpla (2. basış = çift zıplama)", "Bayrak: checkpoint"]
+}
