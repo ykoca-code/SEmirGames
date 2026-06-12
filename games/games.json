@@ -234,6 +234,17 @@
       "thumbnail": "games/bricks/thumbnail.svg",
       "path": "games/bricks/index.html",
       "tags": ["arcade", "brick", "breakout", "power-up", "tuğla"]
+    },
+    {
+      "id": "wolf",
+      "title": "Kurt Maceraları",
+      "description": "Sevimli bir kurt ormanda yıldızları toplayarak seviyeleri tamamlıyor. Zıpla, kaç, topla ve çık!",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/wolf/thumbnail.svg",
+      "path": "games/wolf/index.html",
+      "tags": ["3d", "platformer", "macera", "çocuk", "kurt"]
     }
   ]
 }

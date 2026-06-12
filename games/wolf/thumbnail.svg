@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5aa5d9"/>
+      <stop offset="1" stop-color="#7cc5ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#sky)"/>
+  <!-- ground -->
+  <rect x="0" y="180" width="240" height="60" fill="#4a7c3a"/>
+  <!-- platforms -->
+  <rect x="20" y="170" width="50" height="15" rx="3" fill="#6b8e23"/>
+  <rect x="90" y="140" width="45" height="15" rx="3" fill="#8aac4a"/>
+  <rect x="160" y="120" width="50" height="15" rx="3" fill="#6b8e23"/>
+  <!-- stars -->
+  <g fill="#ffd700">
+    <polygon points="55,145 58,152 66,152 60,157 62,164 55,160 48,164 50,157 44,152 52,152"/>
+    <polygon points="125,120 128,127 136,127 130,132 132,139 125,135 118,139 120,132 114,127 122,127"/>
+    <polygon points="195,100 198,107 206,107 200,112 202,119 195,115 188,119 190,112 184,107 192,107"/>
+  </g>
+  <!-- wolf character -->
+  <g transform="translate(60,155)">
+    <!-- body -->
+    <ellipse cx="0" cy="0" rx="8" ry="12" fill="#8b8b7b"/>
+    <!-- head -->
+    <circle cx="0" cy="-12" r="8" fill="#9a9a8a"/>
+    <!-- ears -->
+    <polygon points="0,-18 -4,-25 4,-25" fill="#7a7a6a"/>
+    <polygon points="0,-18 -3,-24 3,-24" fill="#7a7a6a" transform="translate(-5,0)"/>
+    <polygon points="0,-18 -3,-24 3,-24" fill="#7a7a6a" transform="translate(5,0)"/>
+    <!-- eyes -->
+    <circle cx="-3" cy="-13" r="1.5" fill="#1a1a1a"/>
+    <circle cx="3" cy="-13" r="1.5" fill="#1a1a1a"/>
+    <!-- tail -->
+    <path d="M 8 -2 Q 14 -4 12 6" stroke="#7a7a6a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- exit door (green) -->
+  <rect x="185" y="105" width="30" height="20" rx="4" fill="#22cc22" opacity="0.8"/>
+</svg>
