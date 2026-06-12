@@ -506,26 +506,27 @@
   const FRICTION = 0.15;
 
   function step(dt) {
-    const frameAdj = dt / 16.67; // 60fps normalization
+    const frameAdj = dt / 16.67;          // per-frame factor (friction, spin)
+    const dt_s = Math.min(0.05, dt / 1000); // per-second factor (physics)
 
     // Input — keyboard first, then mobile drag joystick
     if (keys["ArrowLeft"] || keys["a"]) state.wolf.vx = -MOVE_SPEED;
     else if (keys["ArrowRight"] || keys["d"]) state.wolf.vx = MOVE_SPEED;
     else if (touchVec.x !== 0) state.wolf.vx = touchVec.x * MOVE_SPEED;
-    else state.wolf.vx *= (1 - FRICTION);
+    else state.wolf.vx *= Math.max(0, 1 - FRICTION * frameAdj);
 
     if (keys["ArrowUp"] || keys["w"]) state.wolf.vz = -MOVE_SPEED;
     else if (keys["ArrowDown"] || keys["s"]) state.wolf.vz = MOVE_SPEED;
     else if (touchVec.z !== 0) state.wolf.vz = touchVec.z * MOVE_SPEED;
-    else state.wolf.vz *= (1 - FRICTION);
+    else state.wolf.vz *= Math.max(0, 1 - FRICTION * frameAdj);
 
-    // Gravity
-    state.wolf.vy -= GRAVITY * frameAdj;
+    // Gravity (units/s²)
+    state.wolf.vy -= GRAVITY * dt_s;
 
-    // Position update
-    state.wolf.x += state.wolf.vx * frameAdj;
-    state.wolf.z += state.wolf.vz * frameAdj;
-    state.wolf.y += state.wolf.vy * frameAdj;
+    // Position update (velocities are in units/s)
+    state.wolf.x += state.wolf.vx * dt_s;
+    state.wolf.z += state.wolf.vz * dt_s;
+    state.wolf.y += state.wolf.vy * dt_s;
 
     // Fell off the world → lose a life, respawn at checkpoint
     if (state.wolf.y < -10) {
@@ -554,8 +555,8 @@
 
     // Collision with enemies
     for (const enemy of state.enemies) {
-      enemy.x += enemy.vx * frameAdj;
-      enemy.z += enemy.vz * frameAdj;
+      enemy.x += enemy.vx * dt_s;
+      enemy.z += enemy.vz * dt_s;
 
       const dx = state.wolf.x - enemy.x;
       const dz = state.wolf.z - enemy.z;
@@ -697,7 +698,7 @@
     return (
       state.wolf.x + 0.4 > px - plat.w / 2 && state.wolf.x - 0.4 < px + plat.w / 2 &&
       state.wolf.z + 0.4 > pz - plat.d / 2 && state.wolf.z - 0.4 < pz + plat.d / 2 &&
-      state.wolf.y - 0.5 < py + plat.h && state.wolf.y > py + plat.h - 0.8 &&
+      state.wolf.y - 0.5 < py + plat.h && state.wolf.y > py + plat.h - 1.5 &&
       state.wolf.vy <= 0
     );
   }
