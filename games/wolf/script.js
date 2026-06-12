@@ -22,6 +22,10 @@
     starsCollected: 0,
     starsRequired: 3,
     wolf: { x: 0, y: 0, z: 2, vx: 0, vy: 0, vz: 0, grounded: false, jumping: false },
+    jumpsUsed: 0,                      // double jump: 0 = grounded, max 2
+    respawn: { x: 0, y: 2, z: 0 },     // where loseLife puts you back
+    checkpoint: null,                  // { x, y, z, active, flagMat }
+    invulnUntil: 0,                    // i-frames after taking a hit
     platforms: [],
     stars: [],
     enemies: [],
@@ -63,6 +67,68 @@
 
   // Input
   const keys = {};
+  const touchVec = { x: 0, z: 0 }; // mobile drag joystick, -1..1
+
+  // ==========================================================================
+  // Sound FX — tiny WebAudio synth, no external files
+  // ==========================================================================
+  const SFX = (function () {
+    let actx = null;
+    function ac() {
+      if (!actx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        actx = new AC();
+      }
+      if (actx.state === "suspended") actx.resume();
+      return actx;
+    }
+    function tone(freq, dur, opts) {
+      const a = ac();
+      if (!a) return;
+      opts = opts || {};
+      const o = a.createOscillator();
+      const g = a.createGain();
+      const t0 = a.currentTime + (opts.delay || 0);
+      o.type = opts.type || "square";
+      o.frequency.setValueAtTime(freq, t0);
+      if (opts.slide) {
+        o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + opts.slide), t0 + dur);
+      }
+      g.gain.setValueAtTime(opts.vol || 0.07, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g);
+      g.connect(a.destination);
+      o.start(t0);
+      o.stop(t0 + dur + 0.02);
+    }
+    return {
+      unlock: ac, // call on first user gesture (autoplay policy)
+      jump() { tone(300, 0.14, { slide: 250 }); },
+      doubleJump() { tone(450, 0.16, { slide: 350 }); },
+      star() {
+        tone(880, 0.09, { type: "triangle", vol: 0.09 });
+        tone(1320, 0.12, { type: "triangle", vol: 0.09, delay: 0.07 });
+      },
+      checkpoint() {
+        tone(523, 0.1); tone(659, 0.1, { delay: 0.09 }); tone(784, 0.18, { delay: 0.18 });
+      },
+      hurt() { tone(220, 0.28, { type: "sawtooth", slide: -140, vol: 0.09 }); },
+      clear() {
+        tone(523, 0.12); tone(659, 0.12, { delay: 0.1 });
+        tone(784, 0.12, { delay: 0.2 }); tone(1047, 0.26, { delay: 0.3 });
+      },
+      win() {
+        tone(523, 0.15); tone(659, 0.15, { delay: 0.12 }); tone(784, 0.15, { delay: 0.24 });
+        tone(1047, 0.3, { delay: 0.36 }); tone(1319, 0.4, { delay: 0.52 });
+      },
+      over() {
+        tone(330, 0.2, { type: "sawtooth" });
+        tone(262, 0.2, { type: "sawtooth", delay: 0.18 });
+        tone(196, 0.4, { type: "sawtooth", delay: 0.36 });
+      },
+    };
+  })();
 
   // ==========================================================================
   // Three.js Setup
@@ -205,6 +271,7 @@
         { x: 13, y: 2, z: 2 },
       ],
       enemies: [],
+      checkpoint: { x: 9, y: 1, z: 3 },
       exit: { x: 13, y: 1, z: 2 },
     },
     2: {
@@ -226,6 +293,7 @@
       enemies: [
         { x: 8.5, y: 1, z: 3, vx: 1.5, vz: 0 },
       ],
+      checkpoint: { x: 8.5, y: 1, z: 3 },
       exit: { x: 16, y: 1, z: 1 },
     },
     3: {
@@ -251,6 +319,7 @@
         { x: 8.5, y: 1.5, z: 2, vx: 1.2, vz: 0.8 },
         { x: 15.5, y: 1.5, z: 2.5, vx: -1.2, vz: 0.4 },
       ],
+      checkpoint: { x: 12, y: 1, z: 1.5 },
       exit: { x: 19, y: 1, z: 1 },
     },
   };
@@ -395,13 +464,37 @@
     scene.add(exitMesh);
     platformMeshes.exit = exitMesh;
 
-    // Reset wolf position
+    // Checkpoint flag — gray until touched, then green
+    state.checkpoint = null;
+    if (data.checkpoint) {
+      const cp = data.checkpoint;
+      const flagGroup = new THREE.Group();
+      const pole = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.06, 0.06, 1.6, 8),
+        new THREE.MeshStandardMaterial({ color: 0xd9d9d9 })
+      );
+      pole.position.y = 0.8;
+      flagGroup.add(pole);
+      const flagMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, side: THREE.DoubleSide });
+      const flag = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.4, 0.04), flagMat);
+      flag.position.set(0.38, 1.3, 0);
+      flagGroup.add(flag);
+      flagGroup.position.set(cp.x, cp.y, cp.z);
+      scene.add(flagGroup);
+      platformMeshes.checkpoint = flagGroup;
+      state.checkpoint = { x: cp.x, y: cp.y, z: cp.z, active: false, flagMat: flagMat };
+    }
+
+    // Reset wolf position + respawn point + jump/invuln state
     state.wolf.x = 0;
     state.wolf.z = 0;
     state.wolf.y = 2;
     state.wolf.vx = 0;
     state.wolf.vy = 0;
     state.wolf.vz = 0;
+    state.respawn = { x: 0, y: 2, z: 0 };
+    state.jumpsUsed = 0;
+    state.invulnUntil = 0;
   }
 
   // ==========================================================================
@@ -415,13 +508,15 @@
   function step(dt) {
     const frameAdj = dt / 16.67; // 60fps normalization
 
-    // Input
+    // Input — keyboard first, then mobile drag joystick
     if (keys["ArrowLeft"] || keys["a"]) state.wolf.vx = -MOVE_SPEED;
     else if (keys["ArrowRight"] || keys["d"]) state.wolf.vx = MOVE_SPEED;
+    else if (touchVec.x !== 0) state.wolf.vx = touchVec.x * MOVE_SPEED;
     else state.wolf.vx *= (1 - FRICTION);
 
     if (keys["ArrowUp"] || keys["w"]) state.wolf.vz = -MOVE_SPEED;
     else if (keys["ArrowDown"] || keys["s"]) state.wolf.vz = MOVE_SPEED;
+    else if (touchVec.z !== 0) state.wolf.vz = touchVec.z * MOVE_SPEED;
     else state.wolf.vz *= (1 - FRICTION);
 
     // Gravity
@@ -432,6 +527,14 @@
     state.wolf.z += state.wolf.vz * frameAdj;
     state.wolf.y += state.wolf.vy * frameAdj;
 
+    // Fell off the world → lose a life, respawn at checkpoint
+    if (state.wolf.y < -10) {
+      loseLife();
+      return;
+    }
+
+    const invulnerable = performance.now() < state.invulnUntil;
+
     // Collision with platforms
     state.wolf.grounded = false;
     for (const plat of state.platforms) {
@@ -439,10 +542,12 @@
         state.wolf.grounded = true;
         state.wolf.vy = 0;
         state.wolf.y = plat.y + plat.h;
+        state.jumpsUsed = 0; // landing refills both jumps
 
         // Spike damage
-        if (plat.spike) {
+        if (plat.spike && !invulnerable) {
           loseLife();
+          return;
         }
       }
     }
@@ -455,8 +560,9 @@
       const dx = state.wolf.x - enemy.x;
       const dz = state.wolf.z - enemy.z;
       const dist = Math.sqrt(dx * dx + dz * dz);
-      if (dist < 1.0) {
+      if (dist < 1.0 && !invulnerable) {
         loseLife();
+        return;
       }
 
       // Bounce off level bounds
@@ -476,6 +582,25 @@
         state.starsCollected++;
         state.score += 50;
         scene.remove(star.mesh);
+        SFX.star();
+        updateHUD();
+      }
+    }
+
+    // Touch the checkpoint flag → activate it (respawn moves here)
+    if (state.checkpoint && !state.checkpoint.active) {
+      const dx = state.wolf.x - state.checkpoint.x;
+      const dz = state.wolf.z - state.checkpoint.z;
+      if (Math.sqrt(dx * dx + dz * dz) < 1.3) {
+        state.checkpoint.active = true;
+        state.checkpoint.flagMat.color.setHex(0x22c55e);
+        state.respawn = {
+          x: state.checkpoint.x,
+          y: state.checkpoint.y + 1,
+          z: state.checkpoint.z,
+        };
+        state.score += 25;
+        SFX.checkpoint();
         updateHUD();
       }
     }
@@ -513,6 +638,9 @@
 
     // Stylized animations
     animT += dt / 1000;
+
+    // Blink while invulnerable after a hit
+    wolfMesh.visible = !invulnerable || Math.floor(animT * 12) % 2 === 0;
     const moving = Math.abs(state.wolf.vx) + Math.abs(state.wolf.vz) > 1;
 
     // Face movement direction
@@ -596,6 +724,7 @@
     state.score += 200 + state.level * 50;
     state.level++;
     if (state.level <= 3) {
+      SFX.clear();
       buildLevel(state.level);
       updateHUD();
     } else {
@@ -606,16 +735,27 @@
   function loseLife() {
     state.lives--;
     updateHUD();
+    SFX.hurt();
     if (state.lives <= 0) {
       gameOver(false);
       return;
     }
-    buildLevel(state.level);
+    // Respawn at last checkpoint (level start if none touched).
+    // Collected stars and enemy positions are preserved.
+    state.wolf.x = state.respawn.x;
+    state.wolf.y = state.respawn.y;
+    state.wolf.z = state.respawn.z;
+    state.wolf.vx = 0;
+    state.wolf.vy = 0;
+    state.wolf.vz = 0;
+    state.jumpsUsed = 0;
+    state.invulnUntil = performance.now() + 1500; // brief safety window
   }
 
   async function gameOver(won) {
     state.finished = true;
     state.running = false;
+    if (won) SFX.win(); else SFX.over();
 
     if (won) {
       if (state.score > state.best) {
@@ -661,14 +801,30 @@
   // ==========================================================================
   // Input
   // ==========================================================================
+  function tryJump() {
+    if (!state.running || state.finished || state.paused) return;
+    if (state.wolf.grounded) {
+      state.wolf.vy = JUMP_POWER;
+      state.wolf.grounded = false;
+      state.jumpsUsed = 1;
+      SFX.jump();
+    } else if (state.jumpsUsed < 2) {
+      // Double jump — slightly weaker, resets fall speed
+      state.wolf.vy = JUMP_POWER * 0.9;
+      state.jumpsUsed = 2;
+      SFX.doubleJump();
+    }
+  }
+
   function bindEvents() {
+    // Unlock WebAudio on the first user gesture (browser autoplay policy)
+    document.addEventListener("pointerdown", () => SFX.unlock(), { once: true });
+    document.addEventListener("keydown", () => SFX.unlock(), { once: true });
+
     document.addEventListener("keydown", (e) => {
       keys[e.key] = true;
       if (e.key === " " || e.key === "Enter") {
-        if (state.wolf.grounded && state.running && !state.finished) {
-          state.wolf.vy = JUMP_POWER;
-          state.wolf.grounded = false;
-        }
+        if (!e.repeat) tryJump();
         e.preventDefault();
       } else if (e.key === "p" || e.key === "P") {
         togglePause();
@@ -678,14 +834,29 @@
       keys[e.key] = false;
     });
 
-    // Touch input
+    // Touch input — drag = virtual joystick (move), quick tap = jump
     let touchStart = null;
     els.canvas.addEventListener("touchstart", (e) => {
       const t = e.touches[0];
       touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
     }, { passive: true });
 
+    els.canvas.addEventListener("touchmove", (e) => {
+      if (!touchStart) return;
+      const t = e.touches[0];
+      const DEAD = 12, FULL = 60; // px: deadzone → full speed
+      const dx = t.clientX - touchStart.x;
+      const dy = t.clientY - touchStart.y;
+      const norm = (v) =>
+        Math.abs(v) < DEAD ? 0 : Math.max(-1, Math.min(1, v / FULL));
+      // Screen drag right → +x, drag down → +z (matches isometric view)
+      touchVec.x = norm(dx);
+      touchVec.z = norm(dy);
+    }, { passive: true });
+
     els.canvas.addEventListener("touchend", (e) => {
+      touchVec.x = 0;
+      touchVec.z = 0;
       if (!touchStart) return;
       const t = e.changedTouches[0];
       const dx = t.clientX - touchStart.x;
@@ -693,13 +864,15 @@
       const dt = Date.now() - touchStart.time;
       touchStart = null;
 
-      if (Math.abs(dx) < 20 && Math.abs(dy) < 20 && dt < 200) {
-        // Tap → jump
-        if (state.wolf.grounded && state.running && !state.finished) {
-          state.wolf.vy = JUMP_POWER;
-          state.wolf.grounded = false;
-        }
+      if (Math.abs(dx) < 20 && Math.abs(dy) < 20 && dt < 250) {
+        tryJump(); // tap = jump / double jump
       }
+    }, { passive: true });
+
+    els.canvas.addEventListener("touchcancel", () => {
+      touchVec.x = 0;
+      touchVec.z = 0;
+      touchStart = null;
     }, { passive: true });
 
     els.newGameBtn.addEventListener("click", newGame);

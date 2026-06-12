@@ -10,5 +10,5 @@
   "entry": "index.html",
   "tags": ["3d", "platformer", "macera", "çocuk", "kurt"],
   "author": "SEmirK Games",
-  "controls": ["OK tuşları: hareket et", "Space/Tap: zıpla"]
+  "controls": ["OK tuşları / sürükle: hareket et", "Space/Tap: zıpla (2. basış = çift zıplama)", "Bayrak: checkpoint"]
 }
