@@ -159,47 +159,47 @@
       stars: 5,
       platforms: [
         { x: 0, y: 0, z: 0, w: 4, d: 4, h: 1 },
-        { x: 5, y: 0, z: 2, w: 3, d: 3, h: 1, moving: true, moveAxis: "x", moveRange: 4, moveSpeed: 0.02 },
-        { x: 10, y: 0, z: 3, w: 2.5, d: 2.5, h: 1 },
-        { x: 14, y: 0, z: 2, w: 3, d: 3, h: 1, moving: true, moveAxis: "z", moveRange: 3, moveSpeed: 0.015 },
-        { x: 19, y: 0, z: 1, w: 4, d: 4, h: 1 },
+        { x: 4.5, y: 0, z: 2, w: 3, d: 3, h: 1, moving: true, moveAxis: "x", moveRange: 3, moveSpeed: 0.015 },
+        { x: 8.5, y: 0, z: 3, w: 2.5, d: 2.5, h: 1 },
+        { x: 12, y: 0, z: 2, w: 3, d: 3, h: 1, moving: true, moveAxis: "z", moveRange: 2.5, moveSpeed: 0.012 },
+        { x: 16, y: 0, z: 1, w: 4, d: 4, h: 1 },
       ],
       stars: [
-        { x: 5, y: 2, z: 2 },
-        { x: 10, y: 2, z: 3 },
-        { x: 14, y: 2, z: 2 },
-        { x: 19, y: 2, z: 1 },
-        { x: 7, y: 3, z: 1.5 },
+        { x: 4.5, y: 2, z: 2 },
+        { x: 8.5, y: 2, z: 3 },
+        { x: 12, y: 2, z: 2 },
+        { x: 16, y: 2, z: 1 },
+        { x: 10, y: 3, z: 2.5 },
       ],
       enemies: [
-        { x: 10, y: 1, z: 3, vx: 2, vz: 0 },
+        { x: 8.5, y: 1, z: 3, vx: 1.5, vz: 0 },
       ],
-      exit: { x: 19, y: 1, z: 1 },
+      exit: { x: 16, y: 1, z: 1 },
     },
     3: {
       stars: 7,
       platforms: [
         { x: 0, y: 0, z: 0, w: 4, d: 4, h: 1 },
-        { x: 5, y: 0, z: 1, w: 3, d: 3, h: 1 },
-        { x: 9, y: 1.5, z: 2, w: 2.5, d: 2.5, h: 1, spike: true },
-        { x: 13, y: 0, z: 1.5, w: 3, d: 3, h: 1 },
-        { x: 17, y: 1, z: 2.5, w: 3, d: 3, h: 1, moving: true, moveAxis: "y", moveRange: 2, moveSpeed: 0.01 },
-        { x: 21, y: 0, z: 1, w: 4, d: 4, h: 1 },
+        { x: 4.5, y: 0, z: 1, w: 3, d: 3, h: 1 },
+        { x: 8.5, y: 1, z: 2, w: 2.5, d: 2.5, h: 1, spike: true },
+        { x: 12, y: 0, z: 1.5, w: 3, d: 3, h: 1 },
+        { x: 15.5, y: 0.8, z: 2.5, w: 3, d: 3, h: 1, moving: true, moveAxis: "y", moveRange: 1.5, moveSpeed: 0.008 },
+        { x: 19, y: 0, z: 1, w: 4, d: 4, h: 1 },
       ],
       stars: [
-        { x: 5, y: 2, z: 1 },
-        { x: 9, y: 3, z: 2 },
-        { x: 13, y: 2, z: 1.5 },
-        { x: 17, y: 2.5, z: 2.5 },
-        { x: 21, y: 2, z: 1 },
-        { x: 7, y: 2, z: 0.5 },
-        { x: 15, y: 2.5, z: 0.5 },
+        { x: 4.5, y: 2, z: 1 },
+        { x: 8.5, y: 2.5, z: 2 },
+        { x: 12, y: 2, z: 1.5 },
+        { x: 15.5, y: 2.5, z: 2.5 },
+        { x: 19, y: 2, z: 1 },
+        { x: 10.5, y: 2.5, z: 1.5 },
+        { x: 17, y: 1.5, z: 0.5 },
       ],
       enemies: [
-        { x: 9, y: 2, z: 2, vx: 1.5, vz: 1 },
-        { x: 17, y: 2, z: 2.5, vx: -1.5, vz: 0.5 },
+        { x: 8.5, y: 1.5, z: 2, vx: 1.2, vz: 0.8 },
+        { x: 15.5, y: 1.5, z: 2.5, vx: -1.2, vz: 0.4 },
       ],
-      exit: { x: 21, y: 1, z: 1 },
+      exit: { x: 19, y: 1, z: 1 },
     },
   };
 
@@ -307,8 +307,8 @@
   // Physics & Collision
   // ==========================================================================
   const GRAVITY = 30;
-  const JUMP_POWER = 16;
-  const MOVE_SPEED = 15;
+  const JUMP_POWER = 15;
+  const MOVE_SPEED = 13;
   const FRICTION = 0.15;
 
   function step(dt) {
