@@ -50,6 +50,16 @@
   // Three.js scene
   let scene, camera, renderer;
   let wolfMesh, platformMeshes = {}, starMeshes = [], enemyMeshes = [];
+  let groundMat = null, exitMat = null, exitMesh = null;
+  let wolfParts = { legs: [], tail: null };
+  let animT = 0; // shared clock for decor animations
+
+  // Per-level pastel theme (stylized, kid-friendly)
+  const LEVEL_THEME = {
+    1: { sky: 0x7cc5ff, ground: 0x6abf69, platform: 0x8bd17c }, // orman — yeşil
+    2: { sky: 0x9db8ff, ground: 0x6d9bc4, platform: 0x7eb6e8 }, // dağ — mavi
+    3: { sky: 0xb79df0, ground: 0x8a6fc0, platform: 0xa78bdb }, // kale — mor
+  };
 
   // Input
   const keys = {};
@@ -82,7 +92,7 @@
 
     // Ground plane (visual)
     const groundGeo = new THREE.PlaneGeometry(100, 100);
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x4a7c3a });
+    groundMat = new THREE.MeshStandardMaterial({ color: 0x6abf69 });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -1;
@@ -95,41 +105,83 @@
   function createWolf() {
     const group = new THREE.Group();
 
+    const furMat = new THREE.MeshStandardMaterial({ color: 0x9d5c3f, roughness: 0.8 }); // warm brown
+    const furDarkMat = new THREE.MeshStandardMaterial({ color: 0x7d4630, roughness: 0.8 });
+    const bellyMat = new THREE.MeshStandardMaterial({ color: 0xffb6c1, roughness: 0.9 }); // pink belly
+    const creamMat = new THREE.MeshStandardMaterial({ color: 0xf5e6d3, roughness: 0.9 }); // snout/tail tip
+
     // Body
-    const bodyGeo = new THREE.BoxGeometry(1.2, 1.4, 0.8);
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x8b8b7b });
-    const body = new THREE.Mesh(bodyGeo, bodyMat);
-    body.position.y = 0.7;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.3, 0.85), furMat);
+    body.position.y = 0.75;
     group.add(body);
 
+    // Belly panel (front)
+    const belly = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.1), bellyMat);
+    belly.position.set(0, 0.65, 0.41);
+    group.add(belly);
+
+    // Legs (animated while walking)
+    const legGeo = new THREE.BoxGeometry(0.28, 0.5, 0.28);
+    wolfParts.legs = [];
+    for (const [lx, lz] of [[-0.35, 0.22], [0.35, 0.22], [-0.35, -0.22], [0.35, -0.22]]) {
+      const leg = new THREE.Mesh(legGeo, furDarkMat);
+      leg.position.set(lx, 0.05, lz);
+      group.add(leg);
+      wolfParts.legs.push(leg);
+    }
+
     // Head
-    const headGeo = new THREE.BoxGeometry(0.8, 0.8, 0.7);
-    const headMat = new THREE.MeshStandardMaterial({ color: 0x9a9a8a });
-    const head = new THREE.Mesh(headGeo, headMat);
-    head.position.set(0, 1.5, 0);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.8, 0.75), furMat);
+    head.position.set(0, 1.55, 0);
     group.add(head);
 
-    // Ears (cones)
-    const earGeo = new THREE.ConeGeometry(0.3, 0.6, 8);
-    const earMat = new THREE.MeshStandardMaterial({ color: 0x7a7a6a });
-    const earL = new THREE.Mesh(earGeo, earMat);
-    earL.position.set(-0.4, 2.0, 0);
-    earL.rotation.z = -0.3;
-    group.add(earL);
-    const earR = new THREE.Mesh(earGeo, earMat);
-    earR.position.set(0.4, 2.0, 0);
-    earR.rotation.z = 0.3;
-    group.add(earR);
+    // Snout (cream muzzle + black nose)
+    const snout = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.3, 0.3), creamMat);
+    snout.position.set(0, 1.42, 0.48);
+    group.add(snout);
+    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8),
+      new THREE.MeshStandardMaterial({ color: 0x1a1a1a }));
+    nose.position.set(0, 1.46, 0.65);
+    group.add(nose);
 
-    // Eyes
-    const eyeGeo = new THREE.SphereGeometry(0.15, 8, 8);
-    const eyeMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
-    const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
-    eyeL.position.set(-0.2, 1.6, 0.35);
-    group.add(eyeL);
-    const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
-    eyeR.position.set(0.2, 1.6, 0.35);
-    group.add(eyeR);
+    // Ears — outer brown, inner pink
+    const earGeo = new THREE.ConeGeometry(0.26, 0.55, 4);
+    for (const sx of [-1, 1]) {
+      const ear = new THREE.Mesh(earGeo, furDarkMat);
+      ear.position.set(0.38 * sx, 2.1, 0);
+      ear.rotation.z = -0.25 * sx;
+      group.add(ear);
+      const inner = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.3, 4), bellyMat);
+      inner.position.set(0.38 * sx, 2.08, 0.08);
+      inner.rotation.z = -0.25 * sx;
+      group.add(inner);
+    }
+
+    // Big cartoon eyes — white sclera + black pupil
+    const scleraGeo = new THREE.SphereGeometry(0.17, 10, 10);
+    const pupilGeo = new THREE.SphereGeometry(0.08, 8, 8);
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const blackMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
+    for (const sx of [-1, 1]) {
+      const sclera = new THREE.Mesh(scleraGeo, whiteMat);
+      sclera.position.set(0.22 * sx, 1.68, 0.32);
+      group.add(sclera);
+      const pupil = new THREE.Mesh(pupilGeo, blackMat);
+      pupil.position.set(0.22 * sx, 1.68, 0.46);
+      group.add(pupil);
+    }
+
+    // Fluffy tail — brown cone with cream tip (wags while walking)
+    const tail = new THREE.Group();
+    const tailBase = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.7, 8), furMat);
+    tailBase.rotation.x = Math.PI / 2.6;
+    tail.add(tailBase);
+    const tailTip = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 8), creamMat);
+    tailTip.position.set(0, 0.28, -0.28);
+    tail.add(tailTip);
+    tail.position.set(0, 0.9, -0.5);
+    group.add(tail);
+    wolfParts.tail = tail;
 
     wolfMesh = group;
     scene.add(wolfMesh);
@@ -219,18 +271,40 @@
     state.starsCollected = 0;
     updateHUD();
 
+    // Apply level theme — sky, fog, ground tint
+    const theme = LEVEL_THEME[levelNum] || LEVEL_THEME[1];
+    scene.background = new THREE.Color(theme.sky);
+    scene.fog = new THREE.Fog(theme.sky, 80, 100);
+    if (groundMat) groundMat.color.setHex(theme.ground);
+
     // Platforms
     for (let i = 0; i < data.platforms.length; i++) {
       const p = data.platforms[i];
       const gizmo = new THREE.Group();
       const platGeo = new THREE.BoxGeometry(p.w, p.h, p.d);
       const platMat = new THREE.MeshStandardMaterial({
-        color: p.spike ? 0xffcc00 : 0x6b8e23,
+        color: p.spike ? 0xffd166 : theme.platform,
         roughness: 0.7,
       });
       const platMesh = new THREE.Mesh(platGeo, platMat);
       platMesh.position.y = p.h / 2;
       gizmo.add(platMesh);
+      // Spike platforms get visible warning spikes on top
+      if (p.spike) {
+        const spikeMat = new THREE.MeshStandardMaterial({ color: 0xef4444 });
+        const n = Math.max(2, Math.floor(p.w));
+        for (let sx = 0; sx < n; sx++) {
+          for (let sz = 0; sz < n; sz++) {
+            const spike = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.5, 4), spikeMat);
+            spike.position.set(
+              -p.w / 2 + (sx + 0.5) * (p.w / n),
+              p.h + 0.25,
+              -p.d / 2 + (sz + 0.5) * (p.d / n)
+            );
+            gizmo.add(spike);
+          }
+        }
+      }
       gizmo.position.set(p.x, p.y, p.z);
       scene.add(gizmo);
       platformMeshes[i] = gizmo;
@@ -249,13 +323,23 @@
       });
     }
 
-    // Stars
+    // Stars — glowing, pulsing (animated in step)
     for (let i = 0; i < data.stars.length; i++) {
       const s = data.stars[i];
       const starGeo = new THREE.DodecahedronGeometry(0.4, 0);
-      const starMat = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffa500 });
+      const starMat = new THREE.MeshStandardMaterial({
+        color: 0xffd700,
+        emissive: 0xffa500,
+        emissiveIntensity: 1,
+      });
       const starMesh = new THREE.Mesh(starGeo, starMat);
       starMesh.position.set(s.x, s.y, s.z);
+      // Soft glow halo (slightly larger transparent shell)
+      const halo = new THREE.Mesh(
+        new THREE.SphereGeometry(0.55, 10, 10),
+        new THREE.MeshBasicMaterial({ color: 0xffe066, transparent: true, opacity: 0.25 })
+      );
+      starMesh.add(halo);
       scene.add(starMesh);
       starMeshes.push(starMesh);
 
@@ -267,15 +351,28 @@
       });
     }
 
-    // Enemies
+    // Enemies — cute-evil: soft red cone with googly eyes (bobs in step)
     for (let i = 0; i < data.enemies.length; i++) {
       const e = data.enemies[i];
-      const enemyGeo = new THREE.ConeGeometry(0.4, 1, 8);
-      const enemyMat = new THREE.MeshStandardMaterial({ color: 0xff4444 });
-      const enemyMesh = new THREE.Mesh(enemyGeo, enemyMat);
-      enemyMesh.position.set(e.x, e.y, e.z);
-      scene.add(enemyMesh);
-      enemyMeshes.push(enemyMesh);
+      const enemyGroup = new THREE.Group();
+      const cone = new THREE.Mesh(
+        new THREE.ConeGeometry(0.4, 1, 8),
+        new THREE.MeshStandardMaterial({ color: 0xff6b6b })
+      );
+      enemyGroup.add(cone);
+      const eyeWhite = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      const eyeBlack = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
+      for (const sx of [-1, 1]) {
+        const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 8), eyeWhite);
+        sclera.position.set(0.14 * sx, 0.15, 0.3);
+        enemyGroup.add(sclera);
+        const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), eyeBlack);
+        pupil.position.set(0.14 * sx, 0.15, 0.39);
+        enemyGroup.add(pupil);
+      }
+      enemyGroup.position.set(e.x, e.y, e.z);
+      scene.add(enemyGroup);
+      enemyMeshes.push(enemyGroup);
 
       state.enemies.push({
         x: e.x, y: e.y, z: e.z,
@@ -285,11 +382,15 @@
       });
     }
 
-    // Exit
+    // Exit — rainbow portal (hue cycles in step)
     state.exit = data.exit;
     const exitGeo = new THREE.BoxGeometry(2, 1.5, 2);
-    const exitMat = new THREE.MeshStandardMaterial({ color: 0x22cc22, emissive: 0x00ff00 });
-    const exitMesh = new THREE.Mesh(exitGeo, exitMat);
+    exitMat = new THREE.MeshStandardMaterial({
+      color: 0x22cc22,
+      emissive: 0x00ff00,
+      emissiveIntensity: 0.6,
+    });
+    exitMesh = new THREE.Mesh(exitGeo, exitMat);
     exitMesh.position.set(state.exit.x, state.exit.y + 0.75, state.exit.z);
     scene.add(exitMesh);
     platformMeshes.exit = exitMesh;
@@ -410,11 +511,52 @@
     // Update wolf visual
     wolfMesh.position.set(state.wolf.x, state.wolf.y, state.wolf.z);
 
-    // Update enemy visuals
-    for (const enemy of state.enemies) {
-      const idx = state.enemies.indexOf(enemy);
-      if (enemyMeshes[idx]) {
-        enemyMeshes[idx].position.set(enemy.x, enemy.y, enemy.z);
+    // Stylized animations
+    animT += dt / 1000;
+    const moving = Math.abs(state.wolf.vx) + Math.abs(state.wolf.vz) > 1;
+
+    // Face movement direction
+    if (moving) {
+      wolfMesh.rotation.y = Math.atan2(state.wolf.vx, state.wolf.vz);
+    }
+    // Leg sway + tail wag while walking; gentle idle tail otherwise
+    const swing = moving ? Math.sin(animT * 12) * 0.35 : 0;
+    for (let i = 0; i < wolfParts.legs.length; i++) {
+      wolfParts.legs[i].rotation.x = i % 2 === 0 ? swing : -swing;
+    }
+    if (wolfParts.tail) {
+      wolfParts.tail.rotation.y = Math.sin(animT * (moving ? 10 : 3)) * (moving ? 0.5 : 0.2);
+    }
+
+    // Stars: spin + size pulse
+    for (let i = 0; i < starMeshes.length; i++) {
+      const m = starMeshes[i];
+      if (!m.parent) continue; // collected
+      m.rotation.y += 0.04 * frameAdj;
+      const pulse = 1 + Math.sin(animT * 4 + i) * 0.12;
+      m.scale.set(pulse, pulse, pulse);
+    }
+
+    // Exit: rainbow shine + soft pulse
+    if (exitMat && exitMesh) {
+      const hue = (animT * 0.15) % 1;
+      exitMat.color.setHSL(hue, 0.7, 0.55);
+      exitMat.emissive.setHSL(hue, 0.8, 0.4);
+      const ep = 1 + Math.sin(animT * 3) * 0.05;
+      exitMesh.scale.set(ep, ep, ep);
+    }
+
+    // Update enemy visuals — bob up and down as they patrol
+    for (let i = 0; i < state.enemies.length; i++) {
+      const enemy = state.enemies[i];
+      if (enemyMeshes[i]) {
+        enemyMeshes[i].position.set(
+          enemy.x,
+          enemy.y + Math.sin(animT * 5 + i * 2) * 0.12,
+          enemy.z
+        );
+        // Face patrol direction
+        enemyMeshes[i].rotation.y = Math.atan2(enemy.vx, enemy.vz);
       }
     }
   }

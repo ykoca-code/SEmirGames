@@ -18,21 +18,30 @@
     <polygon points="125,120 128,127 136,127 130,132 132,139 125,135 118,139 120,132 114,127 122,127"/>
     <polygon points="195,100 198,107 206,107 200,112 202,119 195,115 188,119 190,112 184,107 192,107"/>
   </g>
-  <!-- wolf character -->
+  <!-- wolf character (cartoon brown) -->
   <g transform="translate(60,155)">
     <!-- body -->
-    <ellipse cx="0" cy="0" rx="8" ry="12" fill="#8b8b7b"/>
+    <ellipse cx="0" cy="0" rx="8" ry="12" fill="#9d5c3f"/>
+    <!-- pink belly -->
+    <ellipse cx="0" cy="3" rx="5" ry="7" fill="#ffb6c1"/>
     <!-- head -->
-    <circle cx="0" cy="-12" r="8" fill="#9a9a8a"/>
+    <circle cx="0" cy="-12" r="8" fill="#a9684a"/>
     <!-- ears -->
-    <polygon points="0,-18 -4,-25 4,-25" fill="#7a7a6a"/>
-    <polygon points="0,-18 -3,-24 3,-24" fill="#7a7a6a" transform="translate(-5,0)"/>
-    <polygon points="0,-18 -3,-24 3,-24" fill="#7a7a6a" transform="translate(5,0)"/>
-    <!-- eyes -->
-    <circle cx="-3" cy="-13" r="1.5" fill="#1a1a1a"/>
-    <circle cx="3" cy="-13" r="1.5" fill="#1a1a1a"/>
-    <!-- tail -->
-    <path d="M 8 -2 Q 14 -4 12 6" stroke="#7a7a6a" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <polygon points="-5,-17 -8,-26 -2,-22" fill="#7d4630"/>
+    <polygon points="5,-17 8,-26 2,-22" fill="#7d4630"/>
+    <polygon points="-5,-19 -6.5,-24 -3,-21.5" fill="#ffb6c1"/>
+    <polygon points="5,-19 6.5,-24 3,-21.5" fill="#ffb6c1"/>
+    <!-- big cartoon eyes -->
+    <circle cx="-3" cy="-13" r="2.6" fill="#ffffff"/>
+    <circle cx="3" cy="-13" r="2.6" fill="#ffffff"/>
+    <circle cx="-2.5" cy="-12.7" r="1.3" fill="#1a1a1a"/>
+    <circle cx="3.5" cy="-12.7" r="1.3" fill="#1a1a1a"/>
+    <!-- snout -->
+    <ellipse cx="0" cy="-8.5" rx="3" ry="2" fill="#f5e6d3"/>
+    <circle cx="0" cy="-9.3" r="1" fill="#1a1a1a"/>
+    <!-- tail with cream tip -->
+    <path d="M 8 -2 Q 14 -4 12 6" stroke="#7d4630" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="12" cy="6" r="2.2" fill="#f5e6d3"/>
   </g>
   <!-- exit door (green) -->
   <rect x="185" y="105" width="30" height="20" rx="4" fill="#22cc22" opacity="0.8"/>
