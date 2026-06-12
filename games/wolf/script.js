@@ -258,7 +258,6 @@
   // ==========================================================================
   const LEVEL_DATA = {
     1: {
-      stars: 3,
       platforms: [
         { x: 0, y: 0, z: 0, w: 4, d: 4, h: 1 }, // start
         { x: 5, y: 0, z: 2, w: 3, d: 3, h: 1 },
@@ -275,7 +274,6 @@
       exit: { x: 13, y: 1, z: 2 },
     },
     2: {
-      stars: 5,
       platforms: [
         { x: 0, y: 0, z: 0, w: 4, d: 4, h: 1 },
         { x: 4.5, y: 0, z: 2, w: 3, d: 3, h: 1, moving: true, moveAxis: "x", moveRange: 3, moveSpeed: 0.015 },
@@ -297,7 +295,6 @@
       exit: { x: 16, y: 1, z: 1 },
     },
     3: {
-      stars: 7,
       platforms: [
         { x: 0, y: 0, z: 0, w: 4, d: 4, h: 1 },
         { x: 4.5, y: 0, z: 1, w: 3, d: 3, h: 1 },
@@ -334,9 +331,10 @@
     platformMeshes = {};
     state.stars = [];
     state.enemies = [];
+    state.platforms = []; // must reset — otherwise ghost platforms pile up
 
     const data = LEVEL_DATA[levelNum] || LEVEL_DATA[1];
-    state.starsRequired = data.stars;
+    state.starsRequired = data.stars.length;
     state.starsCollected = 0;
     updateHUD();
 
@@ -922,12 +920,27 @@
   // Boot
   // ==========================================================================
   function boot() {
-    initThree();
-    buildLevel(1);
-    bindEvents();
-    updateHUD();
-    renderLBSlot();
-    showOverlay();
+    try {
+      if (typeof THREE === "undefined") {
+        throw new Error("Three.js kütüphanesi yüklenemedi");
+      }
+      initThree();
+      buildLevel(1);
+      bindEvents();
+      updateHUD();
+      renderLBSlot();
+      showOverlay();
+    } catch (err) {
+      // Never leave the player staring at a dead black canvas —
+      // surface the actual error so it can be reported and fixed.
+      els.overlayTitle.textContent = "Oyun yüklenemedi 😞";
+      els.overlayText.textContent =
+        "Hata: " + (err && err.message ? err.message : err) +
+        "\nSayfayı yenilemeyi dene. Sorun sürerse bize bildir!";
+      els.overlayBtn.textContent = "Yeniden Dene";
+      els.overlayBtn.addEventListener("click", () => location.reload());
+      showOverlay();
+    }
   }
 
   if (document.readyState === "loading") {
