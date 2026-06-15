@@ -3,34 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Kurt Maceraları - SEmirK Games</title>
+  <title>Sınavdan Kaçış - SEmirK Games</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="wolf-page">
+<body class="runner-page">
   <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
 
-  <main class="container game-container wolf-container">
-    <div class="wolf-hud">
-      <div class="w-stat"><span class="w-label">Seviye</span><span id="level" class="w-value">1</span></div>
-      <div class="w-stat"><span class="w-label">Yıldız</span><span id="stars" class="w-value">0/3</span></div>
-      <div class="w-stat"><span class="w-label">Can</span><span id="lives" class="w-value">❤❤❤</span></div>
-      <div class="w-stat"><span class="w-label">Skor</span><span id="score" class="w-value">0</span></div>
+  <main class="container game-container runner-container">
+    <div class="runner-top">
+      <div class="r-stat"><span class="r-stat-label">Skor</span><span id="score" class="r-stat-value">0</span></div>
+      <div class="r-stat"><span class="r-stat-label">Rekor</span><span id="best" class="r-stat-value">0</span></div>
+      <div class="r-stat"><span class="r-stat-label">Hız</span><span id="speed" class="r-stat-value">1×</span></div>
     </div>
 
-    <div class="wolf-stage">
-      <canvas id="board" width="320" height="500" aria-label="Kurt oyun sahnesi"></canvas>
+    <div class="runner-stage">
+      <canvas id="board" width="360" height="500" aria-label="Sınavdan Kaçış sahnesi"></canvas>
       <div id="overlay" class="overlay hidden">
         <div class="overlay-content">
-          <h2 id="overlayTitle">Kurt Maceraları</h2>
-          <p id="overlayText">Yıldızları topla ve çıkışa ulaş!
-Sürükle: hareket et · Dokun: zıpla (havada bir kez daha = çift zıplama)
-🚩 Bayrağa dokun: checkpoint — düşersen oradan devam edersin!</p>
+          <h2 id="overlayTitle">Sınavdan Kaçış</h2>
+          <p id="overlayText">Sınavlardan ve kitaplardan kaçıyorsun!
+Zıplamak için ekrana dokun veya Space tuşuna bas.
+Uçan engellerin altından geçmek için ↓ tuşuna bas.</p>
           <div class="lb-slot" id="leaderboardSlot"></div>
           <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
         </div>
       </div>
+    </div>
+
+    <div class="touch-pad">
+      <button type="button" id="jumpBtn" class="touch-btn">⤴ Zıpla</button>
+      <button type="button" id="duckBtn" class="touch-btn">⤵ Eğil</button>
     </div>
 
     <div class="action-row">
@@ -39,7 +43,6 @@ Sürükle: hareket et · Dokun: zıpla (havada bir kez daha = çift zıplama)
     </div>
   </main>
 
-  <script src="../../js/vendor/three.min.js?v=1.21.0"></script>
   <script src="../../js/version.js?v=1.21.0"></script>
   <script src="../../js/leaderboard.js?v=1.21.0"></script>
   <script src="script.js?v=1.21.0"></script>

@@ -256,6 +256,17 @@
       "thumbnail": "games/tower/thumbnail.svg",
       "path": "games/tower/index.html",
       "tags": ["arcade", "kule", "tower", "blok", "denge", "zamanlama"]
+    },
+    {
+      "id": "runner",
+      "title": "Sınavdan Kaçış",
+      "description": "Chrome Dino tarzı sonsuz koşu! Kitaplardan, sınav kağıtlarından ve bütünleme tabelalarından zıplayarak kaç. Hızlanırsın, dikkatli ol!",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/runner/thumbnail.svg",
+      "path": "games/runner/index.html",
+      "tags": ["arcade", "endless runner", "dino", "okul", "zıplama"]
     }
   ]
 }

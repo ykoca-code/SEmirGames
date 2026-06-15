@@ -1,0 +1,14 @@
+{
+  "id": "runner",
+  "title": "Sınavdan Kaçış",
+  "description": "Chrome Dino tarzı sonsuz koşu! Kitaplardan, sınav kağıtlarından ve bütünleme tabelalarından zıplayarak kaç. Hızlanırsın, dikkatli ol!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "endless runner", "dino", "okul", "zıplama"],
+  "author": "SEmirK Games",
+  "controls": ["Space / Yukarı / Tap: zıpla", "↓: alçal (uçan engelin altından geç)"]
+}
