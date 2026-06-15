@@ -1,0 +1,14 @@
+{
+  "id": "tower",
+  "title": "Kule Kur",
+  "description": "Vinç sağa sola sallanırken tam doğru anda bırak! Bloklar üst üste binsin, kule yükselsin. 20 seviye, her seviyede vinç hızlanır.",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "kule", "tower", "blok", "denge", "zamanlama"],
+  "author": "SEmirK Games",
+  "controls": ["Tahtaya dokun / Space: bloğu bırak"]
+}
