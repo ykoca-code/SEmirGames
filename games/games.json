@@ -245,6 +245,17 @@
       "thumbnail": "games/wolf/thumbnail.svg",
       "path": "games/wolf/index.html",
       "tags": ["3d", "platformer", "macera", "çocuk", "kurt"]
+    },
+    {
+      "id": "tower",
+      "title": "Kule Kur",
+      "description": "Vinç sağa sola sallanırken tam doğru anda bırak! Bloklar üst üste binsin, kule yükselsin. 20 seviye, her seviyede vinç hızlanır.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/tower/thumbnail.svg",
+      "path": "games/tower/index.html",
+      "tags": ["arcade", "kule", "tower", "blok", "denge", "zamanlama"]
     }
   ]
 }
