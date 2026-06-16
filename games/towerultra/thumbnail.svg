@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#aee6f5"/>
+      <stop offset="1" stop-color="#d1eef7"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#sky)"/>
+  <!-- sun -->
+  <circle cx="200" cy="40" r="14" fill="#fef3c7"/>
+  <!-- distant city silhouette -->
+  <g fill="rgba(50,64,100,0.55)">
+    <rect x="0" y="170" width="30" height="40"/>
+    <rect x="32" y="160" width="36" height="50"/>
+    <rect x="70" y="180" width="22" height="30"/>
+    <rect x="96" y="150" width="30" height="60"/>
+    <rect x="180" y="170" width="26" height="40"/>
+    <rect x="210" y="155" width="30" height="55"/>
+  </g>
+  <!-- ground -->
+  <rect x="0" y="210" width="240" height="30" fill="#7a6b5a"/>
+  <!-- crane rail -->
+  <rect x="20" y="20" width="200" height="5" fill="#475569"/>
+  <!-- crane trolley -->
+  <rect x="104" y="15" width="32" height="8" fill="#facc15" stroke="#a16207"/>
+  <!-- rope swinging right -->
+  <line x1="120" y1="23" x2="160" y2="60" stroke="#1f2937" stroke-width="2"/>
+  <!-- swinging block (right-tilted, pseudo-3D) -->
+  <g transform="translate(140,46) rotate(15 20 14)">
+    <!-- right side -->
+    <polygon points="40,0 50,-10 50,18 40,28" fill="#9c3b2b"/>
+    <!-- top -->
+    <polygon points="0,0 10,-10 50,-10 40,0" fill="#f0826f"/>
+    <!-- front -->
+    <rect x="0" y="0" width="40" height="28" fill="#e85d4a" stroke="rgba(0,0,0,0.3)"/>
+    <!-- windows -->
+    <rect x="6" y="5" width="6" height="5" fill="#fff5d6"/>
+    <rect x="16" y="5" width="6" height="5" fill="#fff5d6"/>
+    <rect x="26" y="5" width="6" height="5" fill="#fff5d6"/>
+    <rect x="6" y="16" width="6" height="5" fill="#fff5d6"/>
+    <rect x="16" y="16" width="6" height="5" fill="#fff5d6"/>
+    <rect x="26" y="16" width="6" height="5" fill="#fff5d6"/>
+  </g>
+  <!-- tower (3 floors) -->
+  <g>
+    <!-- floor 3 (top, golden) -->
+    <g transform="translate(80,110)">
+      <polygon points="80,0 90,-10 90,18 80,28" fill="#9a7421"/>
+      <polygon points="0,0 10,-10 90,-10 80,0" fill="#f2c352"/>
+      <rect x="0" y="0" width="80" height="28" fill="#e8b339" stroke="rgba(0,0,0,0.3)"/>
+      <g fill="#3a2a05">
+        <rect x="8" y="6" width="8" height="6"/>
+        <rect x="22" y="6" width="8" height="6"/>
+        <rect x="36" y="6" width="8" height="6"/>
+        <rect x="50" y="6" width="8" height="6"/>
+        <rect x="64" y="6" width="8" height="6"/>
+        <rect x="8" y="18" width="8" height="6"/>
+        <rect x="22" y="18" width="8" height="6"/>
+        <rect x="36" y="18" width="8" height="6"/>
+        <rect x="50" y="18" width="8" height="6"/>
+        <rect x="64" y="18" width="8" height="6"/>
+      </g>
+    </g>
+    <!-- floor 2 (teal) -->
+    <g transform="translate(72,142)">
+      <polygon points="96,0 106,-10 106,18 96,28" fill="#21657a"/>
+      <polygon points="0,0 10,-10 106,-10 96,0" fill="#5fbcd6"/>
+      <rect x="0" y="0" width="96" height="28" fill="#3aa6c9" stroke="rgba(0,0,0,0.3)"/>
+      <g fill="#fff5d6">
+        <rect x="8" y="6" width="8" height="6"/>
+        <rect x="22" y="6" width="8" height="6"/>
+        <rect x="36" y="6" width="8" height="6"/>
+        <rect x="50" y="6" width="8" height="6"/>
+        <rect x="64" y="6" width="8" height="6"/>
+        <rect x="78" y="6" width="8" height="6"/>
+        <rect x="8" y="18" width="8" height="6"/>
+        <rect x="22" y="18" width="8" height="6"/>
+        <rect x="36" y="18" width="8" height="6"/>
+        <rect x="50" y="18" width="8" height="6"/>
+        <rect x="64" y="18" width="8" height="6"/>
+        <rect x="78" y="18" width="8" height="6"/>
+      </g>
+    </g>
+    <!-- foundation (blue-grey) -->
+    <g transform="translate(60,174)">
+      <polygon points="120,0 130,-10 130,30 120,40" fill="#2c405e"/>
+      <polygon points="0,0 10,-10 130,-10 120,0" fill="#7494b3"/>
+      <rect x="0" y="0" width="120" height="40" fill="#4f6d8a" stroke="rgba(0,0,0,0.3)"/>
+      <g fill="#1f2937">
+        <rect x="10" y="6" width="10" height="7"/>
+        <rect x="26" y="6" width="10" height="7"/>
+        <rect x="42" y="6" width="10" height="7"/>
+        <rect x="58" y="6" width="10" height="7"/>
+        <rect x="74" y="6" width="10" height="7"/>
+        <rect x="90" y="6" width="10" height="7"/>
+        <rect x="10" y="20" width="10" height="7"/>
+        <rect x="26" y="20" width="10" height="7"/>
+        <rect x="42" y="20" width="10" height="7"/>
+        <rect x="58" y="20" width="10" height="7"/>
+        <rect x="74" y="20" width="10" height="7"/>
+        <rect x="90" y="20" width="10" height="7"/>
+      </g>
+    </g>
+  </g>
+  <!-- floor counter -->
+  <g transform="translate(8,8)">
+    <rect width="46" height="22" rx="4" fill="#1f2937" opacity="0.85"/>
+    <text x="23" y="16" font-family="Helvetica,Arial,sans-serif" font-size="12" font-weight="900" text-anchor="middle" fill="#fde047">3 KAT</text>
+  </g>
+  <!-- hearts -->
+  <g transform="translate(195,8)">
+    <text x="0" y="16" font-family="Helvetica,Arial,sans-serif" font-size="14" fill="#ef4444">❤❤❤</text>
+  </g>
+</svg>

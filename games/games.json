@@ -267,6 +267,17 @@
       "thumbnail": "games/runner/thumbnail.svg",
       "path": "games/runner/index.html",
       "tags": ["arcade", "endless runner", "dino", "okul", "zıplama"]
+    },
+    {
+      "id": "towerultra",
+      "title": "Kule Kur Ultra",
+      "description": "Sarkaç gibi sallanan blokları tam zamanında bırak, gökdeleni kat kat yükselt! 3D bina blokları, 3 can ve sonsuz tırmanış.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/towerultra/thumbnail.svg",
+      "path": "games/towerultra/index.html",
+      "tags": ["arcade", "kule", "tower", "3d", "pendulum", "sarkaç", "bina"]
     }
   ]
 }

@@ -3,31 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Kule Kur - SEmirK Games</title>
+  <title>Kule Kur Ultra - SEmirK Games</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
   <link rel="stylesheet" href="../../css/style.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="tower-page">
+<body class="towerultra-page">
   <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
 
-  <main class="container game-container tower-container">
-    <div class="tower-top">
-      <div class="t-stat"><span class="t-stat-label">Seviye</span><span id="level" class="t-stat-value">1</span></div>
-      <div class="t-stat"><span class="t-stat-label">Blok</span><span id="blocks" class="t-stat-value">0/5</span></div>
-      <div class="t-stat"><span class="t-stat-label">Skor</span><span id="score" class="t-stat-value">0</span></div>
-      <div class="t-stat"><span class="t-stat-label">Rekor</span><span id="best" class="t-stat-value">0</span></div>
+  <main class="container game-container towerultra-container">
+    <div class="tu-top">
+      <div class="tu-stat"><span class="tu-stat-label">Kat</span><span id="floor" class="tu-stat-value">0</span></div>
+      <div class="tu-stat"><span class="tu-stat-label">Skor</span><span id="score" class="tu-stat-value">0</span></div>
+      <div class="tu-stat"><span class="tu-stat-label">Can</span><span id="lives" class="tu-stat-value">❤❤❤</span></div>
+      <div class="tu-stat"><span class="tu-stat-label">Rekor</span><span id="best" class="tu-stat-value">0</span></div>
     </div>
 
-    <div class="tower-stage">
-      <canvas id="board" width="320" height="540" aria-label="Kule sahnesi"></canvas>
+    <div class="towerultra-stage">
+      <canvas id="board" width="320" height="540" aria-label="Kule Kur Ultra sahnesi"></canvas>
       <div id="overlay" class="overlay hidden">
         <div class="overlay-content">
-          <h2 id="overlayTitle">Kule Kur</h2>
-          <p id="overlayText">Vinç sağa sola sallanır.
+          <h2 id="overlayTitle">Kule Kur Ultra</h2>
+          <p id="overlayText">Blok sarkaç gibi sağa sola sallanır.
 Tam doğru anda dokun → blok düşer ve üst üste binmeli!
-Kayma olursa blok incelir. Tamamen kaçırırsan kule yıkılır.
-20 seviye, her seviyede vinç daha hızlı.</p>
+Kayma olursa blok incelir. Tamamen kaçırırsan bir can gider.
+3 canın bitince oyun biter. Sonsuza kadar yüksel!</p>
           <div class="lb-slot" id="leaderboardSlot"></div>
           <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
         </div>
