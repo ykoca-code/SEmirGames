@@ -278,6 +278,17 @@
       "thumbnail": "games/towerultra/thumbnail.svg",
       "path": "games/towerultra/index.html",
       "tags": ["arcade", "kule", "tower", "3d", "pendulum", "sarkaç", "bina"]
+    },
+    {
+      "id": "zip",
+      "title": "Sırayla Bağla",
+      "description": "Numaralı hücreleri sırayla birleştir ama tek çizgide tüm hücreleri ziyaret et! 50 bölüm, kademeli zorluk.",
+      "category": "puzzle",
+      "categoryLabel": "Bulmaca",
+      "ageRating": "7+",
+      "thumbnail": "games/zip/thumbnail.svg",
+      "path": "games/zip/index.html",
+      "tags": ["puzzle", "bulmaca", "mantık", "yol", "hamilton"]
     }
   ]
 }
