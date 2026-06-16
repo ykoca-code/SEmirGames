@@ -1,0 +1,14 @@
+{
+  "id": "towerultra",
+  "title": "Kule Kur Ultra",
+  "description": "Sarkaç gibi sallanan blokları tam zamanında bırak, gökdeleni kat kat yükselt! 3D bina blokları, 3 can ve sonsuz tırmanış. Ne kadar yükseğe çıkabilirsin?",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "kule", "tower", "3d", "pendulum", "sarkaç", "bina"],
+  "author": "SEmirK Games",
+  "controls": ["Tahtaya dokun / Space: bloğu bırak"]
+}
