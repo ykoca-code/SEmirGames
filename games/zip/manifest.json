@@ -1,0 +1,14 @@
+{
+  "id": "zip",
+  "title": "Sırayla Bağla",
+  "description": "Numaralı hücreleri sırayla birleştir ama tek çizgide tüm hücreleri ziyaret et! 50 bölüm, her seviye biraz daha zor.",
+  "version": "1.0.0",
+  "category": "puzzle",
+  "categoryLabel": "Bulmaca",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["puzzle", "bulmaca", "mantık", "yol", "hamilton"],
+  "author": "SEmirK Games",
+  "controls": ["Sürükle: yol çiz", "Geri Al: son hücreyi sil"]
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Sırayla Bağla - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="zip-page">
+  <a href="../../index.html" class="game-back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <main class="container game-container zip-container">
+    <div class="zip-top">
+      <div class="z-stat"><span class="z-stat-label">Bölüm</span><span id="level" class="z-stat-value">1/50</span></div>
+      <div class="z-stat"><span class="z-stat-label">Süre</span><span id="timer" class="z-stat-value">0:00</span></div>
+      <div class="z-stat"><span class="z-stat-label">Rekor</span><span id="best" class="z-stat-value">—</span></div>
+    </div>
+
+    <div class="zip-stage">
+      <canvas id="board" width="320" height="320" aria-label="Sırayla Bağla tahtası"></canvas>
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-content">
+          <h2 id="overlayTitle">Sırayla Bağla</h2>
+          <p id="overlayText">Numaralı hücreleri sırayla birleştir.
+Çizgini tüm hücrelerden tek seferde geçir.
+Sürükle: yol çiz · Geri Al: son hücreyi sil
+50 bölüm, kademeli zorluk.</p>
+          <div class="lb-slot" id="leaderboardSlot"></div>
+          <button type="button" id="overlayBtn" class="btn btn-primary">Başla</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="zip-info">
+      <span id="hint" class="zip-hint">1'den başla, hücreleri sırayla bağla.</span>
+    </div>
+
+    <div class="action-row">
+      <button type="button" id="undoBtn" class="btn">↶ Geri Al</button>
+      <button type="button" id="resetBtn" class="btn">Sıfırla</button>
+      <button type="button" id="hintBtn" class="btn">İpucu</button>
+    </div>
+    <div class="action-row">
+      <button type="button" id="prevBtn" class="btn">← Önceki</button>
+      <button type="button" id="restartBtn" class="btn btn-primary">Yeniden Başla</button>
+      <button type="button" id="nextBtn" class="btn">Sonraki →</button>
+    </div>
+  </main>
+
+  <script src="../../js/version.js?v=1.23.0"></script>
+  <script src="../../js/leaderboard.js?v=1.23.0"></script>
+  <script src="script.js?v=1.23.0"></script>
+</body>
+</html>
