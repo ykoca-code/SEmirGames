@@ -26,7 +26,7 @@
   const ROPE_LEN = 110;              // pendulum string length, world units
   const PIVOT_GAP = 60;              // distance from tower top to pivot
   const GRAVITY_FALL = 1900;         // px/s² downward gravity for falling block
-  const PENDULUM_G = 22;             // tunable g for the pendulum (rad/s²)
+  const PENDULUM_G = 60;             // tunable g for the pendulum (rad/s²)
   const MIN_BLOCK_W = 8;
   const PERFECT_TOL = 2.5;
   const START_LIVES = 3;
@@ -180,10 +180,11 @@
   function topBlock() { return state.blocks[state.blocks.length - 1]; }
 
   // Pendulum gets faster as the tower grows, by tweaking the effective
-  // gravity for the pendulum ODE. Starts at 22 rad/s² → caps ~ 55 rad/s².
+  // gravity for the pendulum ODE. Starts at 60 rad/s² (~7s/period) and
+  // ramps to ~220 (~4s/period) over the first 50 floors.
   function pendulumG() {
     const floors = state.blocks.length - 1;
-    return Math.min(55, PENDULUM_G + floors * 0.6);
+    return Math.min(220, PENDULUM_G + floors * 3.2);
   }
 
   function pendulumCenterX(s) {
