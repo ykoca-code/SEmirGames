@@ -5,7 +5,7 @@
    - Cache key bumps with each release so updates are picked up
    ========================================================================== */
 
-const CACHE_VERSION = "v1.23.1";
+const CACHE_VERSION = "v1.23.2";
 const CACHE_NAME = "semirk-" + CACHE_VERSION;
 
 // Shell files that the catalog needs to load. Game-specific files load on
@@ -17,6 +17,7 @@ const PRECACHE = [
   "js/main.js",
   "js/version.js",
   "js/leaderboard.js",
+  "js/pwa-back.js",
   "games/games.json",
   "assets/icons/logo.svg",
   "assets/icons/SemirkLogo.png",
