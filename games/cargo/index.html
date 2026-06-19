@@ -251,8 +251,8 @@
   </div>
 
   <!-- Ortak siteyi etkileyen scriptler (versiyon damgası, geri butonu) -->
-  <script src="../../js/version.js?v=1.24.0"></script>
-  <script src="../../js/pwa-back.js?v=1.24.0"></script>
+  <script src="../../js/version.js?v=1.24.1"></script>
+  <script src="../../js/pwa-back.js?v=1.24.1"></script>
 
   <script>
   /* ============================================================================
@@ -394,8 +394,12 @@
     const joyKnob = document.getElementById("joyKnob");
     const thrustBtnEl = document.getElementById("thrustBtn");
 
-    // Joystick: parmağa göre konumlanır, içine doğru sürükledikçe vektör verir
+    // Joystick: parmağa göre konumlanır, içine doğru sürükledikçe vektör verir.
+    // ÖNEMLİ: sadece oyun oynanırken dokunmaları yakala. Menü/garaj açıkken
+    // (phase !== "playing") hiç dokunma. Aksi halde aşağıdaki preventDefault'lar
+    // tarayıcının buton "click"lerini üretmesini engelliyor → menü kilitleniyor.
     document.addEventListener("touchstart", function (e) {
+      if (state.phase !== "playing") return;
       for (const t of e.changedTouches) {
         // Sol yarıda olan ilk dokunuş joystick, sağ yarıdaki dokunuş thrust olur
         if (t.clientX < W * 0.5 && state.joystick.touchId == null) {
@@ -442,7 +446,15 @@
         joyEl.style.display = "none";
       }
     }
-    document.addEventListener("touchend",    e => { for (const t of e.changedTouches) releaseJoystick(t.identifier); e.preventDefault(); }, { passive: false });
+    document.addEventListener("touchend", e => {
+      // Yalnızca aktif joystick parmağı kalkıyorsa preventDefault yap; aksi
+      // halde menü butonlarına giden "click" event'lerini engellememeliyiz.
+      let handled = false;
+      for (const t of e.changedTouches) {
+        if (t.identifier === state.joystick.touchId) { releaseJoystick(t.identifier); handled = true; }
+      }
+      if (handled) e.preventDefault();
+    }, { passive: false });
     document.addEventListener("touchcancel", e => { for (const t of e.changedTouches) releaseJoystick(t.identifier); }, { passive: false });
 
     // Thrust butonu — basılı tutulduğu sürece motor
