@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#05060f" />
+  <title>Gezegenler Arası Kurye - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+
+  <style>
+    /* ======================================================================
+       ADIM 1 — Mobil tam ekran + dokunmatik kilit
+       ====================================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #05060f;
+      color: #e5e7eb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   Helvetica, Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;          /* mobil tarayıcıda zoom/scroll/swipe kapat */
+      overscroll-behavior: none;
+    }
+
+    /* Canvas tam ekrana yayılır */
+    #board {
+      display: block;
+      width: 100%; height: 100%;
+      background: #05060f;
+      touch-action: none;
+    }
+
+    /* Back butonu — PWA modunda da görünür kalsın */
+    .back-fab {
+      position: fixed; top: 10px; left: 10px;
+      z-index: 30;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      font-size: 22px; font-weight: 700;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* HUD üst şerit (başparmakların kapatmadığı bölge) */
+    .hud-top {
+      position: fixed; top: 8px; left: 56px; right: 8px;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .hud-pill {
+      background: rgba(13,15,24,0.7);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 4px 10px;
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 800;
+    }
+    .hud-pill .lbl { color: #94a3b8; font-size: 9px; letter-spacing: 0.08em; }
+    .hud-bar { position: relative; flex: 1; height: 8px; background: #1f2233; border-radius: 4px; overflow: hidden; }
+    .hud-bar > i { display: block; height: 100%; width: 0%; transition: width 100ms; }
+    .hud-fuel .hud-bar > i { background: linear-gradient(90deg, #22d3ee, #3b82f6); }
+    .hud-shield .hud-bar > i { background: linear-gradient(90deg, #84cc16, #22c55e); }
+    .hud-credits { color: #fde047; }
+
+    /* Görev göstergesi (sahnenin ortasında küçük şerit) */
+    .mission-strip {
+      position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+      z-index: 10;
+      background: rgba(13,15,24,0.7);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12px;
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+    .mission-strip b { color: #fde047; }
+
+    /* Yarı şeffaf joystick + thrust button — sadece touch sırasında görünür */
+    .joystick {
+      position: fixed; left: 60px; bottom: 80px;
+      width: 130px; height: 130px;
+      z-index: 20;
+      border-radius: 50%;
+      border: 2px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.05);
+      transform: translate(-50%, 50%);
+      opacity: 0.6;
+      pointer-events: none;
+      display: none;     /* görünmez başlasın, parmağa göre konumlandırılır */
+    }
+    .joystick .knob {
+      position: absolute; top: 50%; left: 50%;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: rgba(124, 58, 237, 0.55);
+      border: 2px solid rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+    }
+
+    .thrust-btn {
+      position: fixed; right: 24px; bottom: 24px;
+      z-index: 20;
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #f97316, #b91c1c);
+      border: 3px solid rgba(255,255,255,0.4);
+      color: #fff;
+      font-size: 14px; font-weight: 900;
+      letter-spacing: 0.06em;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      user-select: none;
+      touch-action: none;
+    }
+    .thrust-btn.active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 0 30px rgba(255,255,255,0.15);
+    }
+
+    /* Overlay / menü katmanları */
+    .overlay {
+      position: fixed; inset: 0;
+      z-index: 40;
+      background: rgba(5, 6, 15, 0.92);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .overlay.hidden { display: none; }
+    .overlay .panel {
+      background: linear-gradient(180deg, #111328, #0a0c1e);
+      border: 1px solid #1f2244;
+      border-radius: 16px;
+      padding: 18px 20px;
+      width: min(420px, 100%);
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+    .overlay h2 { font-size: 20px; margin-bottom: 8px; }
+    .overlay p  { font-size: 13px; color: #cbd5e1; margin-bottom: 12px; line-height: 1.55; }
+    .overlay .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      background: #7c3aed; color: #fff; border: 0;
+      padding: 10px 14px; font-size: 14px; font-weight: 800;
+      border-radius: 10px; cursor: pointer;
+      flex: 1; min-width: 100px;
+    }
+    .btn.secondary { background: #1f2233; border: 1px solid #313753; }
+    .btn:active { transform: translateY(1px); }
+
+    .upgrade-card {
+      background: #0e1126;
+      border: 1px solid #1f2244;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .upgrade-card .title { font-weight: 800; font-size: 13px; }
+    .upgrade-card .desc  { font-size: 11px; color: #94a3b8; }
+    .upgrade-card .lvl   { color: #fde047; font-weight: 800; font-size: 12px; }
+    .upgrade-card .buyBtn { background: #16a34a; color: #fff; border: 0; padding: 8px 12px;
+      border-radius: 8px; font-weight: 800; font-size: 13px; }
+    .upgrade-card .buyBtn:disabled { background: #334155; color: #94a3b8; }
+
+    /* Portrait uyarısı — yatay zorla */
+    .portrait-block {
+      position: fixed; inset: 0; z-index: 100;
+      background: #05060f;
+      display: none;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 24px;
+    }
+    .portrait-block .icon { font-size: 60px; margin-bottom: 10px; }
+    @media (orientation: portrait) {
+      .portrait-block { display: flex; }
+      .hud-top, .thrust-btn, .joystick, .mission-strip { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <canvas id="board"></canvas>
+
+  <!-- Üst HUD -->
+  <div class="hud-top">
+    <div class="hud-pill hud-fuel">
+      <span class="lbl">YAKIT</span>
+      <div class="hud-bar"><i id="fuelBar"></i></div>
+    </div>
+    <div class="hud-pill hud-shield">
+      <span class="lbl">KALKAN</span>
+      <div class="hud-bar"><i id="shieldBar"></i></div>
+    </div>
+    <div class="hud-pill hud-credits">
+      <span class="lbl">KREDİ</span>
+      <span id="creditsLbl">0</span>
+    </div>
+  </div>
+
+  <!-- Görev şeridi -->
+  <div class="mission-strip" id="missionStrip">Garaj menüsünden başla</div>
+
+  <!-- Joystick (parmağa göre konumlanır) -->
+  <div class="joystick" id="joystick"><div class="knob" id="joyKnob"></div></div>
+
+  <!-- Thrust button -->
+  <button class="thrust-btn" id="thrustBtn">İTKİ</button>
+
+  <!-- Menü / Garaj -->
+  <div class="overlay" id="overlay">
+    <div class="panel">
+      <h2 id="ovTitle">🚀 Gezegenler Arası Kurye</h2>
+      <p id="ovText">Güneş sisteminin kuryesisin. Kargonu bir gezegenden al, hedef gezegene **yakıtın bitmeden** ve çarpmadan götür.<br>
+      Sol alttan parmağını sürüklersen yön belirlersin, sağ alttaki itki tuşuna basılı tutarsan motor çalışır.<br>
+      Kazandığın krediyle gemini geliştir.</p>
+      <div id="garageBox"></div>
+      <div class="row" style="margin-top: 14px;">
+        <button class="btn secondary" id="quitBtn">Çık</button>
+        <button class="btn" id="startBtn">Görev Başlat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portrait uyarısı -->
+  <div class="portrait-block">
+    <div>
+      <div class="icon">📱↻</div>
+      <h2>Lütfen cihazınızı yatay çevirin</h2>
+      <p style="margin-top:8px; font-size:13px; color:#94a3b8;">Bu oyun yatay (landscape) mod için tasarlandı.</p>
+    </div>
+  </div>
+
+  <!-- Ortak siteyi etkileyen scriptler (versiyon damgası, geri butonu) -->
+  <script src="../../js/version.js?v=1.24.0"></script>
+  <script src="../../js/pwa-back.js?v=1.24.0"></script>
+
+  <script>
+  /* ============================================================================
+     GEZEGENLER ARASI KURYE — tek dosya, vanilla JS
+     ADIM 2 → 5 hep bu blokta. Bölümler kod içi yorumlarla işaretlendi.
+     ============================================================================ */
+  (function () {
+    "use strict";
+
+    /* ===== Canvas + DPR-aware tam ekran ===== */
+    const canvas = document.getElementById("board");
+    const ctx = canvas.getContext("2d");
+    let W = 0, H = 0, DPR = 1;
+
+    function resizeCanvas() {
+      DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width  = Math.floor(W * DPR);
+      canvas.height = Math.floor(H * DPR);
+      canvas.style.width  = W + "px";
+      canvas.style.height = H + "px";
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    window.addEventListener("resize", resizeCanvas, { passive: true });
+    window.addEventListener("orientationchange", resizeCanvas, { passive: true });
+    resizeCanvas();
+
+    /* ============================================================================
+       ADIM 2 — Oyun döngüsü, Kamera (Follow + Zoom) ve Spaceship sınıfı
+       ============================================================================ */
+
+    // Evrensel sabitler
+    const G = 6000;            // basitleştirilmiş yerçekimi sabiti (görsel ölçek)
+    const SAFE_LANDING_SPEED = 90;   // bunun üstünde çarpışma → kalkan eksilir
+    const STAR_FIELD_COUNT = 240;
+
+    // Oyun durumu (state)
+    const state = {
+      phase: "menu",          // "menu" | "playing" | "dead" | "delivered"
+      ship: null,
+      sun: null,
+      planets: [],
+      stars: [],
+      particles: [],
+      camera: { x: 0, y: 0, zoom: 1, targetZoom: 1 },
+      sourcePlanet: null,
+      targetPlanet: null,
+      carryingCargo: false,
+      credits: 0,
+      upgrades: { fuel: 0, thrust: 0, shield: 0 },
+      thrustActive: false,
+      joystick: { active: false, baseX: 0, baseY: 0, vec: { x: 0, y: 0 }, touchId: null },
+      lastTs: 0,
+      msgT: 0, msgText: "",
+    };
+
+    // Upgrade tabloları
+    const UPGRADES = {
+      fuel:   { name: "Yakıt Kapasitesi", base: 100, perLevel: 60,  cost: lvl => 100 + lvl * 80,
+                desc: lvl => "Maks " + (100 + lvl * 60) },
+      thrust: { name: "Motor Gücü",       base: 220, perLevel: 60,  cost: lvl => 150 + lvl * 120,
+                desc: lvl => "Güç " + (220 + lvl * 60) + "/s²" },
+      shield: { name: "Kalkan Sınıfı",    base: 3,   perLevel: 1,   cost: lvl => 200 + lvl * 200,
+                desc: lvl => (3 + lvl) + " kalkan" },
+    };
+
+    function maxFuel()   { return UPGRADES.fuel.base   + state.upgrades.fuel   * UPGRADES.fuel.perLevel; }
+    function shipThrust(){ return UPGRADES.thrust.base + state.upgrades.thrust * UPGRADES.thrust.perLevel; }
+    function maxShield() { return UPGRADES.shield.base + state.upgrades.shield * UPGRADES.shield.perLevel; }
+
+    // Spaceship — class değil basit factory (ES6 alternatifi, küçük + hızlı)
+    function makeShip(x, y) {
+      return {
+        x, y,
+        vx: 0, vy: 0,
+        angle: -Math.PI / 2,    // yukarıya bak
+        rotateTo: -Math.PI / 2, // hedef açı (joystick yönü)
+        radius: 12,
+        fuel: maxFuel(),
+        shield: maxShield(),
+        thrustGfx: 0,           // alev animasyonu için
+        invuln: 0,              // çarpışmadan sonra kısa bağışıklık
+      };
+    }
+
+    // Gezegen factory
+    function makePlanet(x, y, radius, mass, color, name) {
+      return { x, y, radius, mass, color, name };
+    }
+
+    // Sistemi kur (Güneş + 3-4 gezegen)
+    function buildSolarSystem() {
+      state.sun = makePlanet(0, 0, 70, 600000, "#fbbf24", "Güneş");
+      state.planets = [
+        makePlanet( 380,    0, 28, 18000, "#fdba74", "Marsus"),     // turuncu
+        makePlanet(-560,  160, 42, 60000, "#60a5fa", "Aquasi"),     // mavi su
+        makePlanet( 200, -640, 36, 32000, "#86efac", "Verdis"),     // yeşil
+        makePlanet(-260, -460, 32, 26000, "#a78bfa", "Lyrai"),      // mor
+      ];
+      // Yıldız tarlası (paralaks)
+      state.stars = [];
+      for (let i = 0; i < STAR_FIELD_COUNT; i++) {
+        state.stars.push({
+          x: (Math.random() - 0.5) * 4000,
+          y: (Math.random() - 0.5) * 4000,
+          r: Math.random() < 0.85 ? 1 : 2,
+          a: 0.3 + Math.random() * 0.5,
+          d: 0.2 + Math.random() * 0.8,    // paralaks derinliği (1 = ön, küçük = arka)
+        });
+      }
+    }
+
+    // Kamera — gemiyi merkezde tut, hızla orantılı zoom-out
+    function updateCamera(dt_s) {
+      const s = state.ship;
+      const speed = Math.hypot(s.vx, s.vy);
+      // Hız ne kadar yüksekse, kameranın zoom'u o kadar küçük (geniş görüş)
+      state.camera.targetZoom = Math.max(0.55, Math.min(1.15, 1.15 - speed / 700));
+      state.camera.zoom += (state.camera.targetZoom - state.camera.zoom) * Math.min(1, dt_s * 3);
+      // Pozisyonu yumuşak takip et
+      state.camera.x += (s.x - state.camera.x) * Math.min(1, dt_s * 4);
+      state.camera.y += (s.y - state.camera.y) * Math.min(1, dt_s * 4);
+    }
+
+    // Dünya→Ekran dönüşümü
+    function worldToScreen(wx, wy) {
+      const z = state.camera.zoom;
+      return {
+        x: (wx - state.camera.x) * z + W / 2,
+        y: (wy - state.camera.y) * z + H / 2,
+      };
+    }
+
+    /* ============================================================================
+       ADIM 3 — Mobil kontroller: yarı şeffaf Joystick + Thrust butonu
+       ============================================================================ */
+    const joyEl = document.getElementById("joystick");
+    const joyKnob = document.getElementById("joyKnob");
+    const thrustBtnEl = document.getElementById("thrustBtn");
+
+    // Joystick: parmağa göre konumlanır, içine doğru sürükledikçe vektör verir
+    document.addEventListener("touchstart", function (e) {
+      for (const t of e.changedTouches) {
+        // Sol yarıda olan ilk dokunuş joystick, sağ yarıdaki dokunuş thrust olur
+        if (t.clientX < W * 0.5 && state.joystick.touchId == null) {
+          state.joystick.active = true;
+          state.joystick.touchId = t.identifier;
+          state.joystick.baseX = t.clientX;
+          state.joystick.baseY = t.clientY;
+          state.joystick.vec.x = 0;
+          state.joystick.vec.y = 0;
+          joyEl.style.left = t.clientX + "px";
+          joyEl.style.top  = t.clientY + "px";
+          joyEl.style.display = "block";
+          joyKnob.style.left = "50%";
+          joyKnob.style.top  = "50%";
+          e.preventDefault();
+        }
+      }
+    }, { passive: false });
+
+    document.addEventListener("touchmove", function (e) {
+      for (const t of e.changedTouches) {
+        if (t.identifier === state.joystick.touchId) {
+          const dx = t.clientX - state.joystick.baseX;
+          const dy = t.clientY - state.joystick.baseY;
+          const max = 50;
+          const len = Math.hypot(dx, dy);
+          const k = len > max ? max / len : 1;
+          const cx = dx * k, cy = dy * k;
+          state.joystick.vec.x = cx / max;
+          state.joystick.vec.y = cy / max;
+          joyKnob.style.left = (65 + cx) + "px"; // 65 = joy yarıçapı (130/2)
+          joyKnob.style.top  = (65 + cy) + "px";
+          e.preventDefault();
+        }
+      }
+    }, { passive: false });
+
+    function releaseJoystick(tid) {
+      if (state.joystick.touchId === tid) {
+        state.joystick.active = false;
+        state.joystick.touchId = null;
+        state.joystick.vec.x = 0;
+        state.joystick.vec.y = 0;
+        joyEl.style.display = "none";
+      }
+    }
+    document.addEventListener("touchend",    e => { for (const t of e.changedTouches) releaseJoystick(t.identifier); e.preventDefault(); }, { passive: false });
+    document.addEventListener("touchcancel", e => { for (const t of e.changedTouches) releaseJoystick(t.identifier); }, { passive: false });
+
+    // Thrust butonu — basılı tutulduğu sürece motor
+    thrustBtnEl.addEventListener("touchstart", e => {
+      state.thrustActive = true;
+      thrustBtnEl.classList.add("active");
+      e.preventDefault();
+    }, { passive: false });
+    thrustBtnEl.addEventListener("touchend", e => {
+      state.thrustActive = false;
+      thrustBtnEl.classList.remove("active");
+      e.preventDefault();
+    }, { passive: false });
+    thrustBtnEl.addEventListener("touchcancel", () => {
+      state.thrustActive = false;
+      thrustBtnEl.classList.remove("active");
+    });
+
+    // Masaüstü test için klavye (oyun zaten mobil tasarlı ama dev-friendly)
+    const keys = {};
+    window.addEventListener("keydown", e => { keys[e.key] = true; });
+    window.addEventListener("keyup",   e => { keys[e.key] = false; });
+    function readKeyboard() {
+      // Yön: ok tuşları joystick'i taklit eder
+      if (keys["ArrowLeft"] || keys["ArrowRight"] || keys["ArrowUp"] || keys["ArrowDown"]) {
+        const jx = (keys["ArrowRight"] ? 1 : 0) - (keys["ArrowLeft"] ? 1 : 0);
+        const jy = (keys["ArrowDown"]  ? 1 : 0) - (keys["ArrowUp"]   ? 1 : 0);
+        const len = Math.hypot(jx, jy);
+        if (len > 0) { state.joystick.vec.x = jx / len; state.joystick.vec.y = jy / len; }
+      } else if (state.joystick.touchId == null) {
+        // dokunma da yoksa idle bırak
+      }
+      state.thrustActive = state.thrustActive || keys[" "] || keys["Shift"];
+    }
+
+    /* ============================================================================
+       ADIM 4 — Fizik: Newton kütleçekimi + vektörel hareket + çarpışma/teslimat
+       ============================================================================ */
+
+    // F = G * m1 * m2 / r²  → her gezegen + güneş için ivmeye katkı topla
+    function applyGravity(ship, dt_s) {
+      const sources = state.planets.concat([state.sun]);
+      let ax = 0, ay = 0;
+      for (const p of sources) {
+        const dx = p.x - ship.x;
+        const dy = p.y - ship.y;
+        const r2 = Math.max(80, dx * dx + dy * dy);  // çok yakınında patlamaması için döşeme
+        const r = Math.sqrt(r2);
+        const f = (G * p.mass) / r2;                 // ship.mass = 1
+        ax += (dx / r) * f;
+        ay += (dy / r) * f;
+      }
+      ship.vx += ax * dt_s;
+      ship.vy += ay * dt_s;
+    }
+
+    function applyThrust(ship, dt_s) {
+      if (!state.thrustActive || ship.fuel <= 0) return;
+      const power = shipThrust();
+      // İtki gemi açısı yönünde
+      ship.vx += Math.cos(ship.angle) * power * dt_s;
+      ship.vy += Math.sin(ship.angle) * power * dt_s;
+      ship.fuel = Math.max(0, ship.fuel - 18 * dt_s);
+      // Egzoz partikülleri
+      for (let i = 0; i < 3; i++) {
+        const spread = (Math.random() - 0.5) * 0.4;
+        const a = ship.angle + Math.PI + spread;
+        const sp = 180 + Math.random() * 100;
+        state.particles.push({
+          x: ship.x - Math.cos(ship.angle) * 12,
+          y: ship.y - Math.sin(ship.angle) * 12,
+          vx: ship.vx + Math.cos(a) * sp,
+          vy: ship.vy + Math.sin(a) * sp,
+          life: 0, max: 0.45,
+          color: i === 0 ? "#fbbf24" : (i === 1 ? "#fb923c" : "#ef4444"),
+        });
+      }
+    }
+
+    function updateParticles(dt_s) {
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx * dt_s;
+        p.y += p.vy * dt_s;
+        p.vx *= 0.93;
+        p.vy *= 0.93;
+        p.life += dt_s;
+        if (p.life >= p.max) state.particles.splice(i, 1);
+      }
+    }
+
+    function rotateShipTowardJoystick(ship, dt_s) {
+      const v = state.joystick.vec;
+      const len = Math.hypot(v.x, v.y);
+      if (len > 0.2) {
+        ship.rotateTo = Math.atan2(v.y, v.x);
+      }
+      // Açıyı en kısa yoldan yumuşak interpolasyon
+      let diff = ship.rotateTo - ship.angle;
+      while (diff >  Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      ship.angle += diff * Math.min(1, dt_s * 8);
+    }
+
+    // Çarpışma / teslimat tespiti
+    function checkCollisions(ship) {
+      if (ship.invuln > 0) ship.invuln = Math.max(0, ship.invuln - 1 / 60);
+
+      const all = state.planets.concat([state.sun]);
+      for (const p of all) {
+        const dx = ship.x - p.x;
+        const dy = ship.y - p.y;
+        const r = Math.hypot(dx, dy);
+        const contact = p.radius + ship.radius;
+
+        if (r < contact) {
+          const speed = Math.hypot(ship.vx, ship.vy);
+
+          if (p === state.sun) {
+            // Güneşe çarpmak ölümcül
+            ship.shield = 0;
+            dieByImpact("Güneş seni yakaladı!");
+            return;
+          }
+
+          // Yumuşak iniş — kargo al/teslim et
+          if (speed < SAFE_LANDING_SPEED) {
+            // Gemiyi yüzeyden yukarıda sabitle
+            const nx = dx / Math.max(0.1, r), ny = dy / Math.max(0.1, r);
+            ship.x = p.x + nx * (contact + 1);
+            ship.y = p.y + ny * (contact + 1);
+            // Yüzeyin teğetinde dur (gravity geri çekmeye devam edebilir)
+            ship.vx *= 0.3;
+            ship.vy *= 0.3;
+            if (!state.carryingCargo && p === state.sourcePlanet) {
+              state.carryingCargo = true;
+              showMsg("📦 Kargo alındı! Hedef: " + state.targetPlanet.name);
+            } else if (state.carryingCargo && p === state.targetPlanet) {
+              completeDelivery();
+              return;
+            }
+          } else if (ship.invuln === 0) {
+            // Sert çarpışma → kalkan eksilir, geri sek
+            ship.shield--;
+            ship.invuln = 1.0;
+            const nx = dx / Math.max(0.1, r), ny = dy / Math.max(0.1, r);
+            ship.x = p.x + nx * (contact + 2);
+            ship.y = p.y + ny * (contact + 2);
+            // Geri sek
+            const dot = ship.vx * nx + ship.vy * ny;
+            ship.vx -= 1.6 * dot * nx;
+            ship.vy -= 1.6 * dot * ny;
+            // patlama partikülleri
+            for (let i = 0; i < 18; i++) {
+              const a = Math.random() * Math.PI * 2;
+              const sp = 100 + Math.random() * 200;
+              state.particles.push({
+                x: ship.x, y: ship.y,
+                vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+                life: 0, max: 0.6,
+                color: i % 2 === 0 ? "#f87171" : "#fbbf24",
+              });
+            }
+            showMsg("💥 Sert çarpışma! Kalkan: " + ship.shield);
+            if (ship.shield <= 0) { dieByImpact("Kalkan kırıldı!"); return; }
+          }
+        }
+      }
+
+      // Yakıt biti VE hız düşük → yardım yok (sürüklenirsin)
+      if (ship.fuel <= 0 && Math.hypot(ship.vx, ship.vy) < 10 && !state.carryingCargo) {
+        dieByImpact("Yakıt bitti — uzayda mahsur kaldın.");
+      }
+    }
+
+    function completeDelivery() {
+      state.carryingCargo = false;
+      const reward = 100 + Math.round(state.ship.fuel) + state.ship.shield * 25;
+      state.credits += reward;
+      state.phase = "delivered";
+      openOverlay("✅ Teslimat Tamam!",
+        "Kargo " + state.targetPlanet.name + "'ne ulaştı.\n+ " + reward + " kredi (" +
+        "yakıt bonusu " + Math.round(state.ship.fuel) + ", kalkan bonusu " +
+        state.ship.shield * 25 + ").",
+        true);
+    }
+
+    function dieByImpact(reason) {
+      state.phase = "dead";
+      openOverlay("💥 Gemi Kayboldu", reason + "\nGörev başarısız.", true);
+    }
+
+    /* ============================================================================
+       ADIM 5 — UI katmanı, Mesajlar, Mağaza (Garaj)
+       ============================================================================ */
+    const fuelBar    = document.getElementById("fuelBar");
+    const shieldBar  = document.getElementById("shieldBar");
+    const creditsLbl = document.getElementById("creditsLbl");
+    const missionStrip = document.getElementById("missionStrip");
+
+    function updateHUD() {
+      const s = state.ship;
+      if (s) {
+        fuelBar.style.width   = Math.max(0, (s.fuel / maxFuel()) * 100) + "%";
+        shieldBar.style.width = Math.max(0, (s.shield / maxShield()) * 100) + "%";
+      } else {
+        fuelBar.style.width = "0%";
+        shieldBar.style.width = "0%";
+      }
+      creditsLbl.textContent = "₡ " + state.credits;
+      if (state.phase === "playing") {
+        const goal = state.carryingCargo
+          ? "🎯 Hedef: " + state.targetPlanet.name
+          : "📦 Kargoyu al: " + state.sourcePlanet.name;
+        missionStrip.textContent = goal;
+      }
+    }
+
+    function showMsg(text) {
+      state.msgText = text; state.msgT = 1.8;
+    }
+
+    /* ====== Garaj / Mağaza menüsü ====== */
+    const overlayEl = document.getElementById("overlay");
+    const garageBox = document.getElementById("garageBox");
+    const ovTitle = document.getElementById("ovTitle");
+    const ovText  = document.getElementById("ovText");
+    const startBtn = document.getElementById("startBtn");
+    const quitBtn  = document.getElementById("quitBtn");
+
+    function openOverlay(title, text, showGarage) {
+      ovTitle.textContent = title;
+      ovText.innerHTML = String(text).replace(/\n/g, "<br>");
+      if (showGarage) renderGarage();
+      else garageBox.innerHTML = "";
+      overlayEl.classList.remove("hidden");
+      startBtn.textContent = state.phase === "delivered" ? "Yeni Görev →" :
+                              state.phase === "dead" ? "Yeniden Başla" : "Görev Başlat";
+    }
+    function closeOverlay() { overlayEl.classList.add("hidden"); }
+
+    function renderGarage() {
+      let html = '<h3 style="font-size:14px;margin-top:8px;color:#94a3b8;">GARAJ — Geliştirmeler</h3>';
+      for (const key of ["fuel", "thrust", "shield"]) {
+        const lvl = state.upgrades[key];
+        const u = UPGRADES[key];
+        const cost = u.cost(lvl);
+        const canBuy = state.credits >= cost && lvl < 6;
+        html += `<div class="upgrade-card">
+          <div>
+            <div class="title">${u.name} <span class="lvl">Sv. ${lvl + 1}</span></div>
+            <div class="desc">${u.desc(lvl)}</div>
+          </div>
+          <button class="buyBtn" data-up="${key}" ${canBuy ? "" : "disabled"}>
+            ${lvl < 6 ? "₡ " + cost : "MAX"}
+          </button>
+        </div>`;
+      }
+      garageBox.innerHTML = html;
+      garageBox.querySelectorAll(".buyBtn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const key = btn.dataset.up;
+          const lvl = state.upgrades[key];
+          if (lvl >= 6) return;
+          const cost = UPGRADES[key].cost(lvl);
+          if (state.credits < cost) return;
+          state.credits -= cost;
+          state.upgrades[key]++;
+          saveProgress();
+          renderGarage();
+          updateHUD();
+        });
+      });
+    }
+
+    startBtn.addEventListener("click", () => {
+      closeOverlay();
+      startNewMission();
+    });
+    quitBtn.addEventListener("click", () => { location.href = "../../index.html"; });
+
+    /* ====== Yeni görev ====== */
+    function startNewMission() {
+      // Spawn pozisyonu: rastgele başlangıç gezegeni yörüngesinde
+      const planets = state.planets.slice();
+      const src = planets.splice(Math.floor(Math.random() * planets.length), 1)[0];
+      const dst = planets[Math.floor(Math.random() * planets.length)];
+      state.sourcePlanet = src;
+      state.targetPlanet = dst;
+      state.carryingCargo = false;
+
+      // Gemiyi src'nin yörüngesinde, hız sıfır olarak yerleştir
+      state.ship = makeShip(src.x + src.radius + 30, src.y);
+      // Yumuşak orbital hız ver: dik yöne küçük tangent
+      const ox = state.ship.x - src.x, oy = state.ship.y - src.y;
+      const tan = Math.sqrt((G * src.mass) / Math.hypot(ox, oy)) * 0.8;
+      state.ship.vx = 0;
+      state.ship.vy = -tan;
+
+      state.camera.x = state.ship.x;
+      state.camera.y = state.ship.y;
+      state.particles = [];
+      state.phase = "playing";
+      state.lastTs = 0;
+      showMsg("Görev: " + src.name + " → " + dst.name);
+      requestAnimationFrame(loop);
+    }
+
+    /* ====== Persist ====== */
+    function saveProgress() {
+      try {
+        localStorage.setItem("semirk_cargo_save", JSON.stringify({
+          credits: state.credits,
+          upgrades: state.upgrades,
+        }));
+      } catch (e) {}
+    }
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem("semirk_cargo_save");
+        if (!raw) return;
+        const o = JSON.parse(raw);
+        state.credits  = +o.credits || 0;
+        state.upgrades = Object.assign({ fuel: 0, thrust: 0, shield: 0 }, o.upgrades || {});
+      } catch (e) {}
+    }
+
+    /* ============================================================================
+       Render
+       ============================================================================ */
+    function render() {
+      // Arka plan
+      ctx.fillStyle = "#05060f";
+      ctx.fillRect(0, 0, W, H);
+
+      // Yıldızlar (paralaks: kameraya göre küçük hızla kayar)
+      for (const s of state.stars) {
+        const sx = (s.x - state.camera.x * s.d) * state.camera.zoom + W / 2;
+        const sy = (s.y - state.camera.y * s.d) * state.camera.zoom + H / 2;
+        if (sx < -4 || sx > W + 4 || sy < -4 || sy > H + 4) continue;
+        ctx.globalAlpha = s.a;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(sx, sy, s.r, s.r);
+      }
+      ctx.globalAlpha = 1;
+
+      // Güneş (glow halo)
+      drawSun(state.sun);
+
+      // Gezegenler
+      for (const p of state.planets) drawPlanet(p);
+
+      // Hedef gezegen — yeşil halka
+      if (state.phase === "playing" && state.targetPlanet) {
+        const t = state.targetPlanet;
+        const sc = worldToScreen(t.x, t.y);
+        const r = (t.radius + 14) * state.camera.zoom;
+        ctx.strokeStyle = state.carryingCargo ? "#22c55e" : "#fbbf24";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        ctx.arc(sc.x, sc.y, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Partiküller
+      for (const p of state.particles) {
+        const sc = worldToScreen(p.x, p.y);
+        const a = 1 - p.life / p.max;
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(sc.x - 1.5, sc.y - 1.5, 3, 3);
+      }
+      ctx.globalAlpha = 1;
+
+      // Gemi
+      if (state.ship && state.phase === "playing") drawShip(state.ship);
+
+      // Mesaj barı (geçici uyarı)
+      if (state.msgT > 0 && state.msgText) {
+        ctx.globalAlpha = Math.min(1, state.msgT * 1.5);
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.font = "bold 14px Helvetica, Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const text = state.msgText;
+        const m = ctx.measureText(text);
+        const tw = m.width + 30;
+        ctx.fillRect(W / 2 - tw / 2, H - 130, tw, 26);
+        ctx.fillStyle = "#fde047";
+        ctx.fillText(text, W / 2, H - 117);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function drawSun(p) {
+      const sc = worldToScreen(p.x, p.y);
+      const r = p.radius * state.camera.zoom;
+      const grd = ctx.createRadialGradient(sc.x, sc.y, 2, sc.x, sc.y, r);
+      grd.addColorStop(0, "#fff5b3");
+      grd.addColorStop(0.5, "#fbbf24");
+      grd.addColorStop(1, "rgba(220,38,38,0)");
+      ctx.fillStyle = grd;
+      ctx.fillRect(sc.x - r, sc.y - r, r * 2, r * 2);
+      // çekirdek
+      ctx.fillStyle = "#fff7d6";
+      ctx.beginPath();
+      ctx.arc(sc.x, sc.y, r * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawPlanet(p) {
+      const sc = worldToScreen(p.x, p.y);
+      const r = p.radius * state.camera.zoom;
+      const grd = ctx.createRadialGradient(sc.x - r * 0.35, sc.y - r * 0.35, 1,
+                                           sc.x, sc.y, r);
+      grd.addColorStop(0, lighten(p.color, 0.4));
+      grd.addColorStop(1, darken(p.color, 0.4));
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(sc.x, sc.y, r, 0, Math.PI * 2);
+      ctx.fill();
+      // gezegen ismi
+      ctx.fillStyle = "rgba(255,255,255,0.7)";
+      ctx.font = "bold 10px Helvetica, Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillText(p.name, sc.x, sc.y + r + 3);
+    }
+
+    function drawShip(ship) {
+      const sc = worldToScreen(ship.x, ship.y);
+      const z = state.camera.zoom;
+      ctx.save();
+      ctx.translate(sc.x, sc.y);
+      ctx.rotate(ship.angle + Math.PI / 2); // sprite +y ileri çiziliyor
+      ctx.scale(z, z);
+
+      // egzoz alev — thrust active ise daha büyük
+      if (state.thrustActive && ship.fuel > 0) {
+        const flame = 14 + Math.random() * 6;
+        const grd = ctx.createLinearGradient(0, 12, 0, 12 + flame);
+        grd.addColorStop(0, "#fbbf24");
+        grd.addColorStop(0.5, "#fb923c");
+        grd.addColorStop(1, "rgba(239,68,68,0)");
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.moveTo(-5, 12);
+        ctx.lineTo(0, 12 + flame);
+        ctx.lineTo(5, 12);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Gövde
+      ctx.fillStyle = ship.invuln > 0 && Math.floor(ship.invuln * 12) % 2 === 0 ? "#94a3b8" : "#e5e7eb";
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(0, -14);
+      ctx.lineTo(9, 10);
+      ctx.lineTo(0, 6);
+      ctx.lineTo(-9, 10);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // Kokpit
+      ctx.fillStyle = "#3b82f6";
+      ctx.fillRect(-2, -6, 4, 7);
+
+      // Kargo — taşıyorsa kutu çiz
+      if (state.carryingCargo) {
+        ctx.fillStyle = "#f59e0b";
+        ctx.fillRect(-4, 2, 8, 5);
+        ctx.strokeStyle = "#7c2d12";
+        ctx.strokeRect(-4, 2, 8, 5);
+      }
+
+      ctx.restore();
+    }
+
+    function lighten(hex, t) { return mix(hex, "#ffffff", t); }
+    function darken(hex, t)  { return mix(hex, "#000000", t); }
+    function mix(a, b, t) {
+      const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+      const ar = (pa >> 16) & 0xff, ag = (pa >> 8) & 0xff, ab = pa & 0xff;
+      const br = (pb >> 16) & 0xff, bg = (pb >> 8) & 0xff, bb = pb & 0xff;
+      const r = Math.round(ar + (br - ar) * t);
+      const g = Math.round(ag + (bg - ag) * t);
+      const bl = Math.round(ab + (bb - ab) * t);
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1);
+    }
+
+    /* ============================================================================
+       Ana döngü
+       ============================================================================ */
+    function step(dt_s) {
+      if (state.phase !== "playing" || !state.ship) return;
+      readKeyboard();
+      const ship = state.ship;
+
+      rotateShipTowardJoystick(ship, dt_s);
+      applyThrust(ship, dt_s);
+      applyGravity(ship, dt_s);
+
+      // Pozisyon
+      ship.x += ship.vx * dt_s;
+      ship.y += ship.vy * dt_s;
+
+      // Hız sınırı (tunnel önleme): magnitude cap
+      const maxV = 800;
+      const speed = Math.hypot(ship.vx, ship.vy);
+      if (speed > maxV) {
+        ship.vx = (ship.vx / speed) * maxV;
+        ship.vy = (ship.vy / speed) * maxV;
+      }
+
+      updateCamera(dt_s);
+      updateParticles(dt_s);
+      checkCollisions(ship);
+
+      if (state.msgT > 0) state.msgT = Math.max(0, state.msgT - dt_s);
+    }
+
+    function loop(ts) {
+      if (!state.lastTs) state.lastTs = ts;
+      const dt = Math.min(50, ts - state.lastTs);
+      const dt_s = dt / 1000;
+      state.lastTs = ts;
+
+      if (state.phase === "playing") step(dt_s);
+      render();
+      updateHUD();
+
+      if (state.phase === "playing") requestAnimationFrame(loop);
+    }
+
+    /* ============================================================================
+       Boot
+       ============================================================================ */
+    function boot() {
+      try {
+        loadProgress();
+        buildSolarSystem();
+        // Başlangıçta önizleme için kamera 0,0'a baksın
+        state.camera.x = 0; state.camera.y = 0; state.camera.zoom = 0.55;
+        render();
+        updateHUD();
+        openOverlay("🚀 Garaj — Gezegenler Arası Kurye",
+          "Sol alttan parmağını sürükleyerek yön belirle, sağdaki itki tuşunu basılı tut.\n" +
+          "Kargoyu al, hedef gezegene yumuşak in!", true);
+      } catch (err) {
+        ovTitle.textContent = "Oyun yüklenemedi";
+        ovText.textContent = "Hata: " + (err && err.message ? err.message : err);
+        overlayEl.classList.remove("hidden");
+      }
+    }
+
+    // Test harness'tan erişebilmek için global API
+    window._cargo = { state, makeShip, makePlanet, buildSolarSystem, startNewMission,
+      maxFuel, shipThrust, maxShield, applyGravity, applyThrust, checkCollisions };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot);
+    } else {
+      boot();
+    }
+  })();
+  </script>
+</body>
+</html>

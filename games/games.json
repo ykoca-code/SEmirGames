@@ -289,6 +289,17 @@
       "thumbnail": "games/zip/thumbnail.svg",
       "path": "games/zip/index.html",
       "tags": ["puzzle", "bulmaca", "mantık", "yol", "hamilton"]
+    },
+    {
+      "id": "cargo",
+      "title": "Gezegenler Arası Kurye",
+      "description": "Güneş sisteminde uzay kargo simülasyonu! Kütleçekimi kullan, yakıtın bitmeden hedef gezegene yumuşak in. Kazandığın kredilerle gemini geliştir.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "7+",
+      "thumbnail": "games/cargo/thumbnail.svg",
+      "path": "games/cargo/index.html",
+      "tags": ["arcade", "uzay", "fizik", "kütleçekim", "kargo", "simülasyon"]
     }
   ]
 }
