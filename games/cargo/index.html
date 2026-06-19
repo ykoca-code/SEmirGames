@@ -251,8 +251,8 @@
   </div>
 
   <!-- Ortak siteyi etkileyen scriptler (versiyon damgası, geri butonu) -->
-  <script src="../../js/version.js?v=1.24.1"></script>
-  <script src="../../js/pwa-back.js?v=1.24.1"></script>
+  <script src="../../js/version.js?v=1.24.2"></script>
+  <script src="../../js/pwa-back.js?v=1.24.2"></script>
 
   <script>
   /* ============================================================================
@@ -286,8 +286,11 @@
        ============================================================================ */
 
     // Evrensel sabitler
-    const G = 6000;            // basitleştirilmiş yerçekimi sabiti (görsel ölçek)
-    const SAFE_LANDING_SPEED = 90;   // bunun üstünde çarpışma → kalkan eksilir
+    // Yerçekimi ölçeği: nazik bir çekim. a = G·M/r². r=150'de büyük gezegen
+    // ~20 px/s², r=80'de ~70 px/s² verir — itki gücünün (220) çok altında,
+    // yani oyuncu her zaman kontrol edebilir.
+    const G = 1;
+    const SAFE_LANDING_SPEED = 85;   // bunun üstünde çarpışma → kalkan eksilir
     const STAR_FIELD_COUNT = 240;
 
     // Oyun durumu (state)
@@ -346,12 +349,13 @@
 
     // Sistemi kur (Güneş + 3-4 gezegen)
     function buildSolarSystem() {
-      state.sun = makePlanet(0, 0, 70, 600000, "#fbbf24", "Güneş");
+      // Kütleler G=1 ölçeğine göre: nazik ama hissedilir çekim alanları.
+      state.sun = makePlanet(0, 0, 70, 2000000, "#fbbf24", "Güneş");
       state.planets = [
-        makePlanet( 380,    0, 28, 18000, "#fdba74", "Marsus"),     // turuncu
-        makePlanet(-560,  160, 42, 60000, "#60a5fa", "Aquasi"),     // mavi su
-        makePlanet( 200, -640, 36, 32000, "#86efac", "Verdis"),     // yeşil
-        makePlanet(-260, -460, 32, 26000, "#a78bfa", "Lyrai"),      // mor
+        makePlanet( 420,    0, 28, 240000, "#fdba74", "Marsus"),     // turuncu
+        makePlanet(-600,  180, 42, 520000, "#60a5fa", "Aquasi"),     // mavi su
+        makePlanet( 240, -680, 36, 360000, "#86efac", "Verdis"),     // yeşil
+        makePlanet(-300, -500, 32, 300000, "#a78bfa", "Lyrai"),      // mor
       ];
       // Yıldız tarlası (paralaks)
       state.stars = [];
@@ -501,7 +505,7 @@
       for (const p of sources) {
         const dx = p.x - ship.x;
         const dy = p.y - ship.y;
-        const r2 = Math.max(80, dx * dx + dy * dy);  // çok yakınında patlamaması için döşeme
+        const r2 = Math.max(400, dx * dx + dy * dy);  // çok yakınında patlamaması için döşeme
         const r = Math.sqrt(r2);
         const f = (G * p.mass) / r2;                 // ship.mass = 1
         ax += (dx / r) * f;
@@ -517,7 +521,7 @@
       // İtki gemi açısı yönünde
       ship.vx += Math.cos(ship.angle) * power * dt_s;
       ship.vy += Math.sin(ship.angle) * power * dt_s;
-      ship.fuel = Math.max(0, ship.fuel - 18 * dt_s);
+      ship.fuel = Math.max(0, ship.fuel - 12 * dt_s);
       // Egzoz partikülleri
       for (let i = 0; i < 3; i++) {
         const spread = (Math.random() - 0.5) * 0.4;
@@ -562,6 +566,17 @@
     // Çarpışma / teslimat tespiti
     function checkCollisions(ship) {
       if (ship.invuln > 0) ship.invuln = Math.max(0, ship.invuln - 1 / 60);
+
+      // Teslim bölgesi: yeşil halkaya makul hızda girersen kargo teslim olur.
+      // (Yüzeye milimetrik <85 px/s inişi zorunlu kılmak çocuklar için çok zor;
+      //  halka görsel olarak zaten "bırakma alanı" — oraya gir yeter.)
+      if (state.carryingCargo && state.targetPlanet) {
+        const t = state.targetPlanet;
+        const dx = ship.x - t.x, dy = ship.y - t.y;
+        const r = Math.hypot(dx, dy);
+        const speed = Math.hypot(ship.vx, ship.vy);
+        if (r < t.radius + 26 && speed < 160) { completeDelivery(); return; }
+      }
 
       const all = state.planets.concat([state.sun]);
       for (const p of all) {
@@ -738,28 +753,35 @@
 
     /* ====== Yeni görev ====== */
     function startNewMission() {
-      // Spawn pozisyonu: rastgele başlangıç gezegeni yörüngesinde
       const planets = state.planets.slice();
       const src = planets.splice(Math.floor(Math.random() * planets.length), 1)[0];
       const dst = planets[Math.floor(Math.random() * planets.length)];
       state.sourcePlanet = src;
       state.targetPlanet = dst;
-      state.carryingCargo = false;
+      // Kargo başlangıçta yüklü gelir; tek hedef: yeşil halkalı gezegene
+      // yumuşak inmek. Bu hem oynanışı netleştirir hem "anında ölme"yi önler.
+      state.carryingCargo = true;
 
-      // Gemiyi src'nin yörüngesinde, hız sıfır olarak yerleştir
-      state.ship = makeShip(src.x + src.radius + 30, src.y);
-      // Yumuşak orbital hız ver: dik yöne küçük tangent
-      const ox = state.ship.x - src.x, oy = state.ship.y - src.y;
-      const tan = Math.sqrt((G * src.mass) / Math.hypot(ox, oy)) * 0.8;
+      // Gemiyi kaynağın GÜNEŞTEN UZAK tarafında doğur: gezegenin çekim kuyusu
+      // gemiyi beşik gibi tutar, güneşe sürüklenip anında ölmeyi imkânsızlaştırır.
+      const awayAng = Math.atan2(src.y - state.sun.y, src.x - state.sun.x);
+      const d = src.radius + 18;   // neredeyse yüzeyde park → düşüp çarpma yok
+      state.ship = makeShip(src.x + Math.cos(awayAng) * d, src.y + Math.sin(awayAng) * d);
       state.ship.vx = 0;
-      state.ship.vy = -tan;
+      state.ship.vy = 0;
+      // Yön: hedefe dön (konum güneşten uzak ama burun hedefe bakar)
+      const faceAng = Math.atan2(dst.y - src.y, dst.x - src.x);
+      state.ship.angle = faceAng;
+      state.ship.rotateTo = faceAng;
+      state.ship.invuln = 2.5;      // başlangıçta 2.5 sn dokunulmazlık
 
       state.camera.x = state.ship.x;
       state.camera.y = state.ship.y;
+      state.camera.zoom = 0.85;
       state.particles = [];
       state.phase = "playing";
       state.lastTs = 0;
-      showMsg("Görev: " + src.name + " → " + dst.name);
+      showMsg("📦 Kargo yüklü! Hedef: " + dst.name);
       requestAnimationFrame(loop);
     }
 
@@ -966,7 +988,7 @@
       ship.y += ship.vy * dt_s;
 
       // Hız sınırı (tunnel önleme): magnitude cap
-      const maxV = 800;
+      const maxV = 450;
       const speed = Math.hypot(ship.vx, ship.vy);
       if (speed > maxV) {
         ship.vx = (ship.vx / speed) * maxV;
@@ -1016,7 +1038,7 @@
 
     // Test harness'tan erişebilmek için global API
     window._cargo = { state, makeShip, makePlanet, buildSolarSystem, startNewMission,
-      maxFuel, shipThrust, maxShield, applyGravity, applyThrust, checkCollisions };
+      maxFuel, shipThrust, maxShield, applyGravity, applyThrust, checkCollisions, step };
 
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", boot);
