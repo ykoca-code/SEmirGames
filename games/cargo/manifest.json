@@ -1,0 +1,14 @@
+{
+  "id": "cargo",
+  "title": "Gezegenler Arası Kurye",
+  "description": "Güneş sistemi içinde kargo taşı! Gezegenler arası yörüngeleri kütleçekimle aş, yakıtın bitmeden ve hızla çarpmadan kargonu teslim et. Kazandığın krediyle gemini geliştir.",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "uzay", "fizik", "kütleçekim", "kargo", "simülasyon"],
+  "author": "SEmirK Games",
+  "controls": ["Sol joystick: yön", "Sağ buton: motor (yakıt yakar)", "Yatay (landscape) mod"]
+}

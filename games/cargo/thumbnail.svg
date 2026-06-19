@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <radialGradient id="space" cx="50%" cy="50%" r="65%">
+      <stop offset="0" stop-color="#1d1f3a"/>
+      <stop offset="1" stop-color="#05060f"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff5b3"/>
+      <stop offset="0.4" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#dc2626"/>
+    </radialGradient>
+    <radialGradient id="targetPlanet" cx="40%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#86efac"/>
+      <stop offset="1" stop-color="#166534"/>
+    </radialGradient>
+    <radialGradient id="sourcePlanet" cx="40%" cy="40%" r="60%">
+      <stop offset="0" stop-color="#fdba74"/>
+      <stop offset="1" stop-color="#9a3412"/>
+    </radialGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#space)"/>
+  <!-- stars -->
+  <g fill="#ffffff">
+    <rect x="20" y="30" width="2" height="2"/>
+    <rect x="200" y="50" width="2" height="2"/>
+    <rect x="60" y="100" width="1.5" height="1.5"/>
+    <rect x="180" y="160" width="1.5" height="1.5"/>
+    <rect x="40" y="200" width="2" height="2"/>
+    <rect x="220" y="120" width="1.5" height="1.5"/>
+    <rect x="100" y="20" width="1.5" height="1.5"/>
+    <rect x="150" y="220" width="2" height="2"/>
+  </g>
+  <!-- orbit guides -->
+  <g fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1">
+    <circle cx="120" cy="120" r="50"/>
+    <circle cx="120" cy="120" r="80"/>
+  </g>
+  <!-- sun -->
+  <circle cx="120" cy="120" r="18" fill="url(#sun)"/>
+  <!-- planets -->
+  <circle cx="170" cy="120" r="10" fill="url(#sourcePlanet)"/>
+  <circle cx="68" cy="92" r="14" fill="url(#targetPlanet)"/>
+  <!-- delivery ring around target -->
+  <circle cx="68" cy="92" r="20" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="3 4"/>
+  <!-- trajectory dashed -->
+  <path d="M 170 120 Q 130 60 68 92" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3 4" opacity="0.7"/>
+  <!-- ship in flight -->
+  <g transform="translate(120,80) rotate(-35)">
+    <polygon points="0,-9 7,7 0,4 -7,7" fill="#e5e7eb" stroke="#1f2937" stroke-width="1"/>
+    <rect x="-1.5" y="-4" width="3" height="6" fill="#3b82f6"/>
+    <!-- exhaust -->
+    <polygon points="-4,7 0,16 4,7" fill="#fbbf24" opacity="0.85"/>
+    <polygon points="-2,9 0,13 2,9" fill="#ef4444" opacity="0.9"/>
+  </g>
+  <!-- HUD strip -->
+  <g transform="translate(8,8)">
+    <rect width="80" height="14" rx="3" fill="rgba(0,0,0,0.6)"/>
+    <rect x="3" y="3" width="55" height="8" rx="2" fill="#22c55e"/>
+    <text x="40" y="11" font-family="Helvetica,Arial,sans-serif" font-size="8" font-weight="900" text-anchor="middle" fill="#fff">YAKIT</text>
+  </g>
+  <!-- credits badge -->
+  <g transform="translate(168,8)">
+    <rect width="64" height="14" rx="3" fill="rgba(0,0,0,0.6)"/>
+    <text x="32" y="11" font-family="Helvetica,Arial,sans-serif" font-size="8" font-weight="900" text-anchor="middle" fill="#fde047">₡ 420</text>
+  </g>
+</svg>
