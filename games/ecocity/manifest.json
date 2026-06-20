@@ -1,0 +1,14 @@
+{
+  "id": "ecocity",
+  "title": "Kayıp Şehir: Geri Dönüşüm Macerası",
+  "description": "Karton kutunun içinde gizli bir şehir kur! Karton, plastik ve metal atıkları ayrıştır, evler ve enerji binaları inşa et. Kirliliği düşür, nüfusu artır.",
+  "version": "1.0.0",
+  "category": "educational",
+  "categoryLabel": "Eğitici",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["şehir", "strateji", "geri dönüşüm", "kaynak yönetimi", "çocuk", "eğitici"],
+  "author": "SEmirK Games",
+  "controls": ["Atığa dokun: topla", "Bina seç → boş kareye dokun: inşa et"]
+}

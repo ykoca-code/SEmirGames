@@ -251,8 +251,8 @@
   </div>
 
   <!-- Ortak siteyi etkileyen scriptler (versiyon damgası, geri butonu) -->
-  <script src="../../js/version.js?v=1.24.2"></script>
-  <script src="../../js/pwa-back.js?v=1.24.2"></script>
+  <script src="../../js/version.js?v=1.25.0"></script>
+  <script src="../../js/pwa-back.js?v=1.25.0"></script>
 
   <script>
   /* ============================================================================
@@ -342,20 +342,20 @@
       };
     }
 
-    // Gezegen factory
-    function makePlanet(x, y, radius, mass, color, name) {
-      return { x, y, radius, mass, color, name };
+    // Gezegen factory (type, render'da gerçekçi desen seçer)
+    function makePlanet(x, y, radius, mass, color, name, type) {
+      return { x, y, radius, mass, color, name, type: type || "rock" };
     }
 
-    // Sistemi kur (Güneş + 3-4 gezegen)
+    // Sistemi kur — gerçek Güneş Sistemi gezegenleri (5 tane)
     function buildSolarSystem() {
-      // Kütleler G=1 ölçeğine göre: nazik ama hissedilir çekim alanları.
-      state.sun = makePlanet(0, 0, 70, 2000000, "#fbbf24", "Güneş");
+      state.sun = makePlanet(0, 0, 70, 2000000, "#fbbf24", "Güneş", "sun");
       state.planets = [
-        makePlanet( 420,    0, 28, 240000, "#fdba74", "Marsus"),     // turuncu
-        makePlanet(-600,  180, 42, 520000, "#60a5fa", "Aquasi"),     // mavi su
-        makePlanet( 240, -680, 36, 360000, "#86efac", "Verdis"),     // yeşil
-        makePlanet(-300, -500, 32, 300000, "#a78bfa", "Lyrai"),      // mor
+        makePlanet( 320,   60, 22, 180000, "#a8a29e", "Merkür",  "mercury"),  // küçük gri
+        makePlanet(-560,  150, 32, 320000, "#fde68a", "Venüs",   "venus"),    // sarı bulutlu
+        makePlanet( 220,  500, 36, 380000, "#3b82f6", "Dünya",   "earth"),    // mavi+yeşil
+        makePlanet(-280, -480, 28, 260000, "#dc2626", "Mars",    "mars"),     // kırmızı
+        makePlanet( 650, -260, 52, 700000, "#fb923c", "Jüpiter", "jupiter"),  // büyük şeritli
       ];
       // Yıldız tarlası (paralaks)
       state.stars = [];
@@ -521,7 +521,7 @@
       // İtki gemi açısı yönünde
       ship.vx += Math.cos(ship.angle) * power * dt_s;
       ship.vy += Math.sin(ship.angle) * power * dt_s;
-      ship.fuel = Math.max(0, ship.fuel - 12 * dt_s);
+      ship.fuel = Math.max(0, ship.fuel - 6 * dt_s);   // motor tüketimi (yavaşlatıldı)
       // Egzoz partikülleri
       for (let i = 0; i < 3; i++) {
         const spread = (Math.random() - 0.5) * 0.4;
@@ -681,10 +681,14 @@
       }
       creditsLbl.textContent = "₡ " + state.credits;
       if (state.phase === "playing") {
-        const goal = state.carryingCargo
-          ? "🎯 Hedef: " + state.targetPlanet.name
-          : "📦 Kargoyu al: " + state.sourcePlanet.name;
-        missionStrip.textContent = goal;
+        if (state.carryingCargo && state.targetPlanet && state.ship) {
+          const dx = state.targetPlanet.x - state.ship.x;
+          const dy = state.targetPlanet.y - state.ship.y;
+          missionStrip.textContent = "🎯 " + state.targetPlanet.name + " · " +
+            Math.round(Math.hypot(dx, dy)) + " birim";
+        } else if (state.sourcePlanet) {
+          missionStrip.textContent = "📦 Kargoyu al: " + state.sourcePlanet.name;
+        }
       }
     }
 
@@ -856,6 +860,9 @@
       // Gemi
       if (state.ship && state.phase === "playing") drawShip(state.ship);
 
+      // Hedef pusulası — kargo varsa kenarda yön + mesafe oku
+      drawTargetCompass();
+
       // Mesaj barı (geçici uyarı)
       if (state.msgT > 0 && state.msgText) {
         ctx.globalAlpha = Math.min(1, state.msgT * 1.5);
@@ -871,6 +878,69 @@
         ctx.fillText(text, W / 2, H - 117);
         ctx.globalAlpha = 1;
       }
+    }
+
+    // Hedef pusulası: gemi → hedef yönünde ekran kenarında ok + mesafe
+    function drawTargetCompass() {
+      if (state.phase !== "playing" || !state.ship || !state.carryingCargo) return;
+      const t = state.targetPlanet;
+      if (!t) return;
+      const ship = state.ship;
+      const dx = t.x - ship.x, dy = t.y - ship.y;
+      const dist = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+
+      // Hedef ekranda mı (geniş bir tolerans ile)?
+      const sc = worldToScreen(t.x, t.y);
+      const targetOnScreen = sc.x > 30 && sc.x < W - 30 && sc.y > 80 && sc.y < H - 100;
+
+      // Hedef ekrandaysa sadece yumuşak bir vurgu, dışındaysa kenarda büyük ok
+      // İlki halkayla zaten gözüküyor; biz okumuz ekran dışıyken görünür olsun
+      if (targetOnScreen) return;
+
+      // Ekran kenarına projeksiyon (güvenli margin ile)
+      const cx = W / 2, cy = H / 2;
+      const marginX = 70, marginY = 90;
+      const halfW = W / 2 - marginX, halfH = H / 2 - marginY;
+      const ax = Math.cos(angle), ay = Math.sin(angle);
+      const k = Math.min(
+        ax !== 0 ? halfW / Math.abs(ax) : Infinity,
+        ay !== 0 ? halfH / Math.abs(ay) : Infinity
+      );
+      const px = cx + ax * k;
+      const py = cy + ay * k;
+
+      // Pulsing yeşil ok
+      const pulse = 1 + Math.sin(performance.now() / 200) * 0.08;
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(angle);
+      ctx.scale(pulse, pulse);
+      ctx.fillStyle = "#22c55e";
+      ctx.strokeStyle = "rgba(0,0,0,0.6)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(28, 0);
+      ctx.lineTo(-16, 16);
+      ctx.lineTo(-8, 0);
+      ctx.lineTo(-16, -16);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      // Mesafe + isim etiketi (okun gerisinde, ekran içine doğru)
+      const labelX = px - ax * 38;
+      const labelY = py - ay * 38;
+      ctx.font = "bold 13px Helvetica, Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const label = "🎯 " + t.name + " · " + Math.round(dist);
+      ctx.strokeStyle = "rgba(0,0,0,0.75)";
+      ctx.lineWidth = 4;
+      ctx.strokeText(label, labelX, labelY);
+      ctx.fillStyle = "#dcfce7";
+      ctx.fillText(label, labelX, labelY);
     }
 
     function drawSun(p) {
@@ -892,20 +962,171 @@
     function drawPlanet(p) {
       const sc = worldToScreen(p.x, p.y);
       const r = p.radius * state.camera.zoom;
+
+      // Atmosfer halo (Venüs ve Dünya için yumuşak parlama)
+      if (p.type === "earth" || p.type === "venus") {
+        const halo = ctx.createRadialGradient(sc.x, sc.y, r * 0.9, sc.x, sc.y, r * 1.18);
+        halo.addColorStop(0, p.type === "earth" ? "rgba(96,165,250,0.4)" : "rgba(253,224,71,0.4)");
+        halo.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(sc.x, sc.y, r * 1.18, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Ana yüzey: gölgeli küre
       const grd = ctx.createRadialGradient(sc.x - r * 0.35, sc.y - r * 0.35, 1,
                                            sc.x, sc.y, r);
       grd.addColorStop(0, lighten(p.color, 0.4));
-      grd.addColorStop(1, darken(p.color, 0.4));
+      grd.addColorStop(1, darken(p.color, 0.45));
       ctx.fillStyle = grd;
       ctx.beginPath();
       ctx.arc(sc.x, sc.y, r, 0, Math.PI * 2);
       ctx.fill();
-      // gezegen ismi
-      ctx.fillStyle = "rgba(255,255,255,0.7)";
-      ctx.font = "bold 10px Helvetica, Arial, sans-serif";
+
+      // Tip-spesifik detaylar (gezegen dairesinin içine clip'lenmiş)
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(sc.x, sc.y, r, 0, Math.PI * 2);
+      ctx.clip();
+      drawPlanetSurface(p, sc, r);
+      ctx.restore();
+
+      // Terminatör: gece tarafı için yumuşak gölge
+      const night = ctx.createRadialGradient(sc.x + r * 0.4, sc.y + r * 0.4, r * 0.1,
+                                             sc.x + r * 0.4, sc.y + r * 0.4, r * 1.4);
+      night.addColorStop(0, "rgba(0,0,0,0)");
+      night.addColorStop(1, "rgba(0,0,0,0.45)");
+      ctx.fillStyle = night;
+      ctx.beginPath();
+      ctx.arc(sc.x, sc.y, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // İsim — kontrastlı, koyu konturlu
+      const fontPx = Math.max(10, Math.min(14, r * 0.36));
+      ctx.font = "bold " + fontPx + "px Helvetica, Arial, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
-      ctx.fillText(p.name, sc.x, sc.y + r + 3);
+      ctx.strokeStyle = "rgba(0,0,0,0.7)";
+      ctx.lineWidth = 3;
+      ctx.strokeText(p.name, sc.x, sc.y + r + 4);
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.fillText(p.name, sc.x, sc.y + r + 4);
+    }
+
+    // Gerçek gezegen yüzeyleri (basit ama tanınabilir desenler)
+    function drawPlanetSurface(p, sc, r) {
+      switch (p.type) {
+        case "mercury": {
+          // Krater izleri (sabit konumlar, parazit yok)
+          const craters = [[-0.35,-0.30,0.18], [0.22,0.10,0.12], [-0.10,0.42,0.14],
+                           [0.40,-0.20,0.10], [0.05,-0.50,0.09], [-0.45,0.15,0.11]];
+          for (const c of craters) {
+            ctx.fillStyle = "rgba(40,38,35,0.45)";
+            ctx.beginPath();
+            ctx.arc(sc.x + c[0]*r, sc.y + c[1]*r, c[2]*r, 0, Math.PI * 2);
+            ctx.fill();
+            // krater içi parlak halka
+            ctx.strokeStyle = "rgba(255,255,255,0.18)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(sc.x + c[0]*r, sc.y + c[1]*r, c[2]*r, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          break;
+        }
+        case "venus": {
+          // Bulutlu yatay bantlar
+          const bands = [-0.6, -0.25, 0.1, 0.45];
+          for (const by of bands) {
+            const grd = ctx.createLinearGradient(sc.x - r, sc.y + by * r,
+                                                  sc.x + r, sc.y + by * r);
+            grd.addColorStop(0, "rgba(252,211,77,0)");
+            grd.addColorStop(0.5, "rgba(253,186,116,0.55)");
+            grd.addColorStop(1, "rgba(252,211,77,0)");
+            ctx.fillStyle = grd;
+            ctx.fillRect(sc.x - r, sc.y + by * r - r * 0.07, r * 2, r * 0.14);
+          }
+          break;
+        }
+        case "earth": {
+          // Yeşil kıtalar (basitleştirilmiş)
+          ctx.fillStyle = "#16a34a";
+          // Africa-Avrupa
+          ctx.beginPath();
+          ctx.ellipse(sc.x - r * 0.05, sc.y + r * 0.10, r * 0.30, r * 0.45, 0.2, 0, Math.PI * 2);
+          ctx.fill();
+          // Asya
+          ctx.beginPath();
+          ctx.ellipse(sc.x + r * 0.40, sc.y - r * 0.25, r * 0.25, r * 0.20, -0.3, 0, Math.PI * 2);
+          ctx.fill();
+          // Amerikalar
+          ctx.beginPath();
+          ctx.ellipse(sc.x - r * 0.50, sc.y - r * 0.15, r * 0.18, r * 0.30, 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          // Beyaz bulutlar
+          ctx.fillStyle = "rgba(255,255,255,0.35)";
+          ctx.beginPath();
+          ctx.ellipse(sc.x + r * 0.20, sc.y + r * 0.35, r * 0.35, r * 0.10, 0.1, 0, Math.PI * 2);
+          ctx.fill();
+          // Kutup buzu
+          ctx.fillStyle = "rgba(255,255,255,0.7)";
+          ctx.beginPath();
+          ctx.arc(sc.x, sc.y - r * 0.92, r * 0.30, 0, Math.PI);
+          ctx.fill();
+          break;
+        }
+        case "mars": {
+          // Koyu lekeler + kutup buz başlığı
+          ctx.fillStyle = "rgba(124,45,18,0.55)";
+          ctx.beginPath();
+          ctx.ellipse(sc.x - r * 0.30, sc.y - r * 0.10, r * 0.28, r * 0.20, -0.3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(sc.x + r * 0.25, sc.y + r * 0.30, r * 0.20, r * 0.15, 0.4, 0, Math.PI * 2);
+          ctx.fill();
+          // Olympus Mons benzeri leke
+          ctx.fillStyle = "rgba(254,202,202,0.35)";
+          ctx.beginPath();
+          ctx.arc(sc.x - r * 0.10, sc.y + r * 0.05, r * 0.10, 0, Math.PI * 2);
+          ctx.fill();
+          // Kutup buzu
+          ctx.fillStyle = "rgba(255,255,255,0.85)";
+          ctx.beginPath();
+          ctx.arc(sc.x, sc.y - r * 0.92, r * 0.25, 0, Math.PI);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(sc.x, sc.y + r * 0.92, r * 0.18, Math.PI, Math.PI * 2);
+          ctx.fill();
+          break;
+        }
+        case "jupiter": {
+          // Yatay bantlar
+          const bands = [
+            { y: -0.78, h: 0.20, c: "rgba(180, 83, 9, 0.55)" },
+            { y: -0.45, h: 0.25, c: "rgba(255, 237, 213, 0.55)" },
+            { y: -0.15, h: 0.20, c: "rgba(194, 65, 12, 0.55)" },
+            { y:  0.10, h: 0.25, c: "rgba(255, 237, 213, 0.45)" },
+            { y:  0.45, h: 0.20, c: "rgba(154, 52, 18, 0.55)" },
+            { y:  0.70, h: 0.25, c: "rgba(254, 215, 170, 0.45)" },
+          ];
+          for (const b of bands) {
+            ctx.fillStyle = b.c;
+            ctx.fillRect(sc.x - r, sc.y + b.y * r, r * 2, b.h * r);
+          }
+          // Büyük Kırmızı Leke
+          ctx.fillStyle = "rgba(190, 18, 60, 0.65)";
+          ctx.beginPath();
+          ctx.ellipse(sc.x + r * 0.20, sc.y + r * 0.18, r * 0.22, r * 0.12, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "rgba(120, 10, 35, 0.5)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.ellipse(sc.x + r * 0.20, sc.y + r * 0.18, r * 0.22, r * 0.12, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          break;
+        }
+      }
     }
 
     function drawShip(ship) {

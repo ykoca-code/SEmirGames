@@ -300,6 +300,17 @@
       "thumbnail": "games/cargo/thumbnail.svg",
       "path": "games/cargo/index.html",
       "tags": ["arcade", "uzay", "fizik", "kütleçekim", "kargo", "simülasyon"]
+    },
+    {
+      "id": "ecocity",
+      "title": "Kayıp Şehir",
+      "description": "Karton kutu içinde gizli bir şehir kur! Atıkları topla, ayrıştır, evleri ve enerjiyi stratejik yerleştir. Kirliliği düşür, nüfusu büyüt.",
+      "category": "educational",
+      "categoryLabel": "Eğitici",
+      "ageRating": "7+",
+      "thumbnail": "games/ecocity/thumbnail.svg",
+      "path": "games/ecocity/index.html",
+      "tags": ["şehir", "strateji", "geri dönüşüm", "kaynak yönetimi", "çocuk", "eğitici"]
     }
   ]
 }
