@@ -1,0 +1,14 @@
+{
+  "id": "sliceit",
+  "title": "Portakal Orda Kal",
+  "description": "Önce meyveni seç! Ön kamera açılır, meyve önüne gelir, bıçak sağa sola gider. Göz kırpınca (veya ekrana dokununca) bıçak meyveyi keser. Maksimum kez kes!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "kamera", "göz kırpma", "meyve kesme", "refleks"],
+  "author": "SEmirK Games",
+  "controls": ["Meyve seç → kamerayı aç", "Göz kırp veya ekrana dokun: bıçak iner"]
+}
