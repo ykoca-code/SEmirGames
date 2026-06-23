@@ -311,6 +311,17 @@
       "thumbnail": "games/ecocity/thumbnail.svg",
       "path": "games/ecocity/index.html",
       "tags": ["şehir", "strateji", "geri dönüşüm", "kaynak yönetimi", "çocuk", "eğitici"]
+    },
+    {
+      "id": "facecatch",
+      "title": "Burnunla Yakala",
+      "description": "Kameran açık, kafanı sağa-sola eğ → sepet seni takip etsin! Sağlıklı meyveleri topla, fast-food ve bombadan kaç. Model indirme yok, tarayıcı içinde çalışır.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "7+",
+      "thumbnail": "games/facecatch/thumbnail.svg",
+      "path": "games/facecatch/index.html",
+      "tags": ["arcade", "kamera", "yüz takibi", "refleks", "sağlıklı beslenme"]
     }
   ]
 }

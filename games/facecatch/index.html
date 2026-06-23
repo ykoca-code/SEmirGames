@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Burnunla Yakala — SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #0f172a;
+      color: #e5e7eb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none; -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+
+    .back-fab {
+      position: fixed; top: 10px; left: 10px; z-index: 50;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 20px; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* HUD */
+    .hud-top {
+      position: fixed; top: 8px; left: 56px; right: 100px;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      pointer-events: none;
+    }
+    .hud-pill {
+      background: rgba(15,23,42,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 5px 8px;
+      text-align: center;
+      font-size: 14px; font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: #fde047;
+    }
+    .hud-pill .lbl { display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: #94a3b8; line-height: 1; }
+    .hud-pill.lives { color: #ef4444; letter-spacing: 1px; }
+    .hud-pill.combo { color: #34d399; }
+
+    /* Webcam mini preview, top-right */
+    .cam-frame {
+      position: fixed; top: 8px; right: 8px;
+      width: 88px; height: 66px;
+      z-index: 20;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      background: rgba(0,0,0,0.6);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .cam-frame video,
+    .cam-frame canvas {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);   /* ayna görüntü */
+    }
+    .cam-frame .cam-dot {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+      transform: translate(-50%, -50%);
+      transition: left 60ms linear, top 60ms linear;
+      pointer-events: none;
+    }
+    .cam-frame .cam-tag {
+      position: absolute; top: 2px; left: 4px;
+      font-size: 9px; font-weight: 800;
+      color: #fff;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.7);
+      pointer-events: none;
+    }
+
+    #board {
+      display: block;
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      touch-action: none;
+    }
+
+    /* Overlay */
+    .overlay {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(2, 6, 23, 0.92);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.hidden { display: none; }
+    .overlay .panel {
+      background: linear-gradient(180deg, #1e293b, #0f172a);
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px 20px;
+      width: min(420px, 100%);
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .overlay h2 { font-size: 22px; margin-bottom: 8px; color: #fde047; }
+    .overlay p  { font-size: 13px; color: #cbd5e1; margin-bottom: 10px; line-height: 1.55; }
+    .overlay .row { display: flex; gap: 8px; margin-top: 10px; }
+    .btn {
+      background: #16a34a; color: #fff; border: 0;
+      padding: 10px 14px; font-size: 14px; font-weight: 800;
+      border-radius: 10px; cursor: pointer;
+      flex: 1;
+    }
+    .btn.secondary { background: #1f2937; border: 1px solid #334155; }
+    .btn:active { transform: translateY(1px); }
+    .legend {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #cbd5e1;
+      text-align: left;
+      margin: 6px 0;
+    }
+    .legend .good { color: #4ade80; }
+    .legend .bad  { color: #f87171; }
+    .legend .bomb { color: #fcd34d; }
+
+    /* Calibration center crosshair */
+    .calib {
+      position: fixed; inset: 0; z-index: 30;
+      pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .calib.hidden { display: none; }
+    .calib-card {
+      background: rgba(15,23,42,0.85);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px 20px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+    .calib-card h3 { font-size: 18px; margin-bottom: 6px; color: #fde047; }
+    .calib-card p  { font-size: 13px; color: #cbd5e1; }
+    .calib-card .cnt { font-size: 28px; font-weight: 900; color: #34d399; margin-top: 6px; }
+
+    .input-hint {
+      position: fixed; bottom: 14px; left: 0; right: 0;
+      text-align: center; z-index: 15;
+      font-size: 11px; color: rgba(255,255,255,0.45);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+
+  <canvas id="board"></canvas>
+
+  <div class="hud-top">
+    <div class="hud-pill">
+      <span class="lbl">SKOR</span><span id="scoreLbl">0</span>
+    </div>
+    <div class="hud-pill combo">
+      <span class="lbl">KOMBO</span><span id="comboLbl">×1</span>
+    </div>
+    <div class="hud-pill lives">
+      <span class="lbl">CAN</span><span id="livesLbl">♥♥♥</span>
+    </div>
+  </div>
+
+  <div class="cam-frame" id="camFrame" style="display:none">
+    <video id="cam" autoplay muted playsinline></video>
+    <div class="cam-tag">YÜZÜN</div>
+    <div class="cam-dot" id="camDot" style="left:50%; top:50%"></div>
+  </div>
+
+  <div class="calib hidden" id="calibBox">
+    <div class="calib-card">
+      <h3>📐 Kalibrasyon</h3>
+      <p>Kafanı ekrana <b>düz</b> tut.<br>3 saniye içinde başlangıç pozisyonunu ölçeceğiz.</p>
+      <div class="cnt" id="calibCnt">3</div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="panel">
+      <h2>📷 Burnunla Yakala</h2>
+      <p>Kameranı açıp <b>kafanı sağa-sola hareket ettir</b>; sepet seni takip etsin.<br>
+      İyi şeyleri yakala, zararlılardan kaç!</p>
+      <div class="legend">
+        <div><span class="good">🍎 🍌 🍇 🍒 🍓 🥦</span> Sağlıklı: <b>+10 puan</b></div>
+        <div><span class="bad">🍩 🍔 🍕 🍟 🥤</span> Fast-food: <b>−5 puan</b></div>
+        <div><span class="bomb">💣 Bomba</span>: <b>−1 can</b></div>
+      </div>
+      <p style="font-size:11px;color:#94a3b8;">Kamera erişimi olmazsa parmakla (sürükle) veya ok tuşlarıyla oynayabilirsin.</p>
+      <div class="row">
+        <button class="btn secondary" id="noCamBtn">Kamerasız Başla</button>
+        <button class="btn" id="startBtn">🎥 Kamerayla Başla</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-hint" id="inputHint">Kafanı oynat veya parmağını sürükle</div>
+
+  <script src="../../js/version.js?v=1.26.0"></script>
+  <script src="../../js/pwa-back.js?v=1.26.0"></script>
+
+  <script>
+  (function () {
+    "use strict";
+
+    /* ===== Canvas ===== */
+    const canvas = document.getElementById("board");
+    const ctx = canvas.getContext("2d");
+    let W = 0, H = 0, DPR = 1;
+    function resize() {
+      DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width  = Math.floor(W * DPR);
+      canvas.height = Math.floor(H * DPR);
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("orientationchange", resize, { passive: true });
+    resize();
+
+    /* ===== State ===== */
+    const FRUITS_GOOD = ["🍎","🍌","🍇","🍒","🍓","🥦","🥕","🍊"];
+    const FRUITS_BAD  = ["🍩","🍔","🍕","🍟","🥤","🍫"];
+
+    const state = {
+      phase: "menu",   // menu | calibrating | playing | over
+      score: 0,
+      lives: 3,
+      combo: 1,
+      lastGoodAt: 0,
+      basketX: 0.5,    // 0..1 (oranlı x)
+      objects: [],     // {kind, x, y, vx, vy, r, t}
+      spawnT: 0,
+      speed: 1,
+      lastTs: 0,
+      usingCamera: false,
+      faceX01: 0.5,    // smoothed face x as 0..1 in cam frame
+      faceBaseline: 0.5,
+      keys: { left: false, right: false },
+      dragX: null,
+    };
+
+    /* ===== Webcam + skin-centroid tracker ===== */
+    const video = document.getElementById("cam");
+    const camFrame = document.getElementById("camFrame");
+    const camDot = document.getElementById("camDot");
+    // Small offscreen canvas for skin-tone analysis (small = fast)
+    const procW = 64, procH = 48;
+    const procCanvas = document.createElement("canvas");
+    procCanvas.width = procW; procCanvas.height = procH;
+    const procCtx = procCanvas.getContext("2d", { willReadFrequently: true });
+
+    async function enableCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        return { ok: false, reason: "Bu tarayıcı kamera API'sini desteklemiyor." };
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: { ideal: 320 }, height: { ideal: 240 } },
+          audio: false,
+        });
+        video.srcObject = stream;
+        await new Promise(r => video.onloadedmetadata = r);
+        await video.play().catch(() => {});
+        camFrame.style.display = "block";
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, reason: "Kamera izni verilmedi veya cihaz yok." };
+      }
+    }
+
+    // Skin filter: YCbCr ten aralığı (kaynak: yaygın skin-detection literatürü)
+    // Cr in [133,173] AND Cb in [77,127] AND Y > 60
+    function trackFaceFromVideo() {
+      if (!video.videoWidth || !video.videoHeight) return null;
+      // Aynalama → mirror with negative scale and translate
+      procCtx.save();
+      procCtx.translate(procW, 0);
+      procCtx.scale(-1, 1);
+      procCtx.drawImage(video, 0, 0, procW, procH);
+      procCtx.restore();
+      const img = procCtx.getImageData(0, 0, procW, procH);
+      const d = img.data;
+      let sumX = 0, sumY = 0, count = 0;
+      for (let y = 0; y < procH; y++) {
+        for (let x = 0; x < procW; x++) {
+          const i = (y * procW + x) * 4;
+          const r = d[i], g = d[i + 1], b = d[i + 2];
+          // YCbCr conversion
+          const Y  = 0.299 * r + 0.587 * g + 0.114 * b;
+          const Cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+          const Cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+          if (Y > 60 && Cr >= 133 && Cr <= 173 && Cb >= 77 && Cb <= 127) {
+            sumX += x; sumY += y; count++;
+          }
+        }
+      }
+      if (count < 30) return null;        // çok az piksel, yüz yok kabul et
+      return { x: sumX / count / procW, y: sumY / count / procH, area: count / (procW * procH) };
+    }
+
+    /* ===== Game ===== */
+    function startCalibration() {
+      state.phase = "calibrating";
+      const calibBox = document.getElementById("calibBox");
+      const cnt = document.getElementById("calibCnt");
+      calibBox.classList.remove("hidden");
+      let n = 3;
+      cnt.textContent = String(n);
+      const samples = [];
+      const interval = setInterval(() => {
+        const f = trackFaceFromVideo();
+        if (f) samples.push(f.x);
+      }, 80);
+      const tick = setInterval(() => {
+        n--;
+        cnt.textContent = String(n);
+        if (n <= 0) {
+          clearInterval(tick);
+          clearInterval(interval);
+          calibBox.classList.add("hidden");
+          if (samples.length >= 5) {
+            state.faceBaseline = samples.reduce((a, b) => a + b, 0) / samples.length;
+          } else {
+            state.faceBaseline = 0.5;
+          }
+          state.faceX01 = state.faceBaseline;
+          startGame();
+        }
+      }, 1000);
+    }
+
+    function startGame() {
+      state.phase = "playing";
+      state.score = 0;
+      state.lives = 3;
+      state.combo = 1;
+      state.lastGoodAt = 0;
+      state.objects = [];
+      state.spawnT = 0;
+      state.speed = 1;
+      state.basketX = 0.5;
+      state.lastTs = 0;
+      document.getElementById("overlay").classList.add("hidden");
+      updateHUD();
+      requestAnimationFrame(loop);
+    }
+
+    function gameOver() {
+      state.phase = "over";
+      const ov = document.getElementById("overlay");
+      ov.querySelector("h2").textContent = "💥 Oyun Bitti!";
+      ov.querySelector("p").innerHTML = "Skor: <b>" + state.score + "</b>";
+      document.getElementById("startBtn").textContent = "Tekrar Oyna 🎥";
+      document.getElementById("noCamBtn").textContent = "Kamerasız tekrar";
+      ov.classList.remove("hidden");
+    }
+
+    /* ===== Spawn / update ===== */
+    function spawnObject() {
+      const r = Math.random();
+      let kind, icon, points;
+      if (r < 0.65) { kind = "good"; icon = FRUITS_GOOD[Math.floor(Math.random() * FRUITS_GOOD.length)]; points = 10; }
+      else if (r < 0.92) { kind = "bad"; icon = FRUITS_BAD[Math.floor(Math.random() * FRUITS_BAD.length)]; points = -5; }
+      else { kind = "bomb"; icon = "💣"; points = 0; }
+      const x = 40 + Math.random() * (W - 80);
+      const speedY = 180 + Math.random() * 80 + state.speed * 30;
+      const swing = (Math.random() - 0.5) * 60;
+      state.objects.push({
+        kind, icon, points,
+        x, y: -30, vx: swing, vy: speedY,
+        size: 36,
+        rot: 0, vrot: (Math.random() - 0.5) * 4,
+      });
+    }
+
+    function step(dt_s) {
+      state.spawnT += dt_s;
+      // Ramp up
+      state.speed = Math.min(3, 1 + state.score / 250);
+      const interval = Math.max(0.45, 1.05 - state.speed * 0.18);
+      if (state.spawnT >= interval) {
+        state.spawnT = 0;
+        spawnObject();
+      }
+
+      // Read input → basket target X
+      let targetX = state.basketX;
+      if (state.usingCamera) {
+        const f = trackFaceFromVideo();
+        if (f) {
+          // EWMA smooth + mirror is already applied in proc draw
+          state.faceX01 = state.faceX01 * 0.7 + f.x * 0.3;
+          // map face deviation to basket X (1.6x sensitivity)
+          const dev = state.faceX01 - state.faceBaseline;
+          targetX = Math.max(0, Math.min(1, 0.5 + dev * 1.8));
+          // Update preview dot
+          camDot.style.left = (f.x * 100) + "%";
+          camDot.style.top  = (f.y * 100) + "%";
+        }
+      }
+      if (state.dragX != null) {
+        targetX = state.dragX;
+      } else if (state.keys.left || state.keys.right) {
+        const dir = (state.keys.right ? 1 : 0) - (state.keys.left ? 1 : 0);
+        targetX = Math.max(0, Math.min(1, state.basketX + dir * 1.2 * dt_s));
+      }
+
+      // Smooth basket movement (responsive but not jittery)
+      state.basketX += (targetX - state.basketX) * Math.min(1, dt_s * 12);
+
+      // Move objects
+      const basketScreenX = state.basketX * W;
+      const basketY = H - 90;
+      const basketHalfW = 60;
+      for (let i = state.objects.length - 1; i >= 0; i--) {
+        const o = state.objects[i];
+        o.x += o.vx * dt_s;
+        o.y += o.vy * dt_s;
+        o.rot += o.vrot * dt_s;
+        // Catch check (basket has a wide AABB)
+        if (o.y >= basketY - 20 && o.y <= basketY + 30 &&
+            Math.abs(o.x - basketScreenX) < basketHalfW) {
+          handleCatch(o);
+          state.objects.splice(i, 1);
+          continue;
+        }
+        // Off-screen
+        if (o.y > H + 50 || o.x < -50 || o.x > W + 50) {
+          state.objects.splice(i, 1);
+          // Missed good fruit → combo resets
+          if (o.kind === "good") state.combo = 1;
+        }
+      }
+    }
+
+    function handleCatch(o) {
+      if (o.kind === "good") {
+        const base = o.points;
+        const bonus = base * (state.combo - 1) * 0.5;
+        state.score = Math.max(0, state.score + Math.round(base + bonus));
+        state.combo = Math.min(8, state.combo + 1);
+        state.lastGoodAt = performance.now();
+      } else if (o.kind === "bad") {
+        state.score = Math.max(0, state.score + o.points);
+        state.combo = 1;
+      } else if (o.kind === "bomb") {
+        state.lives--;
+        state.combo = 1;
+        if (state.lives <= 0) {
+          updateHUD();
+          gameOver();
+          return;
+        }
+      }
+      updateHUD();
+    }
+
+    /* ===== Render ===== */
+    function render() {
+      // Sky gradient
+      const grd = ctx.createLinearGradient(0, 0, 0, H);
+      grd.addColorStop(0, "#0f172a");
+      grd.addColorStop(1, "#312e81");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // Soft stars
+      ctx.fillStyle = "rgba(255,255,255,0.45)";
+      for (let i = 0; i < 24; i++) {
+        const sx = (i * 73) % W;
+        const sy = (i * 53) % H;
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+
+      // Falling objects
+      for (const o of state.objects) {
+        ctx.save();
+        ctx.translate(o.x, o.y);
+        ctx.rotate(o.rot * 0.05);
+        ctx.font = (o.size) + "px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        // Bomb glow
+        if (o.kind === "bomb") {
+          const gl = ctx.createRadialGradient(0, 0, 4, 0, 0, 26);
+          gl.addColorStop(0, "rgba(252,165,165,0.6)");
+          gl.addColorStop(1, "rgba(252,165,165,0)");
+          ctx.fillStyle = gl;
+          ctx.fillRect(-26, -26, 52, 52);
+        }
+        ctx.fillText(o.icon, 0, 1);
+        ctx.restore();
+      }
+
+      // Basket character (face + basket)
+      drawBasket(state.basketX * W, H - 60);
+
+      // Camera/calibrating overlay messages drawn in DOM
+    }
+
+    function drawBasket(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+      // Shadow
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.beginPath();
+      ctx.ellipse(0, 38, 50, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Basket
+      ctx.fillStyle = "#a16207";
+      ctx.strokeStyle = "#451a03";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-55, 0);
+      ctx.lineTo(55, 0);
+      ctx.lineTo(45, 35);
+      ctx.lineTo(-45, 35);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // Basket weave lines
+      ctx.strokeStyle = "rgba(0,0,0,0.4)";
+      ctx.lineWidth = 1;
+      for (let i = -40; i <= 40; i += 12) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i * 0.85, 35);
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.moveTo(-50, 12); ctx.lineTo(50, 12); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-48, 24); ctx.lineTo(48, 24); ctx.stroke();
+
+      // Face above basket
+      ctx.fillStyle = "#fde68a";
+      ctx.strokeStyle = "#78350f";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, -25, 22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      // Hair
+      ctx.fillStyle = "#1f2937";
+      ctx.beginPath();
+      ctx.moveTo(-22, -28);
+      ctx.quadraticCurveTo(0, -55, 22, -28);
+      ctx.lineTo(22, -32);
+      ctx.lineTo(-22, -32);
+      ctx.closePath();
+      ctx.fill();
+      // Eyes
+      ctx.fillStyle = "#1f2937";
+      ctx.beginPath(); ctx.arc(-7, -23, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(7, -23, 2.5, 0, Math.PI * 2); ctx.fill();
+      // Smile or surprise depending on recent catch
+      const smiley = performance.now() - state.lastGoodAt < 600;
+      ctx.strokeStyle = "#1f2937";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      if (smiley) {
+        ctx.arc(0, -14, 6, 0, Math.PI);
+      } else {
+        ctx.moveTo(-4, -14); ctx.lineTo(4, -14);
+      }
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    /* ===== HUD ===== */
+    function updateHUD() {
+      document.getElementById("scoreLbl").textContent = state.score;
+      document.getElementById("comboLbl").textContent = "×" + state.combo;
+      document.getElementById("livesLbl").textContent = "♥".repeat(Math.max(0, state.lives));
+    }
+
+    /* ===== Input fallback (touch + keyboard) ===== */
+    canvas.addEventListener("pointerdown", e => {
+      e.preventDefault();
+      state.dragX = e.clientX / W;
+    });
+    canvas.addEventListener("pointermove", e => {
+      if (state.dragX != null) state.dragX = e.clientX / W;
+    });
+    canvas.addEventListener("pointerup",   () => { state.dragX = null; });
+    canvas.addEventListener("pointercancel",() => { state.dragX = null; });
+
+    window.addEventListener("keydown", e => {
+      if (e.key === "ArrowLeft")  state.keys.left  = true;
+      if (e.key === "ArrowRight") state.keys.right = true;
+    });
+    window.addEventListener("keyup", e => {
+      if (e.key === "ArrowLeft")  state.keys.left  = false;
+      if (e.key === "ArrowRight") state.keys.right = false;
+    });
+
+    /* ===== Loop ===== */
+    function loop(ts) {
+      if (state.phase !== "playing") return;
+      if (!state.lastTs) state.lastTs = ts;
+      const dt_s = Math.min(0.08, (ts - state.lastTs) / 1000);
+      state.lastTs = ts;
+      step(dt_s);
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    /* ===== Boot ===== */
+    document.getElementById("startBtn").addEventListener("click", async () => {
+      const r = await enableCamera();
+      if (!r.ok) {
+        document.getElementById("overlay").querySelector("p").innerHTML =
+          "❗ " + r.reason + "<br>Kamerasız modda parmakla oyna.";
+        return;
+      }
+      state.usingCamera = true;
+      document.getElementById("overlay").classList.add("hidden");
+      document.getElementById("inputHint").textContent = "Kafanı oynat: sepet seninle hareket etsin";
+      startCalibration();
+    });
+    document.getElementById("noCamBtn").addEventListener("click", () => {
+      state.usingCamera = false;
+      document.getElementById("inputHint").textContent = "Parmağını sürükle veya ok tuşları kullan";
+      document.getElementById("overlay").classList.add("hidden");
+      startGame();
+    });
+
+    // Initial preview render
+    render();
+    updateHUD();
+
+    // Expose for harness
+    window._facecatch = { state, FRUITS_GOOD, FRUITS_BAD,
+      step, render, spawnObject, handleCatch, startGame, gameOver, updateHUD };
+  })();
+  </script>
+</body>
+</html>

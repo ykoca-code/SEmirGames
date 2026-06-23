@@ -1,0 +1,14 @@
+{
+  "id": "facecatch",
+  "title": "Burnunla Yakala",
+  "description": "Webcam ile kafanı oynat, sepeti kaydır! Sağlıklı meyveleri topla, fast-food'tan ve bombadan kaç. Tarayıcı kamera erişimi gerekir, model indirme yok.",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "kamera", "yüz takibi", "refleks", "sağlıklı beslenme"],
+  "author": "SEmirK Games",
+  "controls": ["Kafanı sağa/sola eğ: sepet kayar", "Fallback: sürükle/yatay ok tuşları"]
+}
