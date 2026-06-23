@@ -20,7 +20,6 @@
       touch-action: none;
       overscroll-behavior: none;
     }
-
     .back-fab {
       position: fixed; top: 10px; left: 10px; z-index: 50;
       width: 36px; height: 36px; border-radius: 50%;
@@ -29,13 +28,11 @@
       text-decoration: none; font-size: 20px; font-weight: 700;
       border: 1px solid rgba(255,255,255,0.15);
     }
-
-    /* Fullscreen camera as backdrop */
     #cam {
       position: fixed; inset: 0;
       width: 100%; height: 100%;
       object-fit: cover;
-      transform: scaleX(-1);  /* ayna */
+      transform: scaleX(-1);
       background: #020617;
       z-index: 1;
     }
@@ -45,8 +42,6 @@
       z-index: 2;
       touch-action: none;
     }
-
-    /* HUD */
     .hud {
       position: fixed; top: 8px; right: 8px;
       display: flex; gap: 6px;
@@ -68,7 +63,6 @@
     .hud-pill.timer { color: #34d399; }
     .hud-pill.combo { color: #fb923c; }
 
-    /* Selection & info overlays */
     .overlay {
       position: fixed; inset: 0; z-index: 60;
       background: rgba(2, 6, 23, 0.92);
@@ -90,7 +84,6 @@
     }
     .overlay h2 { font-size: 22px; margin-bottom: 8px; color: #fde047; }
     .overlay p  { font-size: 13px; color: #cbd5e1; margin-bottom: 12px; line-height: 1.55; }
-
     .fruit-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -113,7 +106,6 @@
     }
     .fruit-card .icon { font-size: 30px; line-height: 1; }
     .fruit-card .name { font-size: 10px; color: #cbd5e1; margin-top: 4px; font-weight: 800; }
-
     .btn {
       background: #fb923c; color: #1f2937; border: 0;
       padding: 11px 14px; font-size: 14px; font-weight: 900;
@@ -123,8 +115,6 @@
     .btn:active { transform: translateY(1px); }
     .btn.secondary { background: #1f2937; color: #cbd5e1; border: 1px solid #334155; }
     .row { display: flex; gap: 8px; margin-top: 8px; }
-
-    /* Calibration center crosshair */
     .calib {
       position: fixed; inset: 0; z-index: 55;
       pointer-events: none;
@@ -142,14 +132,12 @@
     .calib-card h3 { font-size: 18px; margin-bottom: 6px; color: #fde047; }
     .calib-card p  { font-size: 13px; color: #cbd5e1; }
     .calib-card .cnt { font-size: 28px; font-weight: 900; color: #34d399; margin-top: 6px; }
-
     .hint {
       position: fixed; bottom: 14px; left: 0; right: 0; z-index: 12;
       text-align: center;
       font-size: 12px; color: rgba(255,255,255,0.6);
       pointer-events: none;
     }
-
     .blink-indicator {
       position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
       z-index: 12;
@@ -162,25 +150,17 @@
       pointer-events: none;
     }
     .blink-indicator.armed { color: #34d399; border-color: #16a34a; }
-    .blink-indicator.fire { color: #fde047; border-color: #facc15; background: rgba(250,204,21,0.2); }
   </style>
 </head>
 <body>
   <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
-
   <video id="cam" autoplay muted playsinline></video>
   <canvas id="board"></canvas>
 
   <div class="hud">
-    <div class="hud-pill">
-      <span class="lbl">DİLİM</span><span id="scoreLbl">0</span>
-    </div>
-    <div class="hud-pill combo">
-      <span class="lbl">KOMBO</span><span id="comboLbl">×1</span>
-    </div>
-    <div class="hud-pill timer">
-      <span class="lbl">SÜRE</span><span id="timeLbl">60</span>
-    </div>
+    <div class="hud-pill"><span class="lbl">DİLİM</span><span id="scoreLbl">0</span></div>
+    <div class="hud-pill combo"><span class="lbl">KOMBO</span><span id="comboLbl">×1</span></div>
+    <div class="hud-pill timer"><span class="lbl">SÜRE</span><span id="timeLbl">60</span></div>
   </div>
 
   <div class="blink-indicator" id="blinkInd">👁️ Gözlerini açık tut</div>
@@ -189,8 +169,7 @@
   <div class="calib hidden" id="calibBox">
     <div class="calib-card">
       <h3>👁️ Göz Kalibrasyonu</h3>
-      <p>Kamera açık. Gözlerini <b>açık</b> tut.<br>
-      Birazdan başlayacak…</p>
+      <p>Kamera açık. Gözlerini <b>açık</b> tut.<br>Birazdan başlayacak…</p>
       <div class="cnt" id="calibCnt">3</div>
     </div>
   </div>
@@ -198,8 +177,8 @@
   <div class="overlay" id="overlay">
     <div class="panel" id="panel">
       <h2>🍊 Portakal Orda Kal</h2>
-      <p>Meyveni seç. Kameran açılır, meyve önüne gelir.<br>
-      Bıçak sağa-sola gider; <b>göz kırptığında</b> bıçağın olduğu yerden meyveyi keser!<br>
+      <p>Meyveni seç. Bıçak sağa-sola sallanır; <b>göz kırptığında</b> bıçağın olduğu noktadan meyveyi fiilen <b>ikiye böler</b>.<br>
+      Küçük parça düşer, kalan meyve giderek küçülür → her seferinde isabet daha zor!<br>
       <span style="color:#94a3b8;font-size:11px;">Mobilde göz kırpma + ekran dokunma birlikte çalışır.</span></p>
       <div class="fruit-grid" id="fruitGrid"></div>
       <div class="row">
@@ -209,14 +188,14 @@
     </div>
   </div>
 
-  <script src="../../js/version.js?v=1.27.0"></script>
-  <script src="../../js/pwa-back.js?v=1.27.0"></script>
+  <script src="../../js/version.js?v=1.28.0"></script>
+  <script src="../../js/pwa-back.js?v=1.28.0"></script>
 
   <script>
   (function () {
     "use strict";
 
-    /* ===== DOM ===== */
+    /* ===== Canvas ===== */
     const video = document.getElementById("cam");
     const canvas = document.getElementById("board");
     const ctx = canvas.getContext("2d");
@@ -246,11 +225,12 @@
       { id: "pineapple",  icon: "🍍", name: "Ananas",   color: "#fbbf24", juice: "#fde68a" },
     ];
 
-    const GAME_DURATION = 60;          // seconds
-    const KNIFE_SPEED = 2.6;            // rad/s sweep speed (sin oscillator)
+    const GAME_DURATION = 60;
+    const KNIFE_SPEED = 2.6;
+    const MIN_FRUIT_FRACTION = 0.12;   // bu kadar küçülürse yeni meyve gelir
 
     const state = {
-      phase: "menu",                    // menu | calibrating | playing | over
+      phase: "menu",
       selectedFruit: FRUITS[0],
       usingCamera: false,
       score: 0,
@@ -258,20 +238,26 @@
       timeLeft: GAME_DURATION,
       lastTs: 0,
       knifeT: 0,
-      knifeArmed: true,                 // true when knife can slice (cooldown)
       knifeArmedAgainAt: 0,
-      slashes: [],                      // visual cuts on fruit
-      pieces: [],                       // {x, y, vx, vy, rot, vrot, color, side, life}
+      // Polygon-based fruit model
+      fruit: {
+        polygon: null,        // [{x, y}, ...]
+        initialArea: 0,
+        cx: 0, cy: 0,
+        baseRadius: 0,
+      },
+      fallingPieces: [],      // [{polygon (local), x, y, vx, vy, rot, vrot, color, juice, life, max}]
+      slashes: [],            // [{x, y, dx, dy, t, life}]
       juiceDrops: [],
-      // blink detection
+      blinkArmed: true,
       dark: { baseline: 0, current: 0 },
       darkHistory: [],
-      blinkArmed: true,
       lastBlinkAt: 0,
       fruitWobble: 0,
+      newFruitGlow: 0,        // briefly highlight a freshly spawned fruit
     };
 
-    /* ===== Webcam + blink detection ===== */
+    /* ===== Webcam + blink detection (same as before) ===== */
     const procW = 96, procH = 72;
     const procCanvas = document.createElement("canvas");
     procCanvas.width = procW; procCanvas.height = procH;
@@ -295,11 +281,6 @@
       }
     }
 
-    // Approach: find the skin centroid; analyze the band above it (eye
-    // region). When the eyes are open, the dark/iris pixels lower the
-    // mean luma. When the user blinks, that band briefly gets brighter
-    // (eyelid skin replaces the dark iris) → a sharp rise + fall in luma
-    // counts as a blink.
     function sampleFaceBand() {
       if (!video.videoWidth) return null;
       procCtx.save();
@@ -309,7 +290,6 @@
       procCtx.restore();
       const img = procCtx.getImageData(0, 0, procW, procH);
       const d = img.data;
-      // Pass 1: skin centroid
       let sx = 0, sy = 0, sn = 0;
       for (let y = 0; y < procH; y++) {
         for (let x = 0; x < procW; x++) {
@@ -325,64 +305,255 @@
       }
       if (sn < 50) return null;
       const cx = sx / sn, cy = sy / sn;
-
-      // Pass 2: dark-pixel ratio in the eye band (above centroid)
       const eyeY0 = Math.max(0, Math.floor(cy - 10));
       const eyeY1 = Math.max(0, Math.floor(cy - 2));
       const eyeX0 = Math.max(0, Math.floor(cx - 16));
       const eyeX1 = Math.min(procW - 1, Math.floor(cx + 16));
-      let totalLuma = 0, count = 0, darkCount = 0;
+      let count = 0, darkCount = 0;
       for (let y = eyeY0; y <= eyeY1; y++) {
         for (let x = eyeX0; x <= eyeX1; x++) {
           const i = (y * procW + x) * 4;
           const r = d[i], g = d[i + 1], b = d[i + 2];
           const Y = 0.299 * r + 0.587 * g + 0.114 * b;
-          totalLuma += Y;
           if (Y < 70) darkCount++;
           count++;
         }
       }
       if (count < 10) return null;
-      return {
-        cx, cy,
-        meanLuma: totalLuma / count,
-        darkRatio: darkCount / count,
-      };
+      return { cx, cy, darkRatio: darkCount / count };
     }
 
     function detectBlink() {
       if (!state.usingCamera) return false;
       const b = sampleFaceBand();
       if (!b) return false;
-      // Update sliding history
       state.dark.current = b.darkRatio;
       state.darkHistory.push(b.darkRatio);
       if (state.darkHistory.length > 30) state.darkHistory.shift();
-      // Baseline is the median of recent samples
       if (state.dark.baseline === 0 && state.darkHistory.length > 8) {
         const sorted = state.darkHistory.slice().sort((a, b) => a - b);
         state.dark.baseline = sorted[Math.floor(sorted.length / 2)];
       }
-      // Blink: dark ratio dramatically DROPS for one or two frames
-      // (eyelid covers the dark iris with skin). Threshold 35% below
-      // baseline AND we were "armed" (above baseline recently).
       const now = performance.now();
       if (now < state.knifeArmedAgainAt) return false;
       if (state.dark.baseline > 0.05 &&
           b.darkRatio < state.dark.baseline * 0.55 &&
           state.blinkArmed) {
         state.blinkArmed = false;
-        state.knifeArmedAgainAt = now + 350;   // debounce
+        state.knifeArmedAgainAt = now + 350;
         return true;
       }
-      // Re-arm when dark ratio returns to (or above) baseline
-      if (b.darkRatio >= state.dark.baseline * 0.85) {
-        state.blinkArmed = true;
-      }
+      if (b.darkRatio >= state.dark.baseline * 0.85) state.blinkArmed = true;
       return false;
     }
 
-    /* ===== Game ===== */
+    /* ===== Polygon helpers ===== */
+    function polyArea(poly) {
+      let a = 0;
+      for (let i = 0; i < poly.length; i++) {
+        const j = (i + 1) % poly.length;
+        a += poly[i].x * poly[j].y - poly[j].x * poly[i].y;
+      }
+      return Math.abs(a) / 2;
+    }
+    function simpleCentroid(poly) {
+      let sx = 0, sy = 0;
+      for (const p of poly) { sx += p.x; sy += p.y; }
+      return { x: sx / poly.length, y: sy / poly.length };
+    }
+    function pointInPolygon(poly, x, y) {
+      let inside = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const xi = poly[i].x, yi = poly[i].y;
+        const xj = poly[j].x, yj = poly[j].y;
+        const intersect = ((yi > y) !== (yj > y)) &&
+          (x < (xj - xi) * (y - yi) / ((yj - yi) || 1e-9) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+    // Split a (convex) polygon by an infinite line passing through (px,py)
+    // with normal (nx,ny). Returns [polyPositive, polyNegative] or null on
+    // degenerate split (line doesn't cross the polygon).
+    function splitPolygon(poly, px, py, nx, ny) {
+      const positive = [];
+      const negative = [];
+      const n = poly.length;
+      const eps = 1e-9;
+      const sdists = poly.map(p => nx * (p.x - px) + ny * (p.y - py));
+      for (let i = 0; i < n; i++) {
+        const a = poly[i];
+        const da = sdists[i];
+        const db = sdists[(i + 1) % n];
+        // Vertex assignment — on-line vertices belong to BOTH sides so each
+        // resulting polygon can close along the cut.
+        if (Math.abs(da) < eps) {
+          positive.push(a);
+          negative.push(a);
+        } else if (da > 0) {
+          positive.push(a);
+        } else {
+          negative.push(a);
+        }
+        // Only generate an intersection when the edge strictly crosses the line.
+        if ((da > eps && db < -eps) || (da < -eps && db > eps)) {
+          const t = da / (da - db);
+          const b = poly[(i + 1) % n];
+          const ix = a.x + t * (b.x - a.x);
+          const iy = a.y + t * (b.y - a.y);
+          positive.push({ x: ix, y: iy });
+          negative.push({ x: ix, y: iy });
+        }
+      }
+      if (positive.length < 3 || negative.length < 3) return null;
+      return [positive, negative];
+    }
+    function makeFruitPolygon(cx, cy, r, sides) {
+      // Strict regular polygon → convex, so Sutherland–Hodgman splits cleanly
+      // with full area conservation across cuts. Visual variation comes from
+      // the cuts themselves, not the starting shape.
+      const out = [];
+      for (let i = 0; i < sides; i++) {
+        const ang = (i / sides) * Math.PI * 2 - Math.PI / 2;
+        out.push({ x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r });
+      }
+      return out;
+    }
+    function spawnFruit() {
+      const cx = W / 2, cy = H / 2;
+      const baseR = Math.min(W, H) * 0.18;
+      state.fruit.polygon = makeFruitPolygon(cx, cy, baseR, 32);
+      state.fruit.initialArea = polyArea(state.fruit.polygon);
+      state.fruit.cx = cx; state.fruit.cy = cy;
+      state.fruit.baseRadius = baseR;
+      state.newFruitGlow = 1;
+    }
+
+    /* ===== Knife geometry — corrected so collision = visual ===== */
+    function knifeAngle() {
+      return Math.sin(state.knifeT * KNIFE_SPEED) * (70 * Math.PI / 180);
+    }
+    function knifeArmLen() {
+      return Math.min(H * 0.30, 280);
+    }
+    function knifeGeometry() {
+      // Pivot above fruit, blade tip pendulum-swings below it.
+      // Canvas rotate(+a) takes a local +y vector (0,1) to world (-sin(a), cos(a)).
+      // Pivot is at (W/2, H/2 - armLen). The blade is drawn from local (0,
+      // bladeStart) to (0, armLen); its world tip is therefore:
+      //   tip = pivot + (-sin(a), cos(a)) * armLen
+      const a = knifeAngle();
+      const armLen = knifeArmLen();
+      const cx = W / 2, cy = H / 2;
+      const pivotX = cx, pivotY = cy - armLen;
+      const tipX = pivotX - Math.sin(a) * armLen;
+      const tipY = pivotY + Math.cos(a) * armLen;
+      // Blade direction (pivot → tip): (-sin(a), cos(a))
+      const bdx = -Math.sin(a);
+      const bdy = Math.cos(a);
+      return { angle: a, armLen, pivotX, pivotY, tipX, tipY, bdx, bdy };
+    }
+
+    /* ===== Slicing ===== */
+    function attemptSlice() {
+      if (state.phase !== "playing" || !state.fruit.polygon) return false;
+      const k = knifeGeometry();
+
+      // The slice line passes through the knife tip, along the blade
+      // direction. Its normal is perpendicular to the blade.
+      const nx = -k.bdy;        // perpendicular to (bdx, bdy)
+      const ny = k.bdx;
+
+      // Knife tip must be inside the remaining fruit
+      if (!pointInPolygon(state.fruit.polygon, k.tipX, k.tipY)) {
+        state.combo = 1;
+        // Small visual ghost-slash to show the missed swing
+        state.slashes.push({
+          x: k.tipX, y: k.tipY, dx: k.bdx, dy: k.bdy, t: 0, life: 0.25, miss: true,
+        });
+        return false;
+      }
+
+      const parts = splitPolygon(state.fruit.polygon, k.tipX, k.tipY, nx, ny);
+      if (!parts) {
+        // Degenerate (line tangent at vertex); treat as miss
+        state.combo = 1;
+        return false;
+      }
+      const [A, B] = parts;
+      const aA = polyArea(A), aB = polyArea(B);
+      const larger = aA > aB ? A : B;
+      const smaller = aA > aB ? B : A;
+      const smallerArea = Math.min(aA, aB);
+      const largerArea = Math.max(aA, aB);
+
+      // The big chunk stays as the fruit
+      state.fruit.polygon = larger;
+
+      // The small chunk flies off
+      const sc = simpleCentroid(smaller);
+      const lc = simpleCentroid(larger);
+      const dirX = sc.x - lc.x;
+      const dirY = sc.y - lc.y;
+      const dirLen = Math.hypot(dirX, dirY) || 1;
+      const localPoly = smaller.map(p => ({ x: p.x - sc.x, y: p.y - sc.y }));
+      state.fallingPieces.push({
+        polygon: localPoly,
+        x: sc.x, y: sc.y,
+        vx: (dirX / dirLen) * 180 + (Math.random() - 0.5) * 80,
+        vy: (dirY / dirLen) * 180 - 200 + Math.random() * 60,
+        rot: 0, vrot: (Math.random() - 0.5) * 8,
+        color: state.selectedFruit.color,
+        juice: state.selectedFruit.juice,
+        life: 0, max: 2.4,
+      });
+
+      // Score & combo
+      state.score += 1 * state.combo;
+      state.combo = Math.min(8, state.combo + 1);
+      state.fruitWobble = 1;
+
+      // Slash + juice burst
+      state.slashes.push({
+        x: k.tipX, y: k.tipY, dx: k.bdx, dy: k.bdy, t: 0, life: 0.55, miss: false,
+      });
+      if (state.slashes.length > 6) state.slashes.shift();
+      for (let i = 0; i < 12; i++) {
+        const a = Math.atan2(ny, nx) + (Math.random() - 0.5) * 0.6;
+        const sp = 180 + Math.random() * 260;
+        state.juiceDrops.push({
+          x: k.tipX + (Math.random() - 0.5) * 6,
+          y: k.tipY + (Math.random() - 0.5) * 6,
+          vx: Math.cos(a) * sp * (Math.random() < 0.5 ? 1 : -1),
+          vy: Math.sin(a) * sp + 40,
+          life: 0, max: 0.9,
+          color: state.selectedFruit.juice,
+        });
+      }
+
+      // Too small? Bonus + spawn a fresh one
+      if (largerArea < state.fruit.initialArea * MIN_FRUIT_FRACTION) {
+        state.score += 5 * state.combo;
+        // Send the rest flying too
+        const tinyC = simpleCentroid(state.fruit.polygon);
+        const localTiny = state.fruit.polygon.map(p => ({ x: p.x - tinyC.x, y: p.y - tinyC.y }));
+        state.fallingPieces.push({
+          polygon: localTiny,
+          x: tinyC.x, y: tinyC.y,
+          vx: (Math.random() - 0.5) * 100,
+          vy: -260 + Math.random() * 40,
+          rot: 0, vrot: (Math.random() - 0.5) * 6,
+          color: state.selectedFruit.color,
+          juice: state.selectedFruit.juice,
+          life: 0, max: 2.4,
+        });
+        spawnFruit();
+      }
+
+      return true;
+    }
+
+    /* ===== Lifecycle ===== */
     function renderFruitGrid() {
       const grid = document.getElementById("fruitGrid");
       grid.innerHTML = "";
@@ -392,10 +563,7 @@
         if (state.selectedFruit.id === f.id) card.classList.add("active");
         card.innerHTML = '<div class="icon">' + f.icon + '</div>' +
                          '<div class="name">' + f.name + '</div>';
-        card.addEventListener("click", () => {
-          state.selectedFruit = f;
-          renderFruitGrid();
-        });
+        card.addEventListener("click", () => { state.selectedFruit = f; renderFruitGrid(); });
         grid.appendChild(card);
       }
     }
@@ -407,14 +575,10 @@
       const calib = document.getElementById("calibBox");
       calib.classList.remove("hidden");
       const cnt = document.getElementById("calibCnt");
-      let n = 3;
-      cnt.textContent = String(n);
-      const sample = setInterval(() => {
-        detectBlink();   // populate history while we wait
-      }, 100);
+      let n = 3; cnt.textContent = String(n);
+      const sample = setInterval(() => { detectBlink(); }, 100);
       const ticker = setInterval(() => {
-        n--;
-        cnt.textContent = String(n);
+        n--; cnt.textContent = String(n);
         if (n <= 0) {
           clearInterval(ticker);
           clearInterval(sample);
@@ -426,20 +590,17 @@
 
     function startGame() {
       state.phase = "playing";
-      state.score = 0;
-      state.combo = 1;
+      state.score = 0; state.combo = 1;
       state.timeLeft = GAME_DURATION;
-      state.lastTs = 0;
-      state.knifeT = 0;
-      state.slashes = [];
-      state.pieces = [];
-      state.juiceDrops = [];
+      state.lastTs = 0; state.knifeT = 0;
+      state.slashes = []; state.juiceDrops = []; state.fallingPieces = [];
       state.blinkArmed = true;
-      state.fruitWobble = 0;
+      state.fruitWobble = 0; state.newFruitGlow = 0;
+      spawnFruit();
       document.getElementById("overlay").classList.add("hidden");
       document.getElementById("hintLbl").textContent = state.usingCamera
-        ? "Bıçağın altında olduğunda 👁️ kırp veya 👆 dokun"
-        : "Bıçağın yerinde ekrana dokun!";
+        ? "Bıçak meyve üstünde 👁️ kırp"
+        : "Bıçak meyve üstünde ekrana dokun";
       updateHUD();
       requestAnimationFrame(loop);
     }
@@ -456,97 +617,16 @@
         '  <button class="btn" id="againBtn">Tekrar 🔪</button>' +
         '</div>';
       ov.classList.remove("hidden");
-      document.getElementById("againBtn").addEventListener("click", () => {
+      const again = document.getElementById("againBtn");
+      if (again) again.addEventListener("click", () => {
         if (state.usingCamera) startCalibration(); else startGame();
       });
-      document.getElementById("changeFruitBtn").addEventListener("click", () => {
-        // Re-render the menu panel
+      const chg = document.getElementById("changeFruitBtn");
+      if (chg) chg.addEventListener("click", () => {
         panel.innerHTML = document.getElementById("__menuTemplate").innerHTML;
         renderFruitGrid();
         wireMenuButtons();
       });
-    }
-
-    function knifeAngle() {
-      // Knife swings left-right above the fruit; angle is in radians offset
-      // from straight down. Amplitude ~70°.
-      return Math.sin(state.knifeT * KNIFE_SPEED) * (70 * Math.PI / 180);
-    }
-
-    function knifeTipScreen() {
-      // Knife pivots high above the fruit; tip sits at the fruit center y
-      const fruitCx = W / 2;
-      const fruitCy = H / 2;
-      const armLen = Math.min(H * 0.30, 280);
-      const a = knifeAngle();
-      const tipX = fruitCx + Math.sin(a) * armLen;
-      const tipY = fruitCy - Math.cos(a) * armLen + armLen;
-      // Pivot
-      return {
-        tipX, tipY,
-        pivotX: fruitCx,
-        pivotY: fruitCy - armLen,
-        angle: a,
-      };
-    }
-
-    function attemptSlice() {
-      if (state.phase !== "playing") return false;
-      const k = knifeTipScreen();
-      const fruitCx = W / 2, fruitCy = H / 2;
-      const dx = k.tipX - fruitCx;
-      const dy = k.tipY - fruitCy;
-      const dist = Math.hypot(dx, dy);
-      const fruitR = Math.min(W, H) * 0.18;
-      if (dist > fruitR + 30) {
-        // Knife missed → reset combo
-        state.combo = 1;
-        return false;
-      }
-      // Score = +1 dilim, combo
-      state.score += 1 * state.combo;
-      state.combo = Math.min(8, state.combo + 1);
-      // Visual cut: a slash line through the fruit at knife angle
-      const a = k.angle;
-      state.slashes.push({
-        angle: a,
-        offset: dist * 0.5,    // how far from center
-        t: 0,
-        life: 0.7,
-      });
-      // Limit visual slashes
-      if (state.slashes.length > 6) state.slashes.shift();
-      // Juice drops
-      for (let i = 0; i < 8; i++) {
-        const ang = a + (Math.random() - 0.5) * Math.PI;
-        const sp = 200 + Math.random() * 220;
-        state.juiceDrops.push({
-          x: fruitCx + Math.sin(a) * (Math.random() * fruitR * 0.6),
-          y: fruitCy - Math.cos(a) * (Math.random() * fruitR * 0.6),
-          vx: Math.cos(ang) * sp,
-          vy: Math.sin(ang) * sp + 50,
-          life: 0, max: 0.9,
-          color: state.selectedFruit.juice,
-        });
-      }
-      // After every 5 dilim spawn a "piece" that flies off (visual)
-      if (state.score % 3 === 0) {
-        const ang = a + Math.PI / 2;
-        const sp = 280;
-        state.pieces.push({
-          x: fruitCx, y: fruitCy,
-          vx: Math.cos(ang) * sp,
-          vy: Math.sin(ang) * sp - 100,
-          rot: 0, vrot: (Math.random() - 0.5) * 8,
-          color: state.selectedFruit.color,
-          side: Math.random() < 0.5 ? "L" : "R",
-          life: 0, max: 1.6,
-          r: Math.min(W, H) * 0.08,
-        });
-      }
-      state.fruitWobble = 1;
-      updateHUD();
-      return true;
     }
 
     /* ===== Step ===== */
@@ -554,31 +634,24 @@
       state.knifeT += dt_s;
       state.timeLeft -= dt_s;
       if (state.fruitWobble > 0) state.fruitWobble = Math.max(0, state.fruitWobble - dt_s * 3);
-      if (state.timeLeft <= 0) {
-        state.timeLeft = 0;
-        gameOver();
-        return;
-      }
-      // Blink detection (camera-driven slicing)
-      if (state.usingCamera && detectBlink()) {
-        attemptSlice();
-      }
-      // Slashes life
+      if (state.newFruitGlow > 0) state.newFruitGlow = Math.max(0, state.newFruitGlow - dt_s * 1.5);
+      if (state.timeLeft <= 0) { state.timeLeft = 0; gameOver(); return; }
+
+      if (state.usingCamera && detectBlink()) attemptSlice();
+
       for (let i = state.slashes.length - 1; i >= 0; i--) {
         state.slashes[i].t += dt_s;
         if (state.slashes[i].t >= state.slashes[i].life) state.slashes.splice(i, 1);
       }
-      // Pieces
-      for (let i = state.pieces.length - 1; i >= 0; i--) {
-        const p = state.pieces[i];
+      for (let i = state.fallingPieces.length - 1; i >= 0; i--) {
+        const p = state.fallingPieces[i];
         p.x += p.vx * dt_s;
         p.y += p.vy * dt_s;
         p.vy += 800 * dt_s;
         p.rot += p.vrot * dt_s;
         p.life += dt_s;
-        if (p.life >= p.max) state.pieces.splice(i, 1);
+        if (p.life >= p.max || p.y > H + 300) state.fallingPieces.splice(i, 1);
       }
-      // Juice
       for (let i = state.juiceDrops.length - 1; i >= 0; i--) {
         const j = state.juiceDrops[i];
         j.x += j.vx * dt_s;
@@ -590,152 +663,162 @@
     }
 
     /* ===== Render ===== */
-    function render() {
-      // Clear (the <video> shows through behind the canvas)
-      ctx.clearRect(0, 0, W, H);
-
-      const cx = W / 2, cy = H / 2;
-      const fruitR = Math.min(W, H) * 0.18;
-
-      // Dark vignette so the fruit pops over the camera feed
-      const vg = ctx.createRadialGradient(cx, cy, fruitR * 0.5, cx, cy, Math.max(W, H) * 0.7);
-      vg.addColorStop(0, "rgba(0,0,0,0.15)");
-      vg.addColorStop(1, "rgba(0,0,0,0.65)");
-      ctx.fillStyle = vg;
-      ctx.fillRect(0, 0, W, H);
-
-      // Fruit (wobble on slice)
-      const wob = state.fruitWobble * Math.sin(performance.now() / 30) * 6;
-      drawFruit(cx + wob, cy, fruitR);
-
-      // Slash lines drawn ON the fruit
-      for (const s of state.slashes) {
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(s.angle);
-        const fade = 1 - s.t / s.life;
-        // Cut juice line
-        ctx.strokeStyle = state.selectedFruit.juice;
-        ctx.lineWidth = 4 * fade + 1;
-        ctx.lineCap = "round";
-        ctx.globalAlpha = fade;
-        ctx.beginPath();
-        ctx.moveTo(-fruitR * 0.9, s.offset);
-        ctx.lineTo(fruitR * 0.9, s.offset);
-        ctx.stroke();
-        // Sparkle highlight
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 1.2 * fade;
-        ctx.beginPath();
-        ctx.moveTo(-fruitR * 0.85, s.offset - 1);
-        ctx.lineTo(fruitR * 0.85, s.offset - 1);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-        ctx.restore();
-      }
-
-      // Pieces flying off
-      for (const p of state.pieces) {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.globalAlpha = Math.max(0, 1 - p.life / p.max);
-        // Half-disc piece
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(0, 0, p.r, p.side === "L" ? Math.PI / 2 : -Math.PI / 2,
-                p.side === "L" ? Math.PI * 1.5 : Math.PI / 2);
-        ctx.closePath();
-        ctx.fill();
-        ctx.strokeStyle = "rgba(0,0,0,0.4)";
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-        // Inner flesh
-        ctx.fillStyle = state.selectedFruit.juice;
-        ctx.beginPath();
-        ctx.arc(0, 0, p.r * 0.78, p.side === "L" ? Math.PI / 2 : -Math.PI / 2,
-                p.side === "L" ? Math.PI * 1.5 : Math.PI / 2);
-        ctx.closePath();
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.restore();
-      }
-
-      // Juice drops
-      for (const j of state.juiceDrops) {
-        const a = Math.max(0, 1 - j.life / j.max);
-        ctx.fillStyle = j.color;
-        ctx.globalAlpha = a;
-        ctx.beginPath();
-        ctx.arc(j.x, j.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-
-      // Knife
-      drawKnife();
-
-      // Camera off banner
-      if (!state.usingCamera && state.phase === "playing") {
-        ctx.fillStyle = "rgba(2,6,23,0.6)";
-        ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = state.selectedFruit.color;
-        ctx.font = "bold 18px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("👆 Ekrana dokunarak kes", cx, cy + fruitR + 50);
-      }
+    function lighten(hex, t) { return mix(hex, "#ffffff", t); }
+    function darken(hex, t)  { return mix(hex, "#000000", t); }
+    function mix(a, b, t) {
+      const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+      const r = Math.round(((pa >> 16) & 0xff) + (((pb >> 16) & 0xff) - ((pa >> 16) & 0xff)) * t);
+      const g = Math.round(((pa >> 8) & 0xff) + (((pb >> 8) & 0xff) - ((pa >> 8) & 0xff)) * t);
+      const bl = Math.round((pa & 0xff) + ((pb & 0xff) - (pa & 0xff)) * t);
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1);
     }
 
-    function drawFruit(cx, cy, r) {
+    function tracePolygon(poly) {
+      ctx.beginPath();
+      ctx.moveTo(poly[0].x, poly[0].y);
+      for (let i = 1; i < poly.length; i++) ctx.lineTo(poly[i].x, poly[i].y);
+      ctx.closePath();
+    }
+
+    function drawFruit() {
+      const poly = state.fruit.polygon;
+      if (!poly || poly.length < 3) return;
       const f = state.selectedFruit;
+      const c = simpleCentroid(poly);
+      const area = polyArea(poly);
+      const rEq = Math.sqrt(area / Math.PI);
+      const wob = state.fruitWobble * Math.sin(performance.now() / 30) * 6;
+
       ctx.save();
+      ctx.translate(wob, 0);
+
       // Shadow
       ctx.fillStyle = "rgba(0,0,0,0.4)";
       ctx.beginPath();
-      ctx.ellipse(cx, cy + r + 14, r * 0.85, 10, 0, 0, Math.PI * 2);
+      ctx.ellipse(c.x, c.y + rEq + 14, rEq * 0.85, 10, 0, 0, Math.PI * 2);
       ctx.fill();
-      // Outer glow
-      const halo = ctx.createRadialGradient(cx, cy, r * 0.95, cx, cy, r * 1.18);
-      halo.addColorStop(0, "rgba(255,255,255,0.06)");
-      halo.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = halo;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 1.18, 0, Math.PI * 2);
-      ctx.fill();
+
+      // Glow for new fruit
+      if (state.newFruitGlow > 0) {
+        const halo = ctx.createRadialGradient(c.x, c.y, rEq * 0.7, c.x, c.y, rEq * 1.4);
+        halo.addColorStop(0, "rgba(255,255,255," + (0.25 * state.newFruitGlow) + ")");
+        halo.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, rEq * 1.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       // Body
-      const grd = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.35, 1, cx, cy, r);
+      const grd = ctx.createRadialGradient(c.x - rEq * 0.35, c.y - rEq * 0.35, 1, c.x, c.y, rEq);
       grd.addColorStop(0, lighten(f.color, 0.35));
       grd.addColorStop(1, darken(f.color, 0.35));
       ctx.fillStyle = grd;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      tracePolygon(poly);
       ctx.fill();
       ctx.strokeStyle = darken(f.color, 0.5);
       ctx.lineWidth = 3;
       ctx.stroke();
-      // Big emoji label inside
-      ctx.font = "bold " + Math.floor(r * 1.1) + "px Arial";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(f.icon, cx, cy + r * 0.05);
+
+      // Inner juice tint (subtle, only on cut polygons that aren't full circles)
+      const sides = poly.length;
+      if (sides !== 32) {
+        ctx.save();
+        tracePolygon(poly);
+        ctx.clip();
+        ctx.fillStyle = f.juice;
+        ctx.globalAlpha = 0.18;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, rEq * 0.75, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Emoji scaled by remaining area
+      const scale = Math.sqrt(area / state.fruit.initialArea);
+      if (scale > 0.15) {
+        ctx.font = "bold " + Math.floor(scale * 100) + "px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(f.icon, c.x, c.y + 5);
+      }
+
       ctx.restore();
     }
 
+    function drawFallingPieces() {
+      for (const p of state.fallingPieces) {
+        if (!p.polygon || p.polygon.length < 3) continue;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        const fadeStart = p.max - 0.6;
+        ctx.globalAlpha = p.life < fadeStart ? 1 : Math.max(0, 1 - (p.life - fadeStart) / 0.6);
+        // body
+        ctx.fillStyle = p.color;
+        tracePolygon(p.polygon);
+        ctx.fill();
+        ctx.strokeStyle = darken(p.color, 0.45);
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // exposed flesh — small juice oval in center
+        ctx.fillStyle = p.juice;
+        ctx.globalAlpha *= 0.7;
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function drawSlashes() {
+      for (const s of state.slashes) {
+        const fade = 1 - s.t / s.life;
+        const len = 220;
+        ctx.save();
+        ctx.lineCap = "round";
+        ctx.strokeStyle = s.miss ? "rgba(255,255,255,0.5)" : state.selectedFruit.juice;
+        ctx.lineWidth = (s.miss ? 2 : 5) * fade + 1;
+        ctx.globalAlpha = fade;
+        ctx.beginPath();
+        ctx.moveTo(s.x - s.dx * len, s.y - s.dy * len);
+        ctx.lineTo(s.x + s.dx * len, s.y + s.dy * len);
+        ctx.stroke();
+        if (!s.miss) {
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1.2 * fade;
+          ctx.beginPath();
+          ctx.moveTo(s.x - s.dx * len * 0.95, s.y - s.dy * len * 0.95 - 1);
+          ctx.lineTo(s.x + s.dx * len * 0.95, s.y + s.dy * len * 0.95 - 1);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+
+    function drawJuiceDrops() {
+      for (const j of state.juiceDrops) {
+        ctx.globalAlpha = Math.max(0, 1 - j.life / j.max);
+        ctx.fillStyle = j.color;
+        ctx.beginPath();
+        ctx.arc(j.x, j.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
     function drawKnife() {
-      const k = knifeTipScreen();
-      const cx = W / 2, cy = H / 2;
-      const fruitR = Math.min(W, H) * 0.18;
-      const armLen = Math.min(H * 0.30, 280);
+      const k = knifeGeometry();
       ctx.save();
-      ctx.translate(cx, cy - armLen);
+      ctx.translate(k.pivotX, k.pivotY);
       ctx.rotate(k.angle);
-      // Pivot point dot
+      // Pivot dot
       ctx.fillStyle = "rgba(255,255,255,0.25)";
       ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      const handleStart = k.armLen * 0.05;
+      const bladeStart = k.armLen * 0.45;
+      const bladeEnd = k.armLen;
       // Handle
-      const handleStart = armLen * 0.05;
-      const bladeStart = armLen * 0.45;
-      const bladeEnd = armLen;
       ctx.fillStyle = "#92400e";
       ctx.strokeStyle = "#451a03";
       ctx.lineWidth = 1.5;
@@ -758,7 +841,6 @@
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
-      // Blade highlight
       ctx.strokeStyle = "rgba(255,255,255,0.7)";
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -767,35 +849,45 @@
       ctx.stroke();
       ctx.restore();
 
-      // Arming hint dot when knife tip is OVER the fruit
-      const dx = k.tipX - cx, dy = k.tipY - cy;
-      const onFruit = Math.hypot(dx, dy) < fruitR + 20;
+      // Blink indicator
       const ind = document.getElementById("blinkInd");
       if (state.phase === "playing") {
+        const onFruit = state.fruit.polygon && pointInPolygon(state.fruit.polygon, k.tipX, k.tipY);
         if (state.usingCamera) {
           if (onFruit && state.blinkArmed) {
             ind.textContent = "👁️ Kırp! Bıçak meyve üstünde";
             ind.classList.add("armed");
-            ind.classList.remove("fire");
           } else {
-            ind.textContent = state.usingCamera ? "👁️ Bıçak meyve üstüne gelince kırp" : "👆 Dokun";
+            ind.textContent = "👁️ Bıçak meyveye gelince kırp";
             ind.classList.remove("armed");
           }
         } else {
-          ind.textContent = onFruit ? "👆 Şimdi dokun!" : "Bıçak meyve üstüne gelmedi";
-          ind.classList.toggle("armed", onFruit);
+          ind.textContent = onFruit ? "👆 Şimdi dokun!" : "Bıçak meyveye geldiğinde dokun";
+          ind.classList.toggle("armed", !!onFruit);
         }
       }
     }
 
-    function lighten(hex, t) { return mix(hex, "#ffffff", t); }
-    function darken(hex, t)  { return mix(hex, "#000000", t); }
-    function mix(a, b, t) {
-      const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
-      const r = Math.round(((pa >> 16) & 0xff) + (((pb >> 16) & 0xff) - ((pa >> 16) & 0xff)) * t);
-      const g = Math.round(((pa >> 8) & 0xff) + (((pb >> 8) & 0xff) - ((pa >> 8) & 0xff)) * t);
-      const bl = Math.round((pa & 0xff) + ((pb & 0xff) - (pa & 0xff)) * t);
-      return "#" + ((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1);
+    function render() {
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      const baseR = state.fruit.baseRadius || Math.min(W, H) * 0.18;
+      const vg = ctx.createRadialGradient(cx, cy, baseR * 0.5, cx, cy, Math.max(W, H) * 0.7);
+      vg.addColorStop(0, "rgba(0,0,0,0.15)");
+      vg.addColorStop(1, "rgba(0,0,0,0.65)");
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, W, H);
+
+      drawFruit();
+      drawSlashes();
+      drawFallingPieces();
+      drawJuiceDrops();
+      drawKnife();
+
+      if (!state.usingCamera && state.phase === "playing") {
+        ctx.fillStyle = "rgba(2,6,23,0.55)";
+        ctx.fillRect(0, 0, W, 0);   // intentional no-op; vignette suffices
+      }
     }
 
     /* ===== HUD ===== */
@@ -805,13 +897,13 @@
       document.getElementById("timeLbl").textContent = Math.ceil(state.timeLeft);
     }
 
-    /* ===== Input (touch fallback) ===== */
+    /* ===== Input ===== */
     canvas.addEventListener("pointerdown", e => {
       e.preventDefault();
       if (state.phase !== "playing") return;
       const now = performance.now();
       if (now < state.knifeArmedAgainAt) return;
-      state.knifeArmedAgainAt = now + 250;
+      state.knifeArmedAgainAt = now + 200;
       attemptSlice();
     });
 
@@ -829,34 +921,34 @@
 
     /* ===== Menu wiring ===== */
     function wireMenuButtons() {
-      document.getElementById("startBtn").addEventListener("click", async () => {
+      const start = document.getElementById("startBtn");
+      const touchOnly = document.getElementById("touchOnlyBtn");
+      if (start) start.addEventListener("click", async () => {
         const r = await enableCamera();
         if (!r.ok) {
-          document.getElementById("panel").querySelector("p").innerHTML =
-            "❗ " + r.reason + "<br>Sadece dokunma ile devam edebilirsin.";
+          const p = document.getElementById("panel").querySelector("p");
+          if (p) p.innerHTML = "❗ " + r.reason + "<br>Sadece dokunma ile devam edebilirsin.";
           return;
         }
         state.usingCamera = true;
         startCalibration();
       });
-      document.getElementById("touchOnlyBtn").addEventListener("click", () => {
+      if (touchOnly) touchOnly.addEventListener("click", () => {
         state.usingCamera = false;
         document.getElementById("overlay").classList.add("hidden");
         startGame();
       });
     }
 
-    /* ===== Boot ===== */
     function boot() {
-      // Stash the menu HTML so we can re-render between rounds
       const tmpl = document.createElement("template");
       tmpl.id = "__menuTemplate";
       tmpl.innerHTML = document.getElementById("panel").innerHTML;
       document.body.appendChild(tmpl);
       renderFruitGrid();
       wireMenuButtons();
-      // Initial render so the fruit preview shows under the menu
       state.phase = "menu";
+      spawnFruit();   // preview behind the menu
       render();
       updateHUD();
     }
@@ -868,8 +960,13 @@
     }
 
     // Test harness API
-    window._sliceit = { state, FRUITS, knifeAngle, knifeTipScreen,
-      attemptSlice, step, render, startGame, gameOver, detectBlink };
+    window._sliceit = {
+      state, FRUITS,
+      // game functions
+      knifeGeometry, attemptSlice, step, render, startGame, gameOver, detectBlink,
+      // pure helpers (for unit tests)
+      polyArea, simpleCentroid, pointInPolygon, splitPolygon, makeFruitPolygon, spawnFruit,
+    };
   })();
   </script>
 </body>
