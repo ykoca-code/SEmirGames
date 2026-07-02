@@ -1,0 +1,14 @@
+{
+  "id": "okeytro-gemini",
+  "title": "Okeytro",
+  "description": "Okey + roguelike deste kurma! Seri, per ve çift açarak barajı geç. Jokerler topla, dükkândan güçlen, boss ellerini alt et. Ne kadar yüksek anteye çıkabilirsin?",
+  "version": "1.0.0",
+  "category": "board",
+  "categoryLabel": "Masa Oyunu",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["okey", "roguelike", "balatro", "taş", "strateji", "deste kurma"],
+  "author": "SEmirK Games",
+  "controls": ["Taşlara dokunarak seç", "Aç: kombinasyonu oyna", "Değiştir: seçili taşları yenile", "Sürükle-bırak ile taşları diz"]
+}
