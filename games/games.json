@@ -333,6 +333,17 @@
       "thumbnail": "games/sliceit/thumbnail.svg",
       "path": "games/sliceit/index.html",
       "tags": ["arcade", "kamera", "göz kırpma", "meyve kesme", "refleks"]
+    },
+    {
+      "id": "okeytro",
+      "title": "OKEYTRO",
+      "description": "Okey 101 taşlarıyla roguelike puan oyunu. Per ve serilerle barajları geç, dükkândan gösterge taşları topla, boss ellerini alt et!",
+      "category": "board",
+      "categoryLabel": "Masa Oyunu",
+      "ageRating": "12+",
+      "thumbnail": "games/okeytro/thumbnail.svg",
+      "path": "games/okeytro/index.html",
+      "tags": ["okey", "roguelike", "strateji", "masa", "puan", "balatro"]
     }
   ]
 }

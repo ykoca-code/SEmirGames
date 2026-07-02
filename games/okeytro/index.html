@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="OKEYTRO — Okey 101 taşlarıyla roguelike puan oyunu. Barajları geç, gösterge taşları topla, en yüksek ante'ye ulaş!" />
+  <title>OKEYTRO - SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="thumbnail.svg" />
+  <style>
+    /* ==================================================================
+       OKEYTRO — koyu, neon, CRT/retro tema (Balatro esintili)
+       Taşlar klasik Okey taşı görünümünde: krem zemin, renkli sayılar.
+       ================================================================== */
+    :root {
+      --bg: #150b26;
+      --bg2: #1f1138;
+      --panel: #241543;
+      --panel2: #2e1b55;
+      --neon: #ff2d78;
+      --neon2: #39d8ff;
+      --gold: #ffcf3f;
+      --ok: #37e08b;
+      --bad: #ff4d4d;
+      --ink: #efe6ff;
+      --muted: #a08fc9;
+      --tas-bg: linear-gradient(160deg, #fdf6e3 0%, #f3e6c4 55%, #e6d3a8 100%);
+      --c-kirmizi: #d92b2b;
+      --c-mavi: #1e63d0;
+      --c-siyah: #33302e;
+      --c-sari: #d98f00;
+      --radius: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(120% 90% at 50% 0%, var(--bg2) 0%, var(--bg) 60%, #0c0618 100%);
+      color: var(--ink);
+      user-select: none;
+      -webkit-user-select: none;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+    /* CRT scanline + vinyet katmanı */
+    body::after {
+      content: "";
+      position: fixed; inset: 0; z-index: 90; pointer-events: none;
+      background:
+        repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 1px, transparent 1px 3px),
+        radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.45) 100%);
+      mix-blend-mode: multiply;
+    }
+    .app { height: 100dvh; display: flex; flex-direction: column; max-width: 560px; margin: 0 auto; padding: 6px 8px calc(8px + env(safe-area-inset-bottom)); gap: 6px; }
+
+    /* ---------- üst bar ---------- */
+    .topbar { display: flex; align-items: center; gap: 8px; }
+    .back-fab {
+      width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto;
+      display: grid; place-items: center; text-decoration: none;
+      background: var(--panel); color: var(--ink); font-size: 18px;
+      border: 1px solid #3d2a6b;
+    }
+    .logo-title {
+      font-size: 20px; font-weight: 900; letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--neon), var(--gold), var(--neon2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-shadow: 0 0 18px rgba(255,45,120,.35);
+    }
+    .topbar .spacer { flex: 1; }
+    .jeton-badge {
+      display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 15px;
+      background: var(--panel); border: 1px solid #4a3480; border-radius: 20px; padding: 4px 12px;
+      color: var(--gold);
+    }
+    .icon-btn {
+      width: 34px; height: 34px; border-radius: 50%; border: 1px solid #3d2a6b;
+      background: var(--panel); color: var(--ink); font-size: 15px; cursor: pointer;
+    }
+
+    /* ---------- baraj / skor paneli ---------- */
+    .blind-panel {
+      background: linear-gradient(180deg, var(--panel2), var(--panel));
+      border: 1px solid #4a3480; border-radius: var(--radius);
+      padding: 8px 12px; display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 0 24px rgba(57,216,255,.08) inset;
+    }
+    .blind-info { flex: 1; min-width: 0; }
+    .blind-name { font-size: 12px; font-weight: 800; color: var(--neon2); letter-spacing: 1px; text-transform: uppercase; }
+    .blind-name.boss { color: var(--neon); animation: bossPulse 1.2s ease-in-out infinite; }
+    @keyframes bossPulse { 50% { text-shadow: 0 0 14px var(--neon); } }
+    .boss-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.25; }
+    .score-wrap { text-align: right; }
+    .score-big { font-size: 26px; font-weight: 900; color: var(--gold); line-height: 1; text-shadow: 0 0 16px rgba(255,207,63,.4); }
+    .score-target { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .score-target b { color: var(--ink); }
+    .ante-chip { font-size: 11px; color: var(--muted); }
+    .progress { height: 5px; border-radius: 3px; background: #180d2e; margin-top: 6px; overflow: hidden; }
+    .progress > div { height: 100%; width: 0%; border-radius: 3px; background: linear-gradient(90deg, var(--neon2), var(--gold)); transition: width .5s ease; }
+    .timer-bar { height: 5px; border-radius: 3px; background: #180d2e; margin-top: 4px; overflow: hidden; display: none; }
+    .timer-bar > div { height: 100%; width: 100%; background: var(--bad); }
+
+    /* ---------- gösterge rafı (jokerler) ---------- */
+    .joker-shelf { display: flex; gap: 6px; }
+    .joker-slot {
+      flex: 1; aspect-ratio: 4 / 5; max-height: 76px; border-radius: 10px;
+      border: 1px dashed #4a3480; background: rgba(36,21,67,.5);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; cursor: pointer; position: relative; overflow: hidden;
+    }
+    .joker-slot.dolu {
+      border: 1px solid var(--gold); background: linear-gradient(160deg, #3a2568, #241543);
+      box-shadow: 0 0 10px rgba(255,207,63,.18);
+    }
+    .joker-slot.pasif { filter: grayscale(1) brightness(.6); }
+    .joker-emoji { font-size: 22px; line-height: 1; }
+    .joker-ad { font-size: 8.5px; font-weight: 700; color: var(--gold); text-align: center; padding: 0 2px; line-height: 1.1; }
+    .gosterge-mini {
+      display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted);
+      justify-content: center;
+    }
+    .gosterge-mini .tas { transform: scale(.62); margin: -11px -8px; }
+
+    /* ---------- taşlar ---------- */
+    .rack {
+      background: linear-gradient(180deg, #4a2a12, #331b09);
+      border: 1px solid #6b4420; border-radius: var(--radius);
+      padding: 8px 6px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;
+      min-height: 148px; align-content: center; position: relative;
+      flex: 1 1 auto; max-height: 400px;
+    }
+    .tas {
+      width: 44px; height: 62px; border-radius: 7px; background: var(--tas-bg);
+      box-shadow: 0 3px 0 #b89f72, 0 4px 8px rgba(0,0,0,.5);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; position: relative; transition: transform .12s ease, box-shadow .12s ease;
+      flex: 0 0 auto; touch-action: none;
+    }
+    .tas .num { font-size: 24px; font-weight: 900; line-height: 1; font-family: Georgia, serif; }
+    .tas .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; }
+    .tas.k-kirmizi .num { color: var(--c-kirmizi); } .tas.k-kirmizi .dot { background: var(--c-kirmizi); }
+    .tas.k-mavi .num { color: var(--c-mavi); } .tas.k-mavi .dot { background: var(--c-mavi); }
+    .tas.k-siyah .num { color: var(--c-siyah); } .tas.k-siyah .dot { background: var(--c-siyah); }
+    .tas.k-sari .num { color: var(--c-sari); } .tas.k-sari .dot { background: var(--c-sari); }
+    .tas.secili { transform: translateY(-12px); box-shadow: 0 3px 0 #b89f72, 0 0 14px var(--neon2), 0 8px 12px rgba(0,0,0,.5); }
+    .tas.okey-tas { outline: 2px solid var(--neon); outline-offset: -2px; }
+    .tas.okey-tas::before { content: "OKEY"; position: absolute; top: 2px; font-size: 6.5px; font-weight: 900; color: var(--neon); letter-spacing: .5px; }
+    .tas.sahte .num { font-size: 19px; }
+    .tas.dragging { opacity: .25; }
+    .tas.drop-hedef { box-shadow: -4px 0 0 var(--neon2), 0 3px 0 #b89f72, 0 4px 8px rgba(0,0,0,.5); }
+    .tas.oynandi { animation: tasVur .35s ease; }
+    @keyframes tasVur { 40% { transform: translateY(-20px) scale(1.12); } }
+    .tas-ghost { position: fixed; z-index: 80; pointer-events: none; transform: translate(-50%, -60%) scale(1.08) rotate(3deg); }
+
+    /* ---------- önizleme + düğmeler ---------- */
+    .preview {
+      background: var(--panel); border: 1px solid #4a3480; border-radius: var(--radius);
+      padding: 7px 12px; text-align: center; min-height: 52px;
+      display: flex; flex-direction: column; justify-content: center; gap: 2px;
+    }
+    .preview .combo-ad { font-weight: 900; font-size: 14px; color: var(--neon2); letter-spacing: .5px; }
+    .preview .combo-hesap { font-size: 13px; color: var(--muted); }
+    .preview .combo-hesap b.cip { color: var(--neon2); }
+    .preview .combo-hesap b.carp { color: var(--neon); }
+    .preview .combo-hesap b.sonuc { color: var(--gold); font-size: 15px; }
+    .preview .ipucu { font-size: 11.5px; color: var(--muted); }
+    .preview.gecersiz .combo-ad { color: var(--bad); }
+    .float-puan {
+      position: fixed; z-index: 85; font-weight: 900; pointer-events: none;
+      animation: floatUp .8s ease forwards; color: var(--neon2); font-size: 16px;
+      text-shadow: 0 0 8px rgba(57,216,255,.7);
+    }
+    @keyframes floatUp { to { transform: translateY(-46px); opacity: 0; } }
+
+    .actions { display: flex; gap: 8px; }
+    .btn {
+      flex: 1; padding: 13px 8px; border-radius: var(--radius); border: none; cursor: pointer;
+      font-size: 15px; font-weight: 900; letter-spacing: 1px; color: #fff;
+      transition: transform .08s ease, filter .15s ease; font-family: inherit;
+    }
+    .btn:active { transform: scale(.96); }
+    .btn:disabled { filter: grayscale(.8) brightness(.55); cursor: default; }
+    .btn-ac { background: linear-gradient(180deg, #ff5c96, var(--neon)); box-shadow: 0 4px 0 #a3134c, 0 0 18px rgba(255,45,120,.35); }
+    .btn-degistir { background: linear-gradient(180deg, #56c9ff, #1f8ecf); box-shadow: 0 4px 0 #10578a; }
+    .btn small { display: block; font-size: 10px; font-weight: 700; opacity: .85; letter-spacing: 0; }
+    .side-actions { display: flex; gap: 6px; }
+    .mini-btn {
+      flex: 1; padding: 7px 4px; border-radius: 9px; border: 1px solid #4a3480; cursor: pointer;
+      background: var(--panel); color: var(--muted); font-size: 11.5px; font-weight: 700; font-family: inherit;
+    }
+    .kahve-slot { border-color: #6b4a2a; color: #d9a55f; }
+    .kahve-slot:disabled { opacity: .4; }
+
+    /* ---------- overlay'ler ---------- */
+    .overlay {
+      position: fixed; inset: 0; z-index: 100; display: none;
+      background: rgba(10,5,22,.86); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .overlay.acik { display: flex; }
+    .panel-kutu {
+      width: 100%; max-width: 420px; max-height: 92dvh; overflow-y: auto;
+      background: linear-gradient(180deg, var(--panel2), var(--panel));
+      border: 1px solid #5a3f96; border-radius: 16px; padding: 18px;
+      box-shadow: 0 0 40px rgba(255,45,120,.15);
+    }
+    .panel-kutu h2 { font-size: 21px; letter-spacing: 1px; margin-bottom: 4px; color: var(--gold); text-align: center; }
+    .panel-kutu .alt-baslik { text-align: center; color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+    .shop-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px; border-radius: 10px;
+      background: rgba(20,10,40,.6); border: 1px solid #43307a; margin-bottom: 8px;
+    }
+    .shop-item .emoji { font-size: 26px; width: 36px; text-align: center; flex: 0 0 auto; }
+    .shop-item .bilgi { flex: 1; min-width: 0; }
+    .shop-item .isim { font-weight: 800; font-size: 13.5px; color: var(--ink); }
+    .shop-item .aciklama { font-size: 11px; color: var(--muted); line-height: 1.3; margin-top: 1px; }
+    .buy-btn {
+      flex: 0 0 auto; padding: 8px 12px; border-radius: 9px; border: none; cursor: pointer;
+      background: linear-gradient(180deg, #ffe27a, var(--gold)); color: #4a3400; font-weight: 900; font-size: 13px; font-family: inherit;
+    }
+    .buy-btn:disabled { filter: grayscale(1) brightness(.6); }
+    .buy-btn.satildi { background: var(--ok); color: #063; }
+    .shop-foot { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-devam { background: linear-gradient(180deg, #52e89e, #1fae63); box-shadow: 0 4px 0 #0d6b3a; }
+    .btn-mor { background: linear-gradient(180deg, #8a63e8, #5a35b5); box-shadow: 0 4px 0 #37206e; }
+
+    .sonuc-rakam { font-size: 34px; font-weight: 900; color: var(--gold); text-align: center; text-shadow: 0 0 20px rgba(255,207,63,.5); }
+    .sonuc-satir { display: flex; justify-content: space-between; padding: 7px 4px; border-bottom: 1px dashed #43307a; font-size: 13.5px; }
+    .sonuc-satir b { color: var(--gold); }
+    .kural-liste { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+    .kural-liste b { color: var(--ink); }
+    .kural-liste li { margin: 4px 0 4px 16px; }
+    .tooltip-kutu { text-align: center; }
+    .tooltip-kutu .emoji { font-size: 40px; }
+
+    .mesaj {
+      position: fixed; left: 50%; top: 18%; transform: translateX(-50%); z-index: 110;
+      background: var(--panel2); border: 1px solid var(--neon); color: var(--ink);
+      padding: 10px 18px; border-radius: 12px; font-weight: 800; font-size: 14px;
+      box-shadow: 0 0 24px rgba(255,45,120,.4); opacity: 0; pointer-events: none;
+      transition: opacity .25s ease; text-align: center; max-width: 86vw;
+    }
+    .mesaj.goster { opacity: 1; }
+
+    @media (min-width: 480px) {
+      .tas { width: 50px; height: 70px; }
+      .tas .num { font-size: 27px; }
+      .rack { min-height: 168px; }
+      .logo-title { font-size: 24px; }
+    }
+    @media (max-height: 700px) {
+      .joker-slot { max-height: 58px; }
+      .joker-emoji { font-size: 17px; }
+      .rack { min-height: 140px; }
+      .btn { padding: 10px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+      <div class="logo-title">OKEYTRO</div>
+      <div class="spacer"></div>
+      <div class="jeton-badge">🪙 <span id="jetonSayi">0</span></div>
+      <button type="button" class="icon-btn" id="sesBtn" aria-label="Ses">🔊</button>
+    </div>
+
+    <div class="blind-panel">
+      <div class="blind-info">
+        <div class="ante-chip">ANTE <span id="anteNo">1</span> · <span id="barajSira">Baraj 1/3</span></div>
+        <div class="blind-name" id="barajAdi">Küçük Baraj</div>
+        <div class="boss-desc" id="bossAciklama"></div>
+        <div class="timer-bar" id="timerBar"><div id="timerFill"></div></div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-big" id="puanGosterge">0</div>
+        <div class="score-target">Baraj: <b id="hedefPuan">101</b></div>
+        <div class="progress"><div id="puanBar"></div></div>
+      </div>
+    </div>
+
+    <div class="joker-shelf" id="jokerRafi"></div>
+    <div class="gosterge-mini" id="gostergeMini"></div>
+
+    <div class="rack" id="istekaRafi"></div>
+
+    <div class="preview" id="onizleme">
+      <div class="ipucu">Taşlara dokunarak seç, sürükleyerek sırala</div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn btn-ac" id="acBtn" disabled>AÇ <small><span id="acHak">4</span> hak</small></button>
+      <button type="button" class="btn btn-degistir" id="degistirBtn" disabled>DEĞİŞTİR <small><span id="degistirHak">3</span> hak</small></button>
+    </div>
+
+    <div class="side-actions">
+      <button type="button" class="mini-btn" id="sortSayiBtn">1-2-3 Sırala</button>
+      <button type="button" class="mini-btn" id="sortRenkBtn">Renk Sırala</button>
+      <button type="button" class="mini-btn kahve-slot" id="kahve0" disabled>☕ boş</button>
+      <button type="button" class="mini-btn kahve-slot" id="kahve1" disabled>☕ boş</button>
+    </div>
+  </div>
+
+  <!-- Ana menü -->
+  <div class="overlay acik" id="menuOverlay">
+    <div class="panel-kutu">
+      <h2>🀄 OKEYTRO</h2>
+      <p class="alt-baslik">Okey 101 taşlarıyla roguelike puan oyunu</p>
+      <ul class="kural-liste">
+        <li>Her turda bir <b>puan barajı</b> var. Elindeki 14 taştan per veya seri açarak puan topla.</li>
+        <li><b>4 açış</b> ve <b>3 değiştirme</b> hakkın var. Barajı geç → dükkândan güç topla!</li>
+        <li>Puan = (baz çip + taş sayıları) × çarpan. Çift açışı en değerlisi!</li>
+        <li>Göstergenin bir üstü <b>okey</b>dir (joker). Her 3. baraj bir <b>Boss</b>!</li>
+      </ul>
+      <div class="sonuc-satir" style="margin-top:10px"><span>🏆 En yüksek skor</span><b id="menuRekor">—</b></div>
+      <div class="shop-foot">
+        <button type="button" class="btn btn-devam" id="yeniRunBtn">YENİ RUN</button>
+        <button type="button" class="btn btn-mor" id="devamBtn" style="display:none">DEVAM ET</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dükkân -->
+  <div class="overlay" id="shopOverlay">
+    <div class="panel-kutu">
+      <h2>🏪 Kıraathane Dükkânı</h2>
+      <p class="alt-baslik">Jetonun: <b id="shopJeton" style="color:var(--gold)">0</b> 🪙</p>
+      <div id="shopListe"></div>
+      <div class="shop-foot">
+        <button type="button" class="btn btn-mor" id="yenileBtn">YENİLE (2🪙)</button>
+        <button type="button" class="btn btn-devam" id="shopDevamBtn">SONRAKİ BARAJ →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tur sonucu / oyun sonu -->
+  <div class="overlay" id="sonucOverlay">
+    <div class="panel-kutu" id="sonucKutu"></div>
+  </div>
+
+  <!-- Joker / öğe açıklama tooltip'i -->
+  <div class="overlay" id="tooltipOverlay">
+    <div class="panel-kutu tooltip-kutu" id="tooltipKutu"></div>
+  </div>
+
+  <div class="mesaj" id="mesajKutu"></div>
+
+  <script>
+  /* ====================================================================
+     OKEYTRO — OYUN KURALLARI ÖZETİ
+     --------------------------------------------------------------------
+     • 106 taşlık klasik Okey seti: 4 renk × 13 sayı × 2 kopya + 2 sahte okey.
+     • Run başında bir GÖSTERGE belirlenir; bir üstü OKEY (joker) olur.
+       Sahte okey, okeyin temsil ettiği taş gibi davranır (klasik kural).
+     • Elde (istekada) 14 taş bulunur.
+     • Her turda bir PUAN BARAJI vardır (101 → 151 → 251 → ... ×1.5 eğrisi).
+       4 açış + 3 değiştirme hakkıyla barajı geçmeye çalışırsın.
+     • Puan = (baz çip + taş sayıları toplamı) × çarpan:
+         Kısa Seri (3 ardışık, aynı renk)   10 çip × 1
+         Per (aynı sayı, 3 renk)            15 çip × 1.5
+         Dörtlü Per (aynı sayı, 4 renk)     25 çip × 2
+         Uzun Seri (4 ardışık)              20 çip × 1.5
+         Çok Uzun Seri (5+ ardışık)         30 çip × 2
+         Çift Açışı (3+ özdeş çift)         50 çip × 3
+       Okey her kombinasyonda joker; çip katkısı 0'dır.
+     • Baraj geçilirse dükkân açılır: Gösterge Taşları (pasif joker),
+       Fal Kahvesi (tek seferlik), Tavla Pulu (kalıcı çip artışı).
+     • Her 3. baraj bir BOSS elidir ve özel kısıtlama getirir.
+     • Baraj geçilemezse run biter; en yüksek skor localStorage'da saklanır.
+     Konsolda OKEYTRO.runTests() ile çekirdek testleri çalıştırılabilir.
+     ==================================================================== */
+  "use strict";
+
+  /* ================== VERİ TANIMLARI ================== */
+  const COLORS = ["kirmizi", "mavi", "siyah", "sari"];
+  const COLOR_LABELS = { kirmizi: "Kırmızı", mavi: "Mavi", siyah: "Siyah", sari: "Sarı" };
+
+  const COMBO_DEFS = {
+    kisaSeri:    { ad: "Kısa Seri",     cip: 10, carpan: 1   },
+    per:         { ad: "Per",           cip: 15, carpan: 1.5 },
+    dortluPer:   { ad: "Dörtlü Per",    cip: 25, carpan: 2   },
+    uzunSeri:    { ad: "Uzun Seri",     cip: 20, carpan: 1.5 },
+    cokUzunSeri: { ad: "Çok Uzun Seri", cip: 30, carpan: 2   },
+    ciftAcisi:   { ad: "Çift Açışı",    cip: 50, carpan: 3   },
+  };
+
+  /* Gösterge Taşları (pasif jokerler) — yenisini eklemek için diziye kayıt ekle */
+  const JOKERS = [
+    { id: "cayci",      ad: "Çaycı",             emoji: "🫖", fiyat: 6,
+      aciklama: "Bu turda hiç taş değiştirmediysen tüm açışlara +2 çarpan." },
+    { id: "kiraathane", ad: "Kıraathane Ustası", emoji: "☕", fiyat: 7,
+      aciklama: "Per ve Dörtlü Per açışlarında çarpan ×2." },
+    { id: "serikatili", ad: "Seri Katili",       emoji: "🔪", fiyat: 7,
+      aciklama: "Seri açışlarında her taş başına +5 çip." },
+    { id: "ciftci",     ad: "Çiftçi",            emoji: "🌾", fiyat: 5,
+      aciklama: "Son açış hakkın bittiğinde elinde kalan her çift için +10 puan." },
+    { id: "hirsiz",     ad: "Gösterge Hırsızı",  emoji: "🃏", fiyat: 6,
+      aciklama: "Okey taşları çip katkısı olarak 13 sayılır." },
+    { id: "renkkoru",   ad: "Renk Körü",         emoji: "🕶️", fiyat: 5,
+      aciklama: "Perler tek renkten de açılabilir, ama baz çipi yarıya düşer." },
+    { id: "kumarbaz",   ad: "Kumarbaz",          emoji: "🎲", fiyat: 6,
+      aciklama: "Her açışta %25 ihtimalle çarpan ×3, %10 ihtimalle puan 0." },
+    { id: "eldenbitme", ad: "Elden Bitme",       emoji: "🀄", fiyat: 8,
+      aciklama: "Tek açışta 14 taşın tümünü kullanırsan puan ×4." },
+    { id: "nazar",      ad: "Nazar Boncuğu",     emoji: "🧿", fiyat: 8,
+      aciklama: "Run başına bir kez, kaybedilen bir eli tekrar oynatır." },
+    { id: "torpil",     ad: "Torpil",            emoji: "🤝", fiyat: 5,
+      aciklama: "Dükkân fiyatları %30 indirimli." },
+  ];
+
+  /* Fal Kahveleri (tek seferlik etkiler) — seçili 1 taşa uygulanır */
+  const KAHVELER = [
+    { id: "sade",    ad: "Sade Kahve",   emoji: "☕", fiyat: 3,
+      aciklama: "Seçtiğin taşın bir kopyasını yaratır (rastgele bir taşının yerine geçer)." },
+    { id: "orta",    ad: "Orta Şekerli", emoji: "🍮", fiyat: 3,
+      aciklama: "Seçtiğin taşın rengini rastgele başka bir renge çevirir." },
+    { id: "sekerli", ad: "Şekerli Kahve", emoji: "🍬", fiyat: 3,
+      aciklama: "Seçtiğin taşın sayısını +1 yapar (13 → 1)." },
+    { id: "mirra",   ad: "Mırra",        emoji: "🏺", fiyat: 3,
+      aciklama: "Seçtiğin taşı okey taşına dönüştürür." },
+  ];
+
+  /* Boss barajlar — her 3. baraj birini rastgele getirir */
+  const BOSSLAR = [
+    { id: "kahveci",      ad: "Kahveci Güzeli",    emoji: "💃",
+      aciklama: "Okey taşı bu elde kullanılamaz." },
+    { id: "tekrenk",      ad: "Tek Renk Hüseyin",  emoji: "🎩",
+      aciklama: "Sadece {RENK} taşlarla açılabilir." },
+    { id: "kirmiziyasak", ad: "Kırmızı Yasak",     emoji: "🚫",
+      aciklama: "Kırmızı taşlar çip vermez." },
+    { id: "cimri",        ad: "Cimri",             emoji: "🧤",
+      aciklama: "Taş değiştirme hakkı 1'e düşer." },
+    { id: "acele",        ad: "Acele İşe Şeytan",  emoji: "⏱️",
+      aciklama: "Her açış için 15 saniyen var; süre dolarsa bir açış hakkı yanar!" },
+    { id: "terskose",     ad: "Ters Köşe",         emoji: "🔄",
+      aciklama: "Seriler bu elde azalan sırada gösterilir. (Puana etkisi yok, şaşırma!)" },
+  ];
+
+  /* ================== ÇEKİRDEK: DESTE ================== */
+  function createDeck() {
+    const deck = [];
+    let id = 0;
+    for (const color of COLORS)
+      for (let num = 1; num <= 13; num++)
+        for (let copy = 0; copy < 2; copy++)
+          deck.push({ id: id++, color, num, fake: false });
+    deck.push({ id: id++, color: null, num: 0, fake: true });
+    deck.push({ id: id++, color: null, num: 0, fake: true });
+    return deck;
+  }
+
+  function okeyOf(gosterge) {
+    return { color: gosterge.color, num: gosterge.num === 13 ? 1 : gosterge.num + 1 };
+  }
+
+  /* Taşın etkin kimliği: sahte okey, okeyin temsil ettiği taş gibi davranır;
+     gerçek okey taşı joker (wild) olur. */
+  function effTile(tile, okey) {
+    if (tile.fake) return { color: okey.color, num: okey.num, wild: false };
+    if (tile.color === okey.color && tile.num === okey.num)
+      return { color: tile.color, num: tile.num, wild: true };
+    return { color: tile.color, num: tile.num, wild: false };
+  }
+
+  function isOkeyTile(tile, okey) {
+    return !tile.fake && tile.color === okey.color && tile.num === okey.num;
+  }
+
+  /* ================== ÇEKİRDEK: KOMBİNASYON DOĞRULAMA ==================
+     Bu fonksiyonlar saf (pure) yazılmıştır; OKEYTRO.runTests() ile
+     konsoldan birim test edilebilir. */
+
+  /* Per: aynı sayı, farklı renkler (3-4 taş). Okey eksik rengi tamamlar.
+     renkKoru=true ise renk tekrarına izin verilir (Renk Körü göstergesi). */
+  function isValidPer(tiles, okey, renkKoru = false) {
+    if (tiles.length < 3 || tiles.length > 4) return null;
+    const effs = tiles.map((t) => effTile(t, okey));
+    const solid = effs.filter((e) => !e.wild);
+    const wilds = effs.length - solid.length;
+    if (solid.length === 0) return null; // en az bir gerçek taş gerekli
+    const num = solid[0].num;
+    if (!solid.every((e) => e.num === num)) return null;
+    const colors = solid.map((e) => e.color);
+    if (!renkKoru && new Set(colors).size !== colors.length) return null;
+    if (!renkKoru && solid.length + wilds > 4) return null;
+    return { num, size: tiles.length, renkKoru };
+  }
+
+  /* Seri: aynı renk, ardışık sayılar (3+). Okey boşluk doldurur veya
+     uçtan uzatır. 12-13-1 biçiminde 1'in 14 gibi kullanımı geçerlidir. */
+  function isValidSeri(tiles, okey) {
+    if (tiles.length < 3) return null;
+    const effs = tiles.map((t) => effTile(t, okey));
+    const solid = effs.filter((e) => !e.wild);
+    const wilds = effs.length - solid.length;
+    if (solid.length === 0) return null;
+    const color = solid[0].color;
+    if (!solid.every((e) => e.color === color)) return null;
+    const numSets = [solid.map((e) => e.num)];
+    if (solid.some((e) => e.num === 1) && solid.some((e) => e.num >= 10))
+      numSets.push(solid.map((e) => (e.num === 1 ? 14 : e.num)));
+    for (const nums of numSets) {
+      const sorted = [...nums].sort((a, b) => a - b);
+      if (new Set(sorted).size !== sorted.length) continue; // seri içinde tekrar olmaz
+      const span = sorted[sorted.length - 1] - sorted[0] + 1;
+      if (span > 14) continue;
+      const gaps = span - sorted.length;
+      if (gaps > wilds) continue;
+      // kalan okeyler seriyi uçlardan uzatır; 14 (=1'in 13 sonrası hali) aşılamaz
+      let extra = wilds - gaps;
+      let lo = sorted[0], hi = sorted[sorted.length - 1];
+      while (extra > 0 && hi < 14) { hi++; extra--; }
+      while (extra > 0 && lo > 1) { lo--; extra--; }
+      if (extra > 0) continue;
+      return { color, size: tiles.length };
+    }
+    return null;
+  }
+
+  /* Çift açışı: 3+ özdeş çift. Okey herhangi bir taşla eşleşebilir. */
+  function isValidCiftler(tiles, okey) {
+    if (tiles.length < 6 || tiles.length % 2 !== 0) return null;
+    const effs = tiles.map((t) => effTile(t, okey));
+    const solid = effs.filter((e) => !e.wild);
+    let wilds = effs.length - solid.length;
+    const counts = new Map();
+    for (const e of solid) {
+      const key = e.color + ":" + e.num;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    let singles = 0;
+    for (const c of counts.values()) {
+      if (c > 2) return null;
+      if (c % 2 === 1) singles++;
+    }
+    if (singles > wilds) return null;
+    wilds -= singles;
+    if (wilds % 2 !== 0) return null; // kalan okeyler kendi aralarında eşleşir
+    return { pairs: tiles.length / 2 };
+  }
+
+  /* Seçime uyan kombinasyonu bul (öncelik: çiftler > seri > per). */
+  function detectCombo(tiles, okey, opts = {}) {
+    if (!tiles || tiles.length < 3) return null;
+    const ciftler = isValidCiftler(tiles, okey);
+    if (ciftler) return { tip: "ciftAcisi", detay: ciftler };
+    const seri = isValidSeri(tiles, okey);
+    if (seri) {
+      const tip = tiles.length >= 5 ? "cokUzunSeri" : tiles.length === 4 ? "uzunSeri" : "kisaSeri";
+      return { tip, detay: seri };
+    }
+    const per = isValidPer(tiles, okey, opts.renkKoru);
+    if (per) return { tip: tiles.length === 4 ? "dortluPer" : "per", detay: per };
+    return null;
+  }
+
+  /* ================== ÇEKİRDEK: PUANLAMA ==================
+     Puan = (baz çip + taş sayıları toplamı) × çarpan
+     mods: { okeyCip, perUstasi, cayci, seriKatili, kirmiziYasak, cipBonus } */
+  function scoreCombo(tiles, combo, okey, mods = {}) {
+    const def = COMBO_DEFS[combo.tip];
+    let baseCip = def.cip + ((mods.cipBonus || {})[combo.tip] || 0);
+    if ((combo.tip === "per" || combo.tip === "dortluPer") && combo.detay.renkKoru) {
+      const solidEffs = tiles.map((t) => effTile(t, okey)).filter((e) => !e.wild);
+      if (new Set(solidEffs.map((e) => e.color)).size < solidEffs.length)
+        baseCip = Math.floor(baseCip / 2); // Renk Körü: tekrarlı renk → yarı baz çip
+    }
+    let tileCip = 0;
+    for (const t of tiles) {
+      const e = effTile(t, okey);
+      if (e.wild) tileCip += mods.okeyCip || 0;
+      else if (mods.kirmiziYasak && e.color === "kirmizi") tileCip += 0;
+      else tileCip += e.num;
+    }
+    const seriMi = combo.tip === "kisaSeri" || combo.tip === "uzunSeri" || combo.tip === "cokUzunSeri";
+    if (mods.seriKatili && seriMi) tileCip += 5 * tiles.length;
+    const cip = baseCip + tileCip;
+    let carpan = def.carpan;
+    if (mods.perUstasi && (combo.tip === "per" || combo.tip === "dortluPer")) carpan *= 2;
+    if (mods.cayci) carpan += 2;
+    return { cip, carpan, puan: Math.floor(cip * carpan) };
+  }
+
+  /* Baraj hedefleri: 101, 151, 251, 401, 601, 901, 1301, sonra ~×1.5 */
+  function blindTarget(index) {
+    const base = [101, 151, 251, 401, 601, 901, 1301];
+    if (index < base.length) return base[index];
+    let t = base[base.length - 1];
+    for (let i = base.length; i <= index; i++) t = Math.round((t * 1.5) / 10) * 10 + 1;
+    return t;
+  }
+
+  /* ================== SES (Web Audio) ================== */
+  let audioCtx = null;
+  let sesAcik = localStorage.getItem("okeytro_ses") !== "0";
+  function beep(freq, dur = 0.07, type = "square", vol = 0.05, delay = 0) {
+    if (!sesAcik) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const t = audioCtx.currentTime + delay;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = type; osc.frequency.value = freq;
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.connect(g).connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + dur);
+    } catch (e) { /* ses yoksa sessiz devam */ }
+  }
+  const sfx = {
+    sec:   () => beep(660, 0.05, "square", 0.04),
+    birak: () => beep(440, 0.05, "square", 0.03),
+    cip:   (i) => beep(520 + i * 60, 0.06, "triangle", 0.05),
+    carpan:() => { beep(300, 0.12, "sawtooth", 0.05); beep(450, 0.12, "sawtooth", 0.05, 0.06); },
+    kazan: () => [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.14, "triangle", 0.06, i * 0.09)),
+    kaybet:() => [400, 330, 260, 190].forEach((f, i) => beep(f, 0.16, "sawtooth", 0.05, i * 0.11)),
+    satin: () => { beep(880, 0.07, "triangle", 0.05); beep(1175, 0.09, "triangle", 0.05, 0.07); },
+    hata:  () => beep(160, 0.15, "sawtooth", 0.06),
+  };
+
+  /* ================== OYUN DURUMU ================== */
+  const KAYIT_ANAHTARI = "okeytro_save";
+  const REKOR_ANAHTARI = "okeytro_best";
+
+  let gameState = null;   // tüm oyun durumu tek nesnede
+  let secilenler = [];    // seçili taş id'leri
+  let animasyonda = false;
+  let aceleTimer = null;
+
+  function yeniRunState() {
+    const tumTaslar = createDeck();
+    const gostergeAdaylari = tumTaslar.filter((t) => !t.fake);
+    const gosterge = gostergeAdaylari[Math.floor(Math.random() * gostergeAdaylari.length)];
+    return {
+      ante: 1,
+      blindIndex: 0,
+      jeton: 4,
+      toplamPuan: 0,
+      gosterge: { color: gosterge.color, num: gosterge.num },
+      okey: okeyOf(gosterge),
+      jokerler: [],            // sahip olunan gösterge taşı id'leri (en fazla 5)
+      kahveler: [],            // eldeki fal kahvesi id'leri (en fazla 2)
+      cipBonus: {},            // tavla pulu kalıcı baz çip artışları
+      nazarKullanildi: false,
+      round: null,
+      shop: null,
+      phase: "menu",
+    };
+  }
+
+  function jokerVar(id) { return gameState.jokerler.includes(id); }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  /* ================== TUR AKIŞI ================== */
+  function bossSec(blindIndex) {
+    if (blindIndex % 3 !== 2) return null;
+    const boss = BOSSLAR[Math.floor(Math.random() * BOSSLAR.length)];
+    const b = { id: boss.id };
+    if (boss.id === "tekrenk") b.renk = COLORS[Math.floor(Math.random() * COLORS.length)];
+    return b;
+  }
+
+  function startRound(bossOverride) {
+    const gs = gameState;
+    const deste = shuffle(createDeck());
+    // gösterge taşının 1 kopyasını desteden çıkar (ortada duruyor)
+    const gIdx = deste.findIndex((t) => !t.fake && t.color === gs.gosterge.color && t.num === gs.gosterge.num);
+    if (gIdx >= 0) deste.splice(gIdx, 1);
+    const boss = bossOverride !== undefined ? bossOverride : bossSec(gs.blindIndex);
+    gs.round = {
+      hedef: blindTarget(gs.blindIndex),
+      puan: 0,
+      acisHakki: 4,
+      degistirmeHakki: boss && boss.id === "cimri" ? 1 : 3,
+      el: deste.splice(0, 14),
+      deste,
+      boss,
+      degistirmeYapildi: false,
+      ciftciEklendi: false,
+    };
+    gs.phase = "round";
+    secilenler = [];
+    kaydet();
+    renderAll();
+    if (boss) {
+      const tanim = BOSSLAR.find((b) => b.id === boss.id);
+      mesajGoster(tanim.emoji + " BOSS: " + tanim.ad + " — " + bossAciklamaMetni(boss), 2600);
+    }
+    aceleBaslat();
+  }
+
+  function bossAciklamaMetni(boss) {
+    const tanim = BOSSLAR.find((b) => b.id === boss.id);
+    return tanim.aciklama.replace("{RENK}", boss.renk ? COLOR_LABELS[boss.renk].toUpperCase() : "");
+  }
+
+  function tasCek(adet) {
+    const r = gameState.round;
+    const yeni = r.deste.splice(0, adet);
+    r.el.push(...yeni);
+  }
+
+  function seciliTaslar() {
+    if (!gameState || !gameState.round) return [];
+    return secilenler.map((id) => gameState.round.el.find((t) => t.id === id)).filter(Boolean);
+  }
+
+  /* Boss kısıtlamalarına göre seçim oynanabilir mi? Hata mesajı döndürür. */
+  function bossEngeli(tiles) {
+    const boss = gameState.round.boss;
+    if (!boss) return null;
+    const okey = gameState.okey;
+    if (boss.id === "kahveci" && tiles.some((t) => isOkeyTile(t, okey)))
+      return "Kahveci Güzeli: okey taşı bu elde kullanılamaz!";
+    if (boss.id === "tekrenk") {
+      const yanlis = tiles.some((t) => {
+        const e = effTile(t, okey);
+        return !e.wild && e.color !== boss.renk;
+      });
+      if (yanlis) return "Tek Renk Hüseyin: sadece " + COLOR_LABELS[boss.renk] + " taşlarla açabilirsin!";
+    }
+    return null;
+  }
+
+  function skorModlari() {
+    const r = gameState.round;
+    return {
+      okeyCip: jokerVar("hirsiz") ? 13 : 0,
+      perUstasi: jokerVar("kiraathane"),
+      cayci: jokerVar("cayci") && !r.degistirmeYapildi,
+      seriKatili: jokerVar("serikatili"),
+      kirmiziYasak: r.boss && r.boss.id === "kirmiziyasak",
+      cipBonus: gameState.cipBonus,
+    };
+  }
+
+  /* Seçimin canlı önizlemesi: kombinasyon + tahmini puan (veya null). */
+  function onizlemeHesapla() {
+    const tiles = seciliTaslar();
+    if (tiles.length < 3) return null;
+    if (bossEngeli(tiles)) return { hata: bossEngeli(tiles) };
+    const combo = detectCombo(tiles, gameState.okey, { renkKoru: jokerVar("renkkoru") });
+    if (!combo) return { hata: "Geçersiz kombinasyon" };
+    const s = scoreCombo(tiles, combo, gameState.okey, skorModlari());
+    let puan = s.puan;
+    let notlar = [];
+    if (jokerVar("eldenbitme") && tiles.length === 14) { puan *= 4; notlar.push("🀄 Elden Bitme ×4!"); }
+    if (jokerVar("kumarbaz")) notlar.push("🎲 %25: ×3 · %10: sıfır");
+    if (gameState.round.boss && gameState.round.boss.id === "terskose" &&
+        (combo.tip === "kisaSeri" || combo.tip === "uzunSeri" || combo.tip === "cokUzunSeri"))
+      notlar.push("🔄 Azalan sırada dizildi!");
+    return { combo, skor: s, puan, notlar };
+  }
+
+  /* AÇ düğmesi: kombinasyonu oyna, animasyonlu puanla, taşları yenile. */
+  async function acisYap() {
+    if (animasyonda) return;
+    const on = onizlemeHesapla();
+    if (!on || on.hata) return;
+    const gs = gameState;
+    const r = gs.round;
+    const tiles = seciliTaslar();
+
+    animasyonda = true;
+    aceleDurdur();
+    dugmeleriGuncelle();
+
+    // Kumarbaz zarı
+    let kumarbazCarpan = 1, kumarbazNot = "";
+    if (jokerVar("kumarbaz")) {
+      const zar = Math.random();
+      if (zar < 0.10) { kumarbazCarpan = 0; kumarbazNot = "🎲 Kumarbaz: ELİ BATTI! Puan 0."; }
+      else if (zar < 0.35) { kumarbazCarpan = 3; kumarbazNot = "🎲 Kumarbaz: ×3 TUTTU!"; }
+    }
+
+    // on.puan Elden Bitme çarpanını zaten içeriyor; Kumarbaz üstüne uygulanır
+    const sonPuan = Math.floor(on.puan * kumarbazCarpan);
+
+    await puanAnimasyonu(tiles, on, sonPuan, kumarbazNot);
+
+    r.puan += sonPuan;
+    r.acisHakki--;
+    r.el = r.el.filter((t) => !secilenler.includes(t.id));
+    secilenler = [];
+    tasCek(Math.min(tiles.length, r.deste.length));
+    kaydet();
+    renderAll();
+    animasyonda = false;
+    await turDegerlendir();
+  }
+
+  /* Balatro tarzı adım adım puan animasyonu */
+  async function puanAnimasyonu(tiles, on, sonPuan, kumarbazNot) {
+    const el = document.getElementById("onizleme");
+    const def = COMBO_DEFS[on.combo.tip];
+    const mods = skorModlari();
+    const bekle = (ms) => new Promise((res) => setTimeout(res, ms));
+
+    // taşlar sırayla vurgulanır, çipler sayılır
+    let cip = on.skor.cip - tiles.reduce((a, t) => {
+      const e = effTile(t, gameState.okey);
+      if (e.wild) return a + (mods.okeyCip || 0);
+      if (mods.kirmiziYasak && e.color === "kirmizi") return a;
+      return a + e.num;
+    }, 0);
+    // cip şimdi baz çip (+seri katili); taş taş ekleyerek gösterelim
+    const seriMi = ["kisaSeri", "uzunSeri", "cokUzunSeri"].includes(on.combo.tip);
+    el.classList.remove("gecersiz");
+    el.innerHTML = '<div class="combo-ad">' + def.ad + '</div>' +
+      '<div class="combo-hesap"><b class="cip" id="animCip">' + cip + '</b> çip × <b class="carp">' +
+      on.skor.carpan + '</b> = <b class="sonuc" id="animSonuc">?</b></div>';
+    const cipEl = document.getElementById("animCip");
+
+    let i = 0;
+    for (const t of tiles) {
+      const tasEl = document.querySelector('.tas[data-id="' + t.id + '"]');
+      const e = effTile(t, gameState.okey);
+      let katki = e.wild ? (mods.okeyCip || 0) : (mods.kirmiziYasak && e.color === "kirmizi" ? 0 : e.num);
+      if (mods.seriKatili && seriMi) { /* +5 zaten baz içinde gösterildi */ }
+      cip += katki;
+      cipEl.textContent = cip;
+      sfx.cip(i);
+      if (tasEl) {
+        tasEl.classList.add("oynandi");
+        const rect = tasEl.getBoundingClientRect();
+        const f = document.createElement("div");
+        f.className = "float-puan";
+        f.textContent = "+" + katki;
+        f.style.left = rect.left + rect.width / 2 - 10 + "px";
+        f.style.top = rect.top - 8 + "px";
+        document.body.appendChild(f);
+        setTimeout(() => f.remove(), 800);
+      }
+      i++;
+      await bekle(tiles.length > 8 ? 90 : 150);
+    }
+    await bekle(200);
+    sfx.carpan();
+    const sonucEl = document.getElementById("animSonuc");
+    sonucEl.textContent = sonPuan;
+    if (kumarbazNot) { mesajGoster(kumarbazNot, 1600); await bekle(700); }
+    const eldenNotu = on.notlar.find((n) => n.includes("Elden"));
+    if (eldenNotu && sonPuan > 0) { mesajGoster(eldenNotu, 1400); }
+    await bekle(500);
+    // puan sayaca akar
+    const hedefPuan = gameState.round.puan + sonPuan;
+    const gosterge = document.getElementById("puanGosterge");
+    const baslangic = gameState.round.puan;
+    const adimlar = 14;
+    for (let s = 1; s <= adimlar; s++) {
+      gosterge.textContent = Math.floor(baslangic + ((hedefPuan - baslangic) * s) / adimlar);
+      await bekle(28);
+    }
+  }
+
+  /* Açış sonrası tur durumu: kazandı mı, hakları bitti mi? */
+  async function turDegerlendir() {
+    const gs = gameState;
+    const r = gs.round;
+    if (r.puan >= r.hedef) { await turKazanildi(); return; }
+    if (r.acisHakki <= 0) {
+      // Çiftçi: son haktan sonra eldeki çiftler puan verir
+      if (jokerVar("ciftci") && !r.ciftciEklendi) {
+        r.ciftciEklendi = true;
+        const bonus = ciftciBonusu();
+        if (bonus > 0) {
+          mesajGoster("🌾 Çiftçi: eldeki çiftlerden +" + bonus + " puan!", 1800);
+          r.puan += bonus;
+          renderAll();
+          await new Promise((res) => setTimeout(res, 1200));
+          if (r.puan >= r.hedef) { await turKazanildi(); return; }
+        }
+      }
+      turKaybedildi();
+      return;
+    }
+    aceleBaslat();
+    dugmeleriGuncelle();
+  }
+
+  function ciftciBonusu() {
+    const okey = gameState.okey;
+    const counts = new Map();
+    for (const t of gameState.round.el) {
+      const e = effTile(t, okey);
+      if (e.wild) continue;
+      const key = e.color + ":" + e.num;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    let ciftler = 0;
+    for (const c of counts.values()) ciftler += Math.floor(c / 2);
+    return ciftler * 10;
+  }
+
+  async function turKazanildi() {
+    const gs = gameState;
+    const r = gs.round;
+    aceleDurdur();
+    sfx.kazan();
+    const odul = 4 + r.acisHakki;
+    gs.jeton += odul;
+    gs.toplamPuan += r.puan;
+    gs.blindIndex++;
+    gs.ante = Math.floor(gs.blindIndex / 3) + 1;
+    rekorGuncelle();
+    sonucGoster(
+      "🎉 Baraj Geçildi!",
+      '<div class="sonuc-rakam">' + r.puan + '</div>' +
+      '<div class="sonuc-satir"><span>Baraj hedefi</span><b>' + r.hedef + '</b></div>' +
+      '<div class="sonuc-satir"><span>Kalan açış hakkı</span><b>' + r.acisHakki + '</b></div>' +
+      '<div class="sonuc-satir"><span>Kazanılan jeton</span><b>4 + ' + r.acisHakki + ' = ' + odul + ' 🪙</b></div>',
+      "DÜKKÂNA GİT 🏪",
+      () => { shopAc(); }
+    );
+    gs.phase = "shopBekliyor";
+    kaydet();
+  }
+
+  function turKaybedildi() {
+    const gs = gameState;
+    aceleDurdur();
+    // Nazar Boncuğu: run başına bir kez eli tekrar oynat
+    if (jokerVar("nazar") && !gs.nazarKullanildi) {
+      gs.nazarKullanildi = true;
+      sfx.satin();
+      mesajGoster("🧿 Nazar Boncuğu seni korudu! El yeniden dağıtılıyor...", 2400);
+      const boss = gs.round.boss;
+      setTimeout(() => startRound(boss), 1600);
+      renderAll();
+      return;
+    }
+    sfx.kaybet();
+    gs.toplamPuan += gs.round.puan;
+    const rekor = rekorGuncelle();
+    gs.phase = "gameover";
+    localStorage.removeItem(KAYIT_ANAHTARI);
+    sonucGoster(
+      "💀 Run Bitti",
+      '<div class="sonuc-rakam">' + gs.toplamPuan + '</div>' +
+      '<p class="alt-baslik">toplam puan</p>' +
+      '<div class="sonuc-satir"><span>Ulaşılan ante</span><b>' + gs.ante + '</b></div>' +
+      '<div class="sonuc-satir"><span>Geçilen baraj</span><b>' + gs.blindIndex + '</b></div>' +
+      '<div class="sonuc-satir"><span>Barajdaki puan / hedef</span><b>' + gs.round.puan + " / " + gs.round.hedef + '</b></div>' +
+      '<div class="sonuc-satir"><span>🏆 En yüksek skor</span><b>' + rekor + '</b></div>',
+      "YENİDEN BAŞLA",
+      () => { runBaslat(); }
+    );
+  }
+
+  function rekorGuncelle() {
+    const eski = parseInt(localStorage.getItem(REKOR_ANAHTARI) || "0", 10);
+    const yeni = Math.max(eski, gameState.toplamPuan);
+    localStorage.setItem(REKOR_ANAHTARI, String(yeni));
+    return yeni;
+  }
+
+  /* Değiştir: seçili en fazla 5 taş atılır, yenileri çekilir. */
+  function degistir() {
+    if (animasyonda) return;
+    const r = gameState.round;
+    const tiles = seciliTaslar();
+    if (tiles.length < 1 || tiles.length > 5 || r.degistirmeHakki <= 0) return;
+    r.degistirmeHakki--;
+    r.degistirmeYapildi = true;
+    r.el = r.el.filter((t) => !secilenler.includes(t.id));
+    secilenler = [];
+    tasCek(Math.min(tiles.length, r.deste.length));
+    sfx.birak();
+    kaydet();
+    renderAll();
+  }
+
+  /* ---- Acele İşe Şeytan boss süre sayacı ---- */
+  function aceleBaslat() {
+    aceleDurdur();
+    const r = gameState.round;
+    if (!r || !r.boss || r.boss.id !== "acele" || gameState.phase !== "round") return;
+    const bar = document.getElementById("timerBar");
+    const fill = document.getElementById("timerFill");
+    bar.style.display = "block";
+    const sure = 15000;
+    const baslangic = Date.now();
+    aceleTimer = setInterval(async () => {
+      const kalan = sure - (Date.now() - baslangic);
+      fill.style.width = Math.max(0, (kalan / sure) * 100) + "%";
+      if (kalan <= 0 && !animasyonda) {
+        aceleDurdur();
+        sfx.hata();
+        gameState.round.acisHakki--;
+        mesajGoster("⏱️ Süre doldu — bir açış hakkı yandı!", 1800);
+        kaydet();
+        renderAll();
+        await turDegerlendir();
+      }
+    }, 100);
+  }
+  function aceleDurdur() {
+    if (aceleTimer) { clearInterval(aceleTimer); aceleTimer = null; }
+    const bar = document.getElementById("timerBar");
+    if (bar) bar.style.display = gameState && gameState.round && gameState.round.boss &&
+      gameState.round.boss.id === "acele" && gameState.phase === "round" ? "block" : "none";
+  }
+
+  /* ================== FAL KAHVESİ ETKİLERİ ==================
+     Her etki { ok, mesaj } döndürür; ok=false ise kahve harcanmaz. */
+  const KAHVE_ETKILERI = {
+    sade(tas) {
+      const digerler = gameState.round.el.filter((t) => t.id !== tas.id);
+      if (digerler.length === 0) return { ok: false, mesaj: "Elinde başka taş yok!" };
+      const kurban = digerler[Math.floor(Math.random() * digerler.length)];
+      kurban.color = tas.color; kurban.num = tas.num; kurban.fake = tas.fake;
+      return { ok: true, mesaj: "☕ Kopya yaratıldı: artık iki tane " + tasAdi(tas) + " var!" };
+    },
+    orta(tas) {
+      if (tas.fake) return { ok: false, mesaj: "Sahte okeyin rengi değiştirilemez!" };
+      const digerRenkler = COLORS.filter((c) => c !== tas.color);
+      tas.color = digerRenkler[Math.floor(Math.random() * digerRenkler.length)];
+      return { ok: true, mesaj: "🍮 Taşın yeni rengi: " + COLOR_LABELS[tas.color] };
+    },
+    sekerli(tas) {
+      if (tas.fake) return { ok: false, mesaj: "Sahte okeyin sayısı değiştirilemez!" };
+      tas.num = tas.num === 13 ? 1 : tas.num + 1;
+      return { ok: true, mesaj: "🍬 Taşın yeni sayısı: " + tas.num };
+    },
+    mirra(tas) {
+      if (tas.fake) return { ok: false, mesaj: "Sahte okey zaten okey gibi davranıyor!" };
+      tas.color = gameState.okey.color; tas.num = gameState.okey.num;
+      return { ok: true, mesaj: "🏺 Taş okeye dönüştü!" };
+    },
+  };
+
+  function tasAdi(tas) {
+    if (tas.fake) return "Sahte Okey";
+    return COLOR_LABELS[tas.color] + " " + tas.num;
+  }
+
+  function kahveKullan(slot) {
+    if (animasyonda || gameState.phase !== "round") return;
+    const kahveId = gameState.kahveler[slot];
+    if (!kahveId) return;
+    const tiles = seciliTaslar();
+    if (tiles.length !== 1) { mesajGoster("Kahve için tam 1 taş seçmelisin ☝️"); sfx.hata(); return; }
+    const sonuc = KAHVE_ETKILERI[kahveId](tiles[0]);
+    if (sonuc.ok) { gameState.kahveler.splice(slot, 1); sfx.satin(); secilenler = []; }
+    else sfx.hata();
+    mesajGoster(sonuc.mesaj, 2000);
+    kaydet();
+    renderAll();
+  }
+
+  /* ================== DÜKKÂN ================== */
+  function fiyatHesapla(taban) {
+    return jokerVar("torpil") ? Math.max(1, Math.round(taban * 0.7)) : taban;
+  }
+
+  function shopUret() {
+    const alinabilir = JOKERS.filter((j) => !gameState.jokerler.includes(j.id));
+    shuffle(alinabilir);
+    const puluTipleri = Object.keys(COMBO_DEFS);
+    return {
+      jokerler: alinabilir.slice(0, 2).map((j) => ({ tip: "joker", id: j.id, satildi: false })),
+      kahve: { tip: "kahve", id: KAHVELER[Math.floor(Math.random() * KAHVELER.length)].id, satildi: false },
+      pul: { tip: "pul", combo: puluTipleri[Math.floor(Math.random() * puluTipleri.length)], satildi: false },
+    };
+  }
+
+  function shopAc() {
+    gameState.shop = shopUret();
+    gameState.phase = "shop";
+    kaydet();
+    renderShop();
+    document.getElementById("shopOverlay").classList.add("acik");
+  }
+
+  function shopYenile() {
+    if (gameState.jeton < 2) { sfx.hata(); mesajGoster("Yetersiz jeton!"); return; }
+    gameState.jeton -= 2;
+    gameState.shop = shopUret();
+    sfx.birak();
+    kaydet();
+    renderShop();
+  }
+
+  function shopSatinAl(item) {
+    const gs = gameState;
+    let fiyat, uygulama;
+    if (item.tip === "joker") {
+      const j = JOKERS.find((x) => x.id === item.id);
+      fiyat = fiyatHesapla(j.fiyat);
+      if (gs.jokerler.length >= 5) { mesajGoster("Gösterge rafı dolu (5/5)!"); sfx.hata(); return; }
+      uygulama = () => gs.jokerler.push(item.id);
+    } else if (item.tip === "kahve") {
+      const k = KAHVELER.find((x) => x.id === item.id);
+      fiyat = fiyatHesapla(k.fiyat);
+      if (gs.kahveler.length >= 2) { mesajGoster("Kahve rafın dolu (2/2)!"); sfx.hata(); return; }
+      uygulama = () => gs.kahveler.push(item.id);
+    } else {
+      fiyat = fiyatHesapla(4);
+      uygulama = () => { gs.cipBonus[item.combo] = (gs.cipBonus[item.combo] || 0) + 10; };
+    }
+    if (gs.jeton < fiyat) { mesajGoster("Yetersiz jeton!"); sfx.hata(); return; }
+    gs.jeton -= fiyat;
+    item.satildi = true;
+    uygulama();
+    sfx.satin();
+    kaydet();
+    renderShop();
+    renderUst();
+  }
+
+  function shopKapatVeDevam() {
+    document.getElementById("shopOverlay").classList.remove("acik");
+    gameState.shop = null;
+    startRound();
+  }
+
+  /* ================== KAYIT ================== */
+  function kaydet() {
+    if (!gameState || gameState.phase === "gameover" || gameState.phase === "menu") return;
+    try { localStorage.setItem(KAYIT_ANAHTARI, JSON.stringify({ gameState, secilenler: [] })); } catch (e) {}
+  }
+  function kayitYukle() {
+    try {
+      const ham = localStorage.getItem(KAYIT_ANAHTARI);
+      if (!ham) return null;
+      const veri = JSON.parse(ham);
+      return veri.gameState && veri.gameState.round ? veri.gameState : null;
+    } catch (e) { return null; }
+  }
+
+  /* ================== ARAYÜZ ================== */
+  const $ = (id) => document.getElementById(id);
+
+  function renderAll() {
+    renderUst();
+    renderJokerler();
+    renderGosterge();
+    renderEl();
+    renderOnizleme();
+    dugmeleriGuncelle();
+    renderKahveler();
+  }
+
+  function renderUst() {
+    const gs = gameState;
+    $("jetonSayi").textContent = gs.jeton;
+    $("anteNo").textContent = gs.ante;
+    const sira = (gs.blindIndex % 3) + 1;
+    $("barajSira").textContent = "Baraj " + sira + "/3";
+    const r = gs.round;
+    if (!r) return;
+    const bossMu = r.boss !== null && r.boss !== undefined;
+    const adEl = $("barajAdi");
+    if (bossMu) {
+      const tanim = BOSSLAR.find((b) => b.id === r.boss.id);
+      adEl.textContent = tanim.emoji + " " + tanim.ad;
+      adEl.classList.add("boss");
+      $("bossAciklama").textContent = bossAciklamaMetni(r.boss);
+    } else {
+      adEl.textContent = sira === 1 ? "Küçük Baraj" : "Büyük Baraj";
+      adEl.classList.remove("boss");
+      $("bossAciklama").textContent = "";
+    }
+    $("puanGosterge").textContent = r.puan;
+    $("hedefPuan").textContent = r.hedef;
+    $("puanBar").style.width = Math.min(100, (r.puan / r.hedef) * 100) + "%";
+  }
+
+  function renderJokerler() {
+    const raf = $("jokerRafi");
+    raf.innerHTML = "";
+    for (let i = 0; i < 5; i++) {
+      const slot = document.createElement("div");
+      slot.className = "joker-slot";
+      const id = gameState.jokerler[i];
+      if (id) {
+        const j = JOKERS.find((x) => x.id === id);
+        slot.classList.add("dolu");
+        if (id === "nazar" && gameState.nazarKullanildi) slot.classList.add("pasif");
+        slot.innerHTML = '<div class="joker-emoji">' + j.emoji + '</div><div class="joker-ad">' + j.ad + '</div>';
+        slot.addEventListener("click", () => tooltipGoster(j.emoji, j.ad, j.aciklama +
+          (id === "nazar" && gameState.nazarKullanildi ? " (Bu run'da kullanıldı.)" : "")));
+      }
+      raf.appendChild(slot);
+    }
+  }
+
+  function renderGosterge() {
+    const g = gameState.gosterge;
+    const o = gameState.okey;
+    $("gostergeMini").innerHTML =
+      'Gösterge: ' + tasHtml({ color: g.color, num: g.num, fake: false, id: "g" }, false) +
+      ' → Okey: <b style="color:var(--neon)">' + COLOR_LABELS[o.color] + " " + o.num + "</b>";
+  }
+
+  function tasHtml(tas, okeyIsaretle) {
+    const renk = tas.fake ? gameState.okey.color : tas.color;
+    const sinif = ["tas", "k-" + renk];
+    if (okeyIsaretle && gameState && isOkeyTile(tas, gameState.okey)) sinif.push("okey-tas");
+    if (tas.fake) sinif.push("sahte");
+    const icerik = tas.fake ? "★" : tas.num;
+    return '<div class="' + sinif.join(" ") + '" data-id="' + tas.id + '">' +
+      '<div class="num">' + icerik + '</div><div class="dot"></div></div>';
+  }
+
+  function renderEl() {
+    const raf = $("istekaRafi");
+    if (!gameState.round) { raf.innerHTML = ""; return; }
+    raf.innerHTML = gameState.round.el.map((t) => tasHtml(t, true)).join("");
+    for (const tasEl of raf.querySelectorAll(".tas")) {
+      const id = Number(tasEl.dataset.id);
+      if (secilenler.includes(id)) tasEl.classList.add("secili");
+      tasDokunmaBagla(tasEl, id);
+    }
+  }
+
+  function renderOnizleme() {
+    const el = $("onizleme");
+    if (!gameState.round || gameState.phase !== "round") {
+      el.innerHTML = '<div class="ipucu">Taşlara dokunarak seç, sürükleyerek sırala</div>';
+      return;
+    }
+    const secim = seciliTaslar();
+    if (secim.length === 0) {
+      el.classList.remove("gecersiz");
+      el.innerHTML = '<div class="ipucu">Taşlara dokunarak seç, sürükleyerek sırala</div>';
+      return;
+    }
+    const on = onizlemeHesapla();
+    if (!on) {
+      el.classList.remove("gecersiz");
+      el.innerHTML = '<div class="ipucu">' + secim.length + ' taş seçili — kombinasyon için en az 3 taş</div>';
+      return;
+    }
+    if (on.hata) {
+      el.classList.add("gecersiz");
+      el.innerHTML = '<div class="combo-ad">✗ ' + on.hata + '</div><div class="ipucu">' + secim.length + ' taş seçili</div>';
+      return;
+    }
+    el.classList.remove("gecersiz");
+    const def = COMBO_DEFS[on.combo.tip];
+    el.innerHTML = '<div class="combo-ad">' + def.ad + '</div>' +
+      '<div class="combo-hesap"><b class="cip">' + on.skor.cip + '</b> çip × <b class="carp">' +
+      on.skor.carpan + '</b> = <b class="sonuc">' + on.puan + ' puan</b></div>' +
+      (on.notlar.length ? '<div class="ipucu">' + on.notlar.join(" · ") + '</div>' : "");
+  }
+
+  function dugmeleriGuncelle() {
+    const r = gameState.round;
+    const oyunda = gameState.phase === "round" && !animasyonda;
+    const secim = seciliTaslar();
+    const on = oyunda ? onizlemeHesapla() : null;
+    $("acHak").textContent = r ? r.acisHakki : 0;
+    $("degistirHak").textContent = r ? r.degistirmeHakki : 0;
+    $("acBtn").disabled = !oyunda || !on || !!on.hata || r.acisHakki <= 0;
+    $("degistirBtn").disabled = !oyunda || secim.length < 1 || secim.length > 5 || r.degistirmeHakki <= 0;
+  }
+
+  function renderKahveler() {
+    for (let i = 0; i < 2; i++) {
+      const btn = $("kahve" + i);
+      const id = gameState.kahveler[i];
+      if (id) {
+        const k = KAHVELER.find((x) => x.id === id);
+        btn.textContent = k.emoji + " " + k.ad;
+        btn.disabled = gameState.phase !== "round";
+      } else {
+        btn.textContent = "☕ boş";
+        btn.disabled = true;
+      }
+    }
+  }
+
+  function renderShop() {
+    const gs = gameState;
+    $("shopJeton").textContent = gs.jeton;
+    const liste = $("shopListe");
+    liste.innerHTML = "";
+    const items = [...gs.shop.jokerler, gs.shop.kahve, gs.shop.pul];
+    for (const item of items) {
+      let emoji, isim, aciklama, fiyat;
+      if (item.tip === "joker") {
+        const j = JOKERS.find((x) => x.id === item.id);
+        emoji = j.emoji; isim = j.ad + " (Gösterge Taşı)"; aciklama = j.aciklama; fiyat = fiyatHesapla(j.fiyat);
+      } else if (item.tip === "kahve") {
+        const k = KAHVELER.find((x) => x.id === item.id);
+        emoji = k.emoji; isim = k.ad + " (Fal Kahvesi)"; aciklama = k.aciklama; fiyat = fiyatHesapla(k.fiyat);
+      } else {
+        emoji = "🎯"; isim = "Tavla Pulu: " + COMBO_DEFS[item.combo].ad;
+        aciklama = COMBO_DEFS[item.combo].ad + " baz çipi kalıcı olarak +10 artar (şu an " +
+          (COMBO_DEFS[item.combo].cip + (gs.cipBonus[item.combo] || 0)) + ").";
+        fiyat = fiyatHesapla(4);
+      }
+      const kutu = document.createElement("div");
+      kutu.className = "shop-item";
+      kutu.innerHTML = '<div class="emoji">' + emoji + '</div>' +
+        '<div class="bilgi"><div class="isim">' + isim + '</div><div class="aciklama">' + aciklama + '</div></div>';
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "buy-btn";
+      if (item.satildi) { btn.textContent = "✓"; btn.disabled = true; btn.classList.add("satildi"); }
+      else {
+        btn.textContent = fiyat + "🪙";
+        btn.disabled = gs.jeton < fiyat;
+        btn.addEventListener("click", () => shopSatinAl(item));
+      }
+      kutu.appendChild(btn);
+      liste.appendChild(kutu);
+    }
+    $("yenileBtn").disabled = gs.jeton < 2;
+  }
+
+  function sonucGoster(baslik, icerikHtml, dugmeMetni, dugmeAksiyon) {
+    const kutu = $("sonucKutu");
+    kutu.innerHTML = "<h2>" + baslik + "</h2>" + icerikHtml;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn btn-devam";
+    btn.style.marginTop = "14px";
+    btn.style.width = "100%";
+    btn.textContent = dugmeMetni;
+    btn.addEventListener("click", () => {
+      $("sonucOverlay").classList.remove("acik");
+      dugmeAksiyon();
+    });
+    kutu.appendChild(btn);
+    $("sonucOverlay").classList.add("acik");
+  }
+
+  function tooltipGoster(emoji, baslik, metin) {
+    const kutu = $("tooltipKutu");
+    kutu.innerHTML = '<div class="emoji">' + emoji + '</div><h2>' + baslik + '</h2>' +
+      '<p class="kural-liste" style="text-align:center">' + metin + '</p>';
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn btn-mor";
+    btn.style.marginTop = "12px";
+    btn.style.width = "100%";
+    btn.textContent = "TAMAM";
+    btn.addEventListener("click", () => $("tooltipOverlay").classList.remove("acik"));
+    kutu.appendChild(btn);
+    $("tooltipOverlay").classList.add("acik");
+  }
+
+  let mesajZamanlayici = null;
+  function mesajGoster(metin, sure = 1400) {
+    const kutu = $("mesajKutu");
+    kutu.textContent = metin;
+    kutu.classList.add("goster");
+    clearTimeout(mesajZamanlayici);
+    mesajZamanlayici = setTimeout(() => kutu.classList.remove("goster"), sure);
+  }
+
+  /* ---- taş dokunma + sürükleme (pointer events, touch destekli) ----
+     Sürükleme sırasında raf yeniden çizilmez (pointer capture kopmasın);
+     hedef konum işaretlenir, bırakınca dizi yeniden sıralanır. */
+  function tasDokunmaBagla(tasEl, id) {
+    let basX = 0, basY = 0, surukluyor = false, ghost = null, hedefIdx = -1;
+
+    tasEl.addEventListener("pointerdown", (ev) => {
+      if (animasyonda || gameState.phase !== "round") return;
+      basX = ev.clientX; basY = ev.clientY; surukluyor = false; hedefIdx = -1;
+      tasEl.setPointerCapture(ev.pointerId);
+    });
+
+    tasEl.addEventListener("pointermove", (ev) => {
+      if (animasyonda || gameState.phase !== "round") return;
+      if (!tasEl.hasPointerCapture(ev.pointerId)) return;
+      if (!surukluyor && Math.hypot(ev.clientX - basX, ev.clientY - basY) > 12) {
+        surukluyor = true;
+        tasEl.classList.add("dragging");
+        ghost = tasEl.cloneNode(true);
+        ghost.classList.add("tas-ghost");
+        ghost.classList.remove("dragging", "secili");
+        document.body.appendChild(ghost);
+      }
+      if (surukluyor && ghost) {
+        ghost.style.left = ev.clientX + "px";
+        ghost.style.top = ev.clientY + "px";
+        hedefIdx = hedefIndeks(ev.clientX, ev.clientY);
+        dropHedefIsaretle(hedefIdx);
+      }
+    });
+
+    tasEl.addEventListener("pointerup", () => {
+      if (ghost) { ghost.remove(); ghost = null; }
+      if (surukluyor) {
+        surukluyor = false;
+        dropHedefIsaretle(-1);
+        const el = gameState.round.el;
+        const suAn = el.findIndex((t) => t.id === id);
+        if (hedefIdx !== -1 && suAn !== -1 && hedefIdx !== suAn) {
+          const [tas] = el.splice(suAn, 1);
+          el.splice(hedefIdx, 0, tas);
+          sfx.birak();
+          kaydet();
+        }
+        renderEl();
+        return;
+      }
+      if (animasyonda || gameState.phase !== "round") return;
+      // dokunma = seç / bırak
+      const i = secilenler.indexOf(id);
+      if (i >= 0) { secilenler.splice(i, 1); sfx.birak(); }
+      else { secilenler.push(id); sfx.sec(); }
+      renderEl();
+      renderOnizleme();
+      dugmeleriGuncelle();
+    });
+
+    tasEl.addEventListener("pointercancel", () => {
+      if (ghost) { ghost.remove(); ghost = null; }
+      if (surukluyor) { surukluyor = false; dropHedefIsaretle(-1); renderEl(); }
+    });
+  }
+
+  function dropHedefIsaretle(idx) {
+    document.querySelectorAll("#istekaRafi .tas").forEach((t, i) =>
+      t.classList.toggle("drop-hedef", i === idx));
+  }
+
+  function hedefIndeks(x, y) {
+    const taslar = [...document.querySelectorAll("#istekaRafi .tas")];
+    for (let i = 0; i < taslar.length; i++) {
+      const r = taslar[i].getBoundingClientRect();
+      if (y >= r.top - 4 && y <= r.bottom + 4 && x < r.left + r.width / 2) return i;
+      if (i === taslar.length - 1 && y >= r.top - 4 && x >= r.left) return i;
+    }
+    return -1;
+  }
+
+  /* ---- sıralama yardımcıları ---- */
+  function sayiSirala() {
+    if (!gameState.round) return;
+    const okey = gameState.okey;
+    gameState.round.el.sort((a, b) => {
+      const ea = effTile(a, okey), eb = effTile(b, okey);
+      return ea.num - eb.num || COLORS.indexOf(ea.color) - COLORS.indexOf(eb.color);
+    });
+    sfx.birak(); kaydet(); renderEl();
+  }
+  function renkSirala() {
+    if (!gameState.round) return;
+    const okey = gameState.okey;
+    gameState.round.el.sort((a, b) => {
+      const ea = effTile(a, okey), eb = effTile(b, okey);
+      return COLORS.indexOf(ea.color) - COLORS.indexOf(eb.color) || ea.num - eb.num;
+    });
+    sfx.birak(); kaydet(); renderEl();
+  }
+
+  /* ================== BAŞLATMA ================== */
+  function runBaslat() {
+    gameState = yeniRunState();
+    $("menuOverlay").classList.remove("acik");
+    startRound();
+  }
+
+  function menuGoster() {
+    const rekor = localStorage.getItem(REKOR_ANAHTARI);
+    $("menuRekor").textContent = rekor ? rekor + " puan" : "—";
+    const kayit = kayitYukle();
+    $("devamBtn").style.display = kayit ? "block" : "none";
+    $("menuOverlay").classList.add("acik");
+  }
+
+  function kayittanDevam() {
+    const kayit = kayitYukle();
+    if (!kayit) return;
+    gameState = kayit;
+    secilenler = [];
+    $("menuOverlay").classList.remove("acik");
+    if (gameState.phase === "shop" && gameState.shop) {
+      renderAll();
+      renderShop();
+      document.getElementById("shopOverlay").classList.add("acik");
+    } else if (gameState.phase === "shopBekliyor") {
+      renderAll();
+      shopAc();
+    } else {
+      gameState.phase = "round";
+      renderAll();
+      aceleBaslat();
+    }
+  }
+
+  /* ================== BİRİM TESTLER (konsol) ================== */
+  function runTests() {
+    const okey = { color: "mavi", num: 5 };
+    const T = (color, num, fake = false) => ({ id: Math.random(), color, num, fake });
+    let gecti = 0, kaldi = 0;
+    const kontrol = (ad, kosul) => {
+      if (kosul) gecti++;
+      else { kaldi++; console.error("BAŞARISIZ:", ad); }
+    };
+    kontrol("deste 106 taş", createDeck().length === 106);
+    kontrol("okey hesaplama 13→1", okeyOf({ color: "sari", num: 13 }).num === 1);
+    kontrol("kısa seri", !!isValidSeri([T("kirmizi",3),T("kirmizi",4),T("kirmizi",5)], okey));
+    kontrol("farklı renk seri olmaz", !isValidSeri([T("kirmizi",3),T("mavi",4),T("kirmizi",5)], okey));
+    kontrol("okey boşluk doldurur", !!isValidSeri([T("kirmizi",3),T("mavi",5),T("kirmizi",5)], okey));
+    kontrol("12-13-1 geçerli", !!isValidSeri([T("siyah",12),T("siyah",13),T("siyah",1)], okey));
+    kontrol("13-1-2 geçersiz", !isValidSeri([T("siyah",13),T("siyah",1),T("siyah",2)], okey));
+    kontrol("sahte okey gösterge taşı gibi", !!isValidSeri([T("mavi",4),T(null,0,true),T("mavi",6)], okey));
+    kontrol("per 3 renk", !!isValidPer([T("kirmizi",7),T("mavi",7),T("siyah",7)], okey));
+    kontrol("aynı renk per olmaz", !isValidPer([T("kirmizi",7),T("kirmizi",7),T("siyah",7)], okey));
+    kontrol("renk körü aynı renk per", !!isValidPer([T("kirmizi",7),T("kirmizi",7),T("siyah",7)], okey, true));
+    kontrol("3 çift", !!isValidCiftler([T("kirmizi",2),T("kirmizi",2),T("mavi",8),T("mavi",8),T("sari",13),T("sari",13)], okey));
+    kontrol("2 çift yetmez", !isValidCiftler([T("kirmizi",2),T("kirmizi",2),T("mavi",8),T("mavi",8)], okey));
+    const seriTiles = [T("kirmizi",3),T("kirmizi",4),T("kirmizi",5)];
+    const seriCombo = detectCombo(seriTiles, okey);
+    kontrol("kısa seri puanı 22", scoreCombo(seriTiles, seriCombo, okey).puan === 22);
+    const perTiles = [T("kirmizi",7),T("mavi",7),T("siyah",7)];
+    const perCombo = detectCombo(perTiles, okey);
+    kontrol("per puanı 54", scoreCombo(perTiles, perCombo, okey).puan === 54);
+    kontrol("kıraathane ×2", scoreCombo(perTiles, perCombo, okey, { perUstasi: true }).puan === 108);
+    kontrol("baraj eğrisi", blindTarget(0) === 101 && blindTarget(6) === 1301 && blindTarget(7) > 1800);
+    console.log("OKEYTRO testleri: " + gecti + " geçti, " + kaldi + " başarısız");
+    return kaldi === 0;
+  }
+
+  /* dışa açılan küçük API (konsol testleri için) */
+  window.OKEYTRO = { runTests, createDeck, okeyOf, isValidPer, isValidSeri, isValidCiftler, detectCombo, scoreCombo, blindTarget };
+
+  /* ---- olay bağlama ---- */
+  $("acBtn").addEventListener("click", acisYap);
+  $("degistirBtn").addEventListener("click", degistir);
+  $("sortSayiBtn").addEventListener("click", sayiSirala);
+  $("sortRenkBtn").addEventListener("click", renkSirala);
+  $("kahve0").addEventListener("click", () => kahveKullan(0));
+  $("kahve1").addEventListener("click", () => kahveKullan(1));
+  $("yeniRunBtn").addEventListener("click", runBaslat);
+  $("devamBtn").addEventListener("click", kayittanDevam);
+  $("yenileBtn").addEventListener("click", shopYenile);
+  $("shopDevamBtn").addEventListener("click", shopKapatVeDevam);
+  $("sesBtn").addEventListener("click", () => {
+    sesAcik = !sesAcik;
+    localStorage.setItem("okeytro_ses", sesAcik ? "1" : "0");
+    $("sesBtn").textContent = sesAcik ? "🔊" : "🔇";
+    if (sesAcik) sfx.sec();
+  });
+  $("sesBtn").textContent = sesAcik ? "🔊" : "🔇";
+
+  gameState = yeniRunState(); // menü arkasında boş durum
+  menuGoster();
+  </script>
+</body>
+</html>

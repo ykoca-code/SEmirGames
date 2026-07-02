@@ -1,0 +1,14 @@
+{
+  "id": "okeytro",
+  "title": "OKEYTRO",
+  "description": "Okey 101 taşlarıyla roguelike puan oyunu. Per ve serilerle barajları geç, gösterge taşları topla, boss ellerini alt et!",
+  "version": "1.0.0",
+  "category": "board",
+  "categoryLabel": "Masa Oyunu",
+  "ageRating": "12+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["okey", "roguelike", "strateji", "masa", "puan", "balatro"],
+  "author": "SEmirK Games",
+  "controls": ["Taşa dokun: seç", "Sürükle: sırala"]
+}
