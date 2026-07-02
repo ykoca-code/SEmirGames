@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OKEYTRO</title>
+    <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+    <style>
+        /* CSS Değişkenleri & Temel Ayarlar */
+        :root {
+            --bg-color: #0d1117; --neon-blue: #00f3ff; --neon-red: #ff003c; --neon-purple: #b026ff;
+            --tile-bg: #fffdd0; --tile-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            --kirmizi: #e53935; --mavi: #1e88e5; --siyah: #212121; --sari: #fbc02d;
+        }
+        * { box-sizing: border-box; user-select: none; font-family: 'Courier New', Courier, monospace; }
+        body { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+        .back-fab {
+            color: var(--neon-blue); text-decoration: none; font-size: 18px; font-weight: 700;
+            margin-right: 8px; text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        /* CRT Efekti */
+        .crt::before {
+            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+
+        /* Arayüz Düzeni */
+        #top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); z-index: 10; font-weight: bold; }
+        .stat { text-shadow: 0 0 5px currentColor; }
+        .stat-blue { color: var(--neon-blue); } .stat-red { color: var(--neon-red); } .stat-purple { color: var(--neon-purple); } .stat-gold { color: gold; }
+
+        #joker-shelf { display: flex; justify-content: center; gap: 10px; padding: 10px; min-height: 80px; background: rgba(255,255,255,0.05); }
+        .joker-slot { width: 60px; height: 60px; border: 1px dashed #555; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; cursor: help; position: relative; }
+        .joker-slot.filled { border: 1px solid var(--neon-purple); background: rgba(176, 38, 255, 0.2); box-shadow: 0 0 8px var(--neon-purple); }
+        .tooltip { visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%); background: #222; border: 1px solid var(--neon-blue); padding: 5px; border-radius: 4px; width: 150px; z-index: 100; font-size: 12px; }
+        .joker-slot:hover .tooltip { visibility: visible; }
+
+        #play-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        #boss-info { color: var(--neon-red); font-weight: bold; font-size: 18px; text-shadow: 0 0 10px var(--neon-red); margin-bottom: 10px; text-align: center; height: 20px;}
+
+        #hand-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 10px; max-width: 100%; min-height: 160px; align-items: center; }
+
+        /* Okey Taşları */
+        .tile { width: 45px; height: 65px; background-color: var(--tile-bg); border-radius: 8px; box-shadow: var(--tile-shadow); display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; position: relative; font-weight: bold; font-size: 24px; font-family: 'Arial', sans-serif; touch-action: none; }
+        .tile.selected { transform: translateY(-15px); box-shadow: 0 0 15px var(--neon-blue); border: 2px solid var(--neon-blue); }
+        .color-kirmizi { color: var(--kirmizi); } .color-mavi { color: var(--mavi); } .color-siyah { color: var(--siyah); } .color-sari { color: var(--sari); text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; }
+        .tile-okey-icon { font-size: 12px; position: absolute; top: 2px; }
+        .tile.is-okey::after { content: '★'; position: absolute; top: -5px; right: -5px; color: gold; font-size: 20px; text-shadow: 0 0 5px gold; }
+
+        #preview-box { height: 50px; font-size: 18px; color: #aaa; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        #preview-box.valid { color: #0f0; text-shadow: 0 0 8px #0f0; font-size: 20px; }
+
+        #controls { display: flex; gap: 15px; padding: 20px; background: rgba(0,0,0,0.9); border-top: 1px solid #333; justify-content: center; flex-wrap: wrap;}
+        button { background: transparent; border: 2px solid #555; color: #fff; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; border-color: #333; }
+        #btn-play { border-color: var(--neon-blue); box-shadow: 0 0 5px var(--neon-blue); }
+        #btn-play:not(:disabled):hover { background: var(--neon-blue); color: #000; }
+        #btn-discard { border-color: var(--neon-red); box-shadow: 0 0 5px var(--neon-red); }
+        #btn-discard:not(:disabled):hover { background: var(--neon-red); color: #000; }
+
+        /* Modallar (Dükkan, Oyun Sonu vb.) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: #111; border: 2px solid var(--neon-purple); padding: 20px; border-radius: 10px; box-shadow: 0 0 20px var(--neon-purple); text-align: center; max-width: 90%; max-height: 90%; overflow-y: auto;}
+        .shop-items { display: flex; gap: 15px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .shop-item { border: 1px solid #555; padding: 10px; border-radius: 8px; width: 120px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
+        .shop-item:hover { border-color: gold; box-shadow: 0 0 10px gold; }
+        .shop-item h4 { margin: 0 0 5px 0; font-size: 14px; color: var(--neon-purple); }
+        .shop-item p { font-size: 11px; margin: 0 0 10px 0; color: #aaa; }
+
+        /* Animasyonlar */
+        @keyframes scoreBump { 0% { transform: scale(1); } 50% { transform: scale(1.5); color: #fff; } 100% { transform: scale(1); } }
+        .anim-bump { animation: scoreBump 0.3s ease-out; }
+
+        /* Mobil Optimizasyon */
+        @media (max-width: 600px) {
+            .tile { width: 35px; height: 55px; font-size: 20px; }
+            #hand-container { gap: 2px; }
+            button { padding: 8px 15px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body class="crt">
+
+    <div id="top-bar">
+        <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+        <div class="stat stat-red">Baraj: <span id="ui-baraj">101</span></div>
+        <div class="stat stat-blue">Puan: <span id="ui-score">0</span></div>
+        <div class="stat stat-purple">Ante: <span id="ui-ante">1</span></div>
+        <div class="stat stat-gold">Jeton: <span id="ui-jeton">0</span></div>
+        <div style="cursor:pointer;" id="btn-sound">🔊</div>
+    </div>
+
+    <div id="joker-shelf">
+        <div class="joker-slot" data-index="0">Boş</div>
+        <div class="joker-slot" data-index="1">Boş</div>
+        <div class="joker-slot" data-index="2">Boş</div>
+        <div class="joker-slot" data-index="3">Boş</div>
+        <div class="joker-slot" data-index="4">Boş</div>
+    </div>
+
+    <div id="play-area">
+        <div id="boss-info"></div>
+        <div id="hand-container"></div>
+        <div id="preview-box">Geçerli bir kombinasyon seçin...</div>
+    </div>
+
+    <div id="controls">
+        <button id="btn-play" disabled>Aç (Hak: <span id="ui-plays">4</span>)</button>
+        <button id="btn-sort-num">Sırala (Sayı)</button>
+        <button id="btn-sort-color">Sırala (Renk)</button>
+        <button id="btn-discard" disabled>Değiştir (Hak: <span id="ui-discards">3</span>)</button>
+    </div>
+
+    <div id="modal-shop" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="stat-gold">Dükkân</h2>
+            <p>Jeton: <span id="shop-jeton">0</span></p>
+            <div class="shop-items" id="shop-container"></div>
+            <div style="margin-top: 15px; display:flex; gap:10px; justify-content:center;">
+                <button id="btn-reroll" style="border-color:#555;">Yenile (2 Jeton)</button>
+                <button id="btn-next-ante" style="border-color:var(--neon-blue);">Sonraki Tura Geç</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-gameover" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="stat-red">Oyun Bitti!</h2>
+            <p>Ulaşılan Ante: <span id="go-ante"></span></p>
+            <p>Toplam Puan: <span id="go-score"></span></p>
+            <p>En Yüksek Skor: <span id="go-highscore"></span></p>
+            <button id="btn-restart" style="margin-top:20px; border-color:var(--neon-blue);">Yeniden Başla</button>
+        </div>
+    </div>
+
+    <script src="../../js/version.js?v=1.29.0"></script>
+    <script src="../../js/pwa-back.js?v=1.29.0"></script>
+
+<script>
+/* ==========================================
+ * OKEYTRO - Oyun Kuralları ve Motoru
+ * ==========================================
+ * - 106 taşlı okey seti. Her elde bir gösterge taşı rastgele belirlenir.
+ * - Okey = Göstergenin bir fazlası (renk aynı).
+ * - Sahte Okey = Gösterge taşı gibi davranır.
+ * - Puanlama: (Baz + Taşların Toplamı) * Çarpan
+ * - Kombinasyonlar: Seri (aynı renk, ardışık), Per (aynı sayı, farklı renk), Çift.
+ * ========================================== */
+
+// --- VERİ TANIMLAMALARI ---
+const COLORS = ['kirmizi', 'mavi', 'siyah', 'sari'];
+const COMBOS = {
+    'KisaSeri': { ad: 'Kısa Seri', baz: 10, carp: 1 },
+    'Per': { ad: 'Per', baz: 15, carp: 1.5 },
+    'DortluPer': { ad: 'Dörtlü Per', baz: 25, carp: 2 },
+    'UzunSeri': { ad: 'Uzun Seri', baz: 20, carp: 1.5 },
+    'CokUzunSeri': { ad: 'Çok Uzun Seri', baz: 30, carp: 2 },
+    'Cift': { ad: 'Çift Açışı', baz: 50, carp: 3 }
+};
+
+const JOKER_DEFS = [
+    { id: 'j1', ad: 'Çaycı', desc: 'Turda hiç taş değiştirmediysen açışlara +2 çarpan', fiyat: 6 },
+    { id: 'j2', ad: 'Kıraathane Ustası', desc: 'Per açışlarında çarpan x2', fiyat: 7 },
+    { id: 'j3', ad: 'Seri Katili', desc: 'Seri açışlarında taş başına +5 çip', fiyat: 6 },
+    { id: 'j4', ad: 'Çiftçi', desc: 'Tur sonu eldeki her çift için +10 çip', fiyat: 5 },
+    { id: 'j5', ad: 'Gösterge Hırsızı', desc: 'Okey taşları çip katkısı 13 sayılır', fiyat: 8 },
+    { id: 'j6', ad: 'Renk Körü', desc: 'Perler tek renkten açılabilir (baz çip yarıya düşer)', fiyat: 7 },
+    { id: 'j7', ad: 'Kumarbaz', desc: '%25 ihtimalle çarpan x3, %10 puan 0', fiyat: 5 },
+    { id: 'j8', ad: 'Elden Bitme', desc: 'Tek açışta 14 taş kullanırsan puan x4', fiyat: 8 },
+    { id: 'j9', ad: 'Nazar Boncuğu', desc: 'Kaybedilen bir eli tekrar oynatır (Tek kullanımlık)', fiyat: 6 },
+    { id: 'j10', ad: 'Torpil', desc: 'Dükkân fiyatları %30 indirimli', fiyat: 7 }
+];
+
+const KAHVELER = [
+    { id: 'k1', ad: 'Sade Kahve', desc: 'Seçili taşı Okeye dönüştürür', fiyat: 3 },
+    { id: 'k2', ad: 'Orta Kahve', desc: 'Seçili taşın kopyasını oluşturur', fiyat: 3 },
+    { id: 'k3', ad: 'Şekerli Kahve', desc: '+1 Açış Hakkı', fiyat: 3 },
+    { id: 'k4', ad: 'Sütlü Kahve', desc: '+1 Değiştirme Hakkı', fiyat: 3 }
+];
+
+const TAVLA_PULU = { id: 't1', ad: 'Tavla Pulu', desc: 'Rastgele bir kombinasyonun baz çipini kalıcı +10 artırır', fiyat: 4 };
+
+const BOSS_DEFS = [
+    { id: 'b1', ad: 'Kahveci Güzeli', desc: 'Okey taşı bu elde kullanılamaz' },
+    { id: 'b2', ad: 'Tek Renk Hüseyin', desc: 'Sadece tek bir (rastgele) renkten açılabilir' },
+    { id: 'b3', ad: 'Kırmızı Yasak', desc: 'Kırmızı taşlar çip vermez' },
+    { id: 'b4', ad: 'Cimri', desc: 'Taş değiştirme hakkı 1\'e düşer' },
+    { id: 'b5', ad: 'Acele İşe Şeytan', desc: 'Her açış için 15 saniye (Şimdilik pasif)' },
+    { id: 'b6', ad: 'Ters Köşe', desc: 'Seriler sadece azalan sırayla dizilebilir' }
+];
+
+// --- SES SİSTEMİ ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let soundEnabled = true;
+
+function playSound(type) {
+    if (!soundEnabled || audioCtx.state === 'suspended') return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'click') {
+        osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+    } else if (type === 'score') {
+        osc.type = 'square'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+    } else if (type === 'error') {
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    }
+}
+
+document.getElementById('btn-sound').addEventListener('click', (e) => {
+    soundEnabled = !soundEnabled;
+    e.target.innerText = soundEnabled ? '🔊' : '🔇';
+    if(soundEnabled) audioCtx.resume();
+});
+
+// --- OYUN DURUMU (STATE) ---
+let gameState = {
+    ante: 1, baraj: 101, score: 0, totalScore: 0, jeton: 0,
+    plays: 4, discards: 3, maxPlays: 4, maxDiscards: 3,
+    deck: [], hand: [], selectedIndices: [],
+    gosterge: null, okey: null,
+    jokers: [], comboUpgrades: {}, activeBoss: null,
+    hasDiscardedThisRound: false, highScore: localStorage.getItem('okeytro_hs') || 0
+};
+
+// --- YARDIMCI FONKSİYONLAR ---
+function generateDeck() {
+    let d = [];
+    let idCounter = 0;
+    for (let copy = 0; copy < 2; copy++) {
+        for (let color of COLORS) {
+            for (let num = 1; num <= 13; num++) {
+                d.push({ id: idCounter++, color, num, isFake: false });
+            }
+        }
+        d.push({ id: idCounter++, color: 'siyah', num: 0, isFake: true }); // Sahte okey
+    }
+    // Shuffle (Fisher-Yates)
+    for (let i = d.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [d[i], d[j]] = [d[j], d[i]];
+    }
+    return d;
+}
+
+function getOkeyDef(gosterge) {
+    if (gosterge.isFake) return { color: 'siyah', num: 0 }; // Edge case
+    let okeyNum = gosterge.num === 13 ? 1 : gosterge.num + 1;
+    return { color: gosterge.color, num: okeyNum };
+}
+
+function isTileOkey(tile) {
+    if (!gameState.okey) return false;
+    return tile.color === gameState.okey.color && tile.num === gameState.okey.num && !tile.isFake;
+}
+
+function getTileValue(tile) {
+    if (isTileOkey(tile)) {
+        if (gameState.jokers.some(j => j.id === 'j5')) return 13; // Gösterge Hırsızı
+        return 0;
+    }
+    if (tile.isFake) return gameState.gosterge.num;
+    return tile.num;
+}
+
+// --- KOMBİNASYON DOĞRULAMA (Çekirdek) ---
+function validateSelection(indices) {
+    if (indices.length < 3) return null;
+    let tiles = indices.map(i => gameState.hand[i]);
+
+    // Boss kısıtlamaları
+    if (gameState.activeBoss && gameState.activeBoss.id === 'b1' && tiles.some(t => isTileOkey(t))) return null; // Kahveci Güzeli
+    if (gameState.activeBoss && gameState.activeBoss.id === 'b2') {
+        // Tek Renk Hüseyin: Sadece tek renk kabul (Okey hariç).
+        let nonOkeys = tiles.filter(t => !isTileOkey(t));
+        if (new Set(nonOkeys.map(t => t.color)).size > 1) return null;
+    }
+
+    let numOkeys = tiles.filter(t => isTileOkey(t)).length;
+    let normalTiles = tiles.filter(t => !isTileOkey(t));
+
+    // Normal taşları sahte okeyleri gerçek değerine çevirerek işle
+    let evalTiles = normalTiles.map(t => {
+        if (t.isFake) return { color: gameState.gosterge.color, num: gameState.gosterge.num };
+        return t;
+    });
+
+    let isPer = false, isSeri = false, isCift = false;
+
+    // Çift Kontrolü
+    if (tiles.length >= 6 && tiles.length % 2 === 0) {
+        // Basit çift kontrolü: Aynı sayı ve aynı renkten 2'şerli gruplar olmalı
+        // Okeyler joker olarak çift tamamlayabilir.
+        let neededOkeys = 0;
+        let counts = {};
+        evalTiles.forEach(t => {
+            let key = t.color + t.num;
+            counts[key] = (counts[key] || 0) + 1;
+        });
+        for (let k in counts) {
+            if (counts[k] % 2 !== 0) neededOkeys++;
+        }
+        if (neededOkeys <= numOkeys) isCift = true;
+    }
+
+    // Per Kontrolü (Aynı sayı, farklı renk)
+    if (!isCift && tiles.length >= 3 && tiles.length <= 4) {
+        let hasRenkKoru = gameState.jokers.some(j => j.id === 'j6');
+        let nums = new Set(evalTiles.map(t => t.num));
+        if (nums.size <= 1) { // Hepsi aynı sayı veya hepsi okey
+            let colors = new Set(evalTiles.map(t => t.color));
+            // Farklı renk olmalı (Renk körü jokeri yoksa)
+            if (colors.size === evalTiles.length || hasRenkKoru) {
+                isPer = true;
+            }
+        }
+    }
+
+    // Seri Kontrolü (Aynı renk, ardışık sayı)
+    if (!isCift && !isPer && tiles.length >= 3) {
+        let colors = new Set(evalTiles.map(t => t.color));
+        if (colors.size <= 1) {
+            // Renk aynı, ardışık mı?
+            let sortedNums = evalTiles.map(t => t.num).sort((a,b)=>a-b);
+            // 13-1-2 geçişi standart okeyde var ama basitleştirmek için 1-13 arası düz seri kabul edeceğiz.
+            // Boss: Ters Köşe
+            let isTersKose = gameState.activeBoss && gameState.activeBoss.id === 'b6';
+            if(isTersKose) sortedNums = evalTiles.map(t => t.num).sort((a,b)=>b-a);
+
+            let gaps = 0;
+            for (let i = 0; i < sortedNums.length - 1; i++) {
+                let diff = Math.abs(sortedNums[i+1] - sortedNums[i]);
+                if (diff === 0) { gaps = 99; break; } // Aynı sayı olamaz
+                gaps += (diff - 1);
+            }
+            if (gaps <= numOkeys) isSeri = true;
+        }
+    }
+
+    if (isCift) return { id: 'Cift', len: tiles.length };
+    if (isPer) return { id: tiles.length === 4 ? 'DortluPer' : 'Per', len: tiles.length };
+    if (isSeri) {
+        if (tiles.length === 3) return { id: 'KisaSeri', len: tiles.length };
+        if (tiles.length === 4) return { id: 'UzunSeri', len: tiles.length };
+        return { id: 'CokUzunSeri', len: tiles.length };
+    }
+
+    return null;
+}
+
+function calculateScore(comboId, indices) {
+    let base = COMBOS[comboId];
+    let tiles = indices.map(i => gameState.hand[i]);
+
+    let bazCip = base.baz + (gameState.comboUpgrades[comboId] || 0);
+
+    // Joker: Renk Körü (Per için baz çip yarıya düşer)
+    if ((comboId === 'Per' || comboId === 'DortluPer') && gameState.jokers.some(j=>j.id==='j6')) {
+        let nonOkeys = tiles.filter(t => !isTileOkey(t));
+        let colors = new Set(nonOkeys.map(t => (t.isFake ? gameState.gosterge.color : t.color)));
+        if(colors.size < nonOkeys.length) bazCip = Math.floor(bazCip / 2);
+    }
+
+    let tasToplami = 0;
+    tiles.forEach(t => {
+        let val = getTileValue(t);
+        // Boss: Kırmızı Yasak
+        if (gameState.activeBoss && gameState.activeBoss.id === 'b3' && (t.color === 'kirmizi' || (t.isFake && gameState.gosterge.color === 'kirmizi'))) {
+            val = 0;
+        }
+        tasToplami += val;
+    });
+
+    // Joker: Seri Katili
+    if (comboId.includes('Seri') && gameState.jokers.some(j=>j.id==='j3')) {
+        tasToplami += (tiles.length * 5);
+    }
+
+    let carp = base.carp;
+
+    // Joker: Çaycı
+    if (!gameState.hasDiscardedThisRound && gameState.jokers.some(j=>j.id==='j1')) carp += 2;
+    // Joker: Kıraathane Ustası
+    if (comboId.includes('Per') && gameState.jokers.some(j=>j.id==='j2')) carp *= 2;
+    // Joker: Elden Bitme
+    if (tiles.length === 14 && gameState.jokers.some(j=>j.id==='j8')) carp *= 4;
+
+    // Joker: Kumarbaz
+    let kumarbaz = gameState.jokers.find(j=>j.id==='j7');
+    if (kumarbaz) {
+        let r = Math.random();
+        if (r < 0.1) { carp = 0; bazCip = 0; tasToplami = 0; }
+        else if (r < 0.35) { carp *= 3; }
+    }
+
+    return { bazCip, tasToplami, carp, toplam: Math.floor((bazCip + tasToplami) * carp) };
+}
+
+// --- ARAYÜZ (UI) GÜNCELLEME ---
+function updateUI() {
+    document.getElementById('ui-baraj').innerText = gameState.baraj;
+    document.getElementById('ui-score').innerText = gameState.score;
+    document.getElementById('ui-ante').innerText = gameState.ante;
+    document.getElementById('ui-jeton').innerText = gameState.jeton;
+    document.getElementById('ui-plays').innerText = gameState.plays;
+    document.getElementById('ui-discards').innerText = gameState.discards;
+
+    let btnPlay = document.getElementById('btn-play');
+    let btnDiscard = document.getElementById('btn-discard');
+
+    let combo = validateSelection(gameState.selectedIndices);
+    if (combo && gameState.plays > 0) {
+        btnPlay.disabled = false;
+        let p = calculateScore(combo.id, gameState.selectedIndices);
+        let preview = document.getElementById('preview-box');
+        preview.innerHTML = `${COMBOS[combo.id].ad}<br>${p.bazCip} + ${p.tasToplami} Çip x ${p.carp} Çarpan = <b>${p.toplam}</b>`;
+        preview.className = 'valid anim-bump';
+        setTimeout(() => preview.classList.remove('anim-bump'), 300);
+    } else {
+        btnPlay.disabled = true;
+        document.getElementById('preview-box').innerHTML = 'Geçerli bir kombinasyon seçin...';
+        document.getElementById('preview-box').className = '';
+    }
+
+    btnDiscard.disabled = !(gameState.selectedIndices.length > 0 && gameState.selectedIndices.length <= 5 && gameState.discards > 0);
+
+    let bossEl = document.getElementById('boss-info');
+    if(gameState.activeBoss) {
+        bossEl.innerText = `Boss: ${gameState.activeBoss.ad} - ${gameState.activeBoss.desc}`;
+    } else {
+        bossEl.innerText = `Gösterge: ${gameState.gosterge ? gameState.gosterge.color.toUpperCase() + ' ' + gameState.gosterge.num : ''}`;
+    }
+
+    // Jokerleri Güncelle
+    for (let i=0; i<5; i++) {
+        let slot = document.querySelector(`.joker-slot[data-index="${i}"]`);
+        if (gameState.jokers[i]) {
+            slot.innerHTML = `${gameState.jokers[i].ad.substring(0,3)}...<div class="tooltip">${gameState.jokers[i].ad}: ${gameState.jokers[i].desc}</div>`;
+            slot.classList.add('filled');
+        } else {
+            slot.innerHTML = 'Boş';
+            slot.classList.remove('filled');
+        }
+    }
+}
+
+function renderHand() {
+    let container = document.getElementById('hand-container');
+    container.innerHTML = '';
+
+    gameState.hand.forEach((tile, index) => {
+        let el = document.createElement('div');
+        el.className = `tile color-${tile.color}`;
+        if (gameState.selectedIndices.includes(index)) el.classList.add('selected');
+
+        let text = tile.isFake ? 'S' : tile.num;
+        if(isTileOkey(tile)) el.classList.add('is-okey');
+
+        el.innerHTML = `<span class="tile-okey-icon">${tile.isFake ? 'Sahte' : ''}</span>${text}`;
+
+        // Basit Dokunma/Tıklama Seçimi
+        el.addEventListener('click', () => {
+            playSound('click');
+            let selIdx = gameState.selectedIndices.indexOf(index);
+            if (selIdx > -1) {
+                gameState.selectedIndices.splice(selIdx, 1);
+            } else {
+                gameState.selectedIndices.push(index);
+            }
+            renderHand();
+            updateUI();
+        });
+
+        // Sürükle Bırak (Masaüstü & Temel Mobil)
+        el.draggable = true;
+        el.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', index); });
+        el.addEventListener('dragover', (e) => { e.preventDefault(); });
+        el.addEventListener('drop', (e) => {
+            e.preventDefault();
+            let fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+            let toIdx = index;
+            if(fromIdx !== toIdx) {
+                let temp = gameState.hand[fromIdx];
+                gameState.hand.splice(fromIdx, 1);
+                gameState.hand.splice(toIdx, 0, temp);
+                gameState.selectedIndices = [];
+                renderHand();
+                updateUI();
+            }
+        });
+
+        container.appendChild(el);
+    });
+}
+
+// --- OYUN DÖNGÜSÜ (ACTIONS) ---
+document.getElementById('btn-play').addEventListener('click', () => {
+    let combo = validateSelection(gameState.selectedIndices);
+    if (!combo) return;
+
+    playSound('score');
+    let p = calculateScore(combo.id, gameState.selectedIndices);
+
+    // Puan Ekleme Animasyonu
+    let scoreEl = document.getElementById('ui-score');
+    let startScore = gameState.score;
+    gameState.score += p.toplam;
+
+    // Taşları desteden yenile
+    let newHand = gameState.hand.filter((_, i) => !gameState.selectedIndices.includes(i));
+    while(newHand.length < 14 && gameState.deck.length > 0) {
+        newHand.push(gameState.deck.pop());
+    }
+    gameState.hand = newHand;
+    gameState.selectedIndices = [];
+    gameState.plays--;
+
+    scoreEl.classList.add('anim-bump');
+    setTimeout(() => scoreEl.classList.remove('anim-bump'), 300);
+
+    checkRoundEnd();
+    renderHand();
+    updateUI();
+});
+
+document.getElementById('btn-discard').addEventListener('click', () => {
+    if (gameState.selectedIndices.length === 0 || gameState.selectedIndices.length > 5 || gameState.discards <= 0) return;
+    playSound('click');
+    gameState.hasDiscardedThisRound = true;
+
+    let newHand = gameState.hand.filter((_, i) => !gameState.selectedIndices.includes(i));
+    while(newHand.length < 14 && gameState.deck.length > 0) {
+        newHand.push(gameState.deck.pop());
+    }
+    gameState.hand = newHand;
+    gameState.selectedIndices = [];
+    gameState.discards--;
+
+    renderHand();
+    updateUI();
+});
+
+// Sıralama Butonları
+document.getElementById('btn-sort-num').addEventListener('click', () => {
+    gameState.hand.sort((a,b) => getTileValue(a) - getTileValue(b));
+    gameState.selectedIndices = []; renderHand(); updateUI();
+});
+document.getElementById('btn-sort-color').addEventListener('click', () => {
+    gameState.hand.sort((a,b) => a.color.localeCompare(b.color) || getTileValue(a) - getTileValue(b));
+    gameState.selectedIndices = []; renderHand(); updateUI();
+});
+
+
+function checkRoundEnd() {
+    if (gameState.score >= gameState.baraj) {
+        // Tur Kazanıldı!
+        setTimeout(() => {
+            // Joker: Çiftçi
+            if (gameState.jokers.some(j=>j.id==='j4')) {
+                // Eldeki çiftleri sayıp puan ekleme mantığı (Basitleştirilmiş: eldeki taş sayısına göre bonus)
+                gameState.jeton += 2; // Sembolik bonus
+            }
+
+            gameState.jeton += 4 + gameState.plays; // Ödül
+            gameState.totalScore += gameState.score;
+            if(gameState.totalScore > gameState.highScore) {
+                gameState.highScore = gameState.totalScore;
+                localStorage.setItem('okeytro_hs', gameState.highScore);
+            }
+            openShop();
+        }, 500);
+    } else if (gameState.plays <= 0) {
+        // Tur Kaybedildi
+        let nazar = gameState.jokers.findIndex(j=>j.id==='j9');
+        if (nazar > -1) {
+            alert("Nazar Boncuğu kırıldı! Eli tekrar oynuyorsun.");
+            gameState.jokers.splice(nazar, 1);
+            startAnte(gameState.ante); // Aynı ante tekrar
+        } else {
+            playSound('error');
+            document.getElementById('go-ante').innerText = gameState.ante;
+            document.getElementById('go-score').innerText = gameState.totalScore + gameState.score;
+            document.getElementById('go-highscore').innerText = gameState.highScore;
+            document.getElementById('modal-gameover').style.display = 'flex';
+        }
+    }
+}
+
+// --- DÜKKAN SİSTEMİ ---
+function openShop() {
+    document.getElementById('modal-shop').style.display = 'flex';
+    document.getElementById('shop-jeton').innerText = gameState.jeton;
+    generateShopItems();
+}
+
+function generateShopItems() {
+    let container = document.getElementById('shop-container');
+    container.innerHTML = '';
+
+    let discount = gameState.jokers.some(j=>j.id==='j10') ? 0.7 : 1;
+
+    // 2 Rastgele Joker
+    let availableJokers = JOKER_DEFS.filter(j => !gameState.jokers.some(owned => owned.id === j.id));
+    for(let i=0; i<2; i++) {
+        if(availableJokers.length === 0) break;
+        let r = Math.floor(Math.random() * availableJokers.length);
+        let item = availableJokers.splice(r, 1)[0];
+        createShopHTML(item, Math.floor(item.fiyat * discount), 'joker');
+    }
+
+    // 1 Fal Kahvesi
+    let k = KAHVELER[Math.floor(Math.random() * KAHVELER.length)];
+    createShopHTML(k, Math.floor(k.fiyat * discount), 'kahve');
+
+    // 1 Tavla Pulu
+    createShopHTML(TAVLA_PULU, Math.floor(TAVLA_PULU.fiyat * discount), 'pul');
+}
+
+function createShopHTML(item, price, type) {
+    let el = document.createElement('div');
+    el.className = 'shop-item';
+    el.innerHTML = `<h4>${item.ad}</h4><p>${item.desc}</p><button>${price} Jeton</button>`;
+
+    el.querySelector('button').addEventListener('click', () => {
+        if (gameState.jeton >= price) {
+            if (type === 'joker') {
+                if(gameState.jokers.length >= 5) { alert("Raf dolu!"); return; }
+                gameState.jokers.push(item);
+            } else if (type === 'pul') {
+                let keys = Object.keys(COMBOS);
+                let rndKey = keys[Math.floor(Math.random() * keys.length)];
+                gameState.comboUpgrades[rndKey] = (gameState.comboUpgrades[rndKey] || 0) + 10;
+                alert(`${COMBOS[rndKey].ad} baz çipi +10 arttı!`);
+            } else if (type === 'kahve') {
+                // Anında etki (Basitleştirilmiş)
+                if(item.id === 'k3') gameState.maxPlays++;
+                if(item.id === 'k4') gameState.maxDiscards++;
+                alert(`${item.ad} içildi!`);
+            }
+
+            gameState.jeton -= price;
+            document.getElementById('shop-jeton').innerText = gameState.jeton;
+            el.style.opacity = 0.5;
+            el.style.pointerEvents = 'none';
+            updateUI();
+        } else {
+            playSound('error');
+        }
+    });
+    document.getElementById('shop-container').appendChild(el);
+}
+
+document.getElementById('btn-reroll').addEventListener('click', () => {
+    if(gameState.jeton >= 2) {
+        gameState.jeton -= 2;
+        document.getElementById('shop-jeton').innerText = gameState.jeton;
+        generateShopItems();
+    }
+});
+
+document.getElementById('btn-next-ante').addEventListener('click', () => {
+    document.getElementById('modal-shop').style.display = 'none';
+    startAnte(gameState.ante + 1);
+});
+
+// --- OYUN BAŞLATMA ---
+function startAnte(anteLevel) {
+    gameState.ante = anteLevel;
+    // Baraj eğrisi: 101, 151, 251, 401... (Yaklaşık x1.5)
+    gameState.baraj = Math.floor(101 * Math.pow(1.5, anteLevel - 1));
+    // Düzleme
+    if(anteLevel === 2) gameState.baraj = 151;
+    if(anteLevel === 3) gameState.baraj = 251;
+
+    gameState.score = 0;
+    gameState.plays = gameState.maxPlays;
+    gameState.discards = gameState.maxDiscards;
+
+    // Boss kontrolü
+    if (anteLevel % 3 === 0) {
+        gameState.activeBoss = BOSS_DEFS[Math.floor(Math.random() * BOSS_DEFS.length)];
+        if(gameState.activeBoss.id === 'b4') gameState.discards = 1; // Cimri
+    } else {
+        gameState.activeBoss = null;
+    }
+
+    gameState.deck = generateDeck();
+    gameState.gosterge = gameState.deck.pop();
+    gameState.okey = getOkeyDef(gameState.gosterge);
+    gameState.hasDiscardedThisRound = false;
+
+    gameState.hand = [];
+    for(let i=0; i<14; i++) gameState.hand.push(gameState.deck.pop());
+
+    gameState.selectedIndices = [];
+    renderHand();
+    updateUI();
+}
+
+document.getElementById('btn-restart').addEventListener('click', () => {
+    document.getElementById('modal-gameover').style.display = 'none';
+    initGame();
+});
+
+function initGame() {
+    audioCtx.resume();
+    gameState.totalScore = 0;
+    gameState.jeton = 0;
+    gameState.jokers = [];
+    gameState.comboUpgrades = {};
+    gameState.maxPlays = 4;
+    gameState.maxDiscards = 3;
+    startAnte(1);
+}
+
+// Başlat
+initGame();
+
+</script>
+</body>
+</html>
