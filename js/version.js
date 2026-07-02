@@ -6,8 +6,8 @@
 
 (function () {
   "use strict";
-  const VERSION = "1.28.0";
-  const DEPLOYED = "2026-06-10";
+  const VERSION = "1.29.0";
+  const DEPLOYED = "2026-07-02";
 
   function apply() {
     document.querySelectorAll(".version-badge").forEach((el) => {

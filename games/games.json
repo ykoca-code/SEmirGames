@@ -333,6 +333,17 @@
       "thumbnail": "games/sliceit/thumbnail.svg",
       "path": "games/sliceit/index.html",
       "tags": ["arcade", "kamera", "göz kırpma", "meyve kesme", "refleks"]
+    },
+    {
+      "id": "okeytro-gemini",
+      "title": "Okeytro",
+      "description": "Okey + roguelike deste kurma! Seri, per ve çift açarak barajı geç. Jokerler topla, dükkândan güçlen, boss ellerini alt et. Ne kadar yüksek anteye çıkabilirsin?",
+      "category": "board",
+      "categoryLabel": "Masa Oyunu",
+      "ageRating": "7+",
+      "thumbnail": "games/okeytro-gemini/thumbnail.svg",
+      "path": "games/okeytro-gemini/index.html",
+      "tags": ["okey", "roguelike", "balatro", "taş", "strateji", "deste kurma"]
     }
   ]
 }
