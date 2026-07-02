@@ -136,8 +136,8 @@
         </div>
     </div>
 
-    <script src="../../js/version.js?v=1.29.0"></script>
-    <script src="../../js/pwa-back.js?v=1.29.0"></script>
+    <script src="../../js/version.js?v=1.30.0"></script>
+    <script src="../../js/pwa-back.js?v=1.30.0"></script>
 
 <script>
 /* ==========================================
@@ -175,8 +175,8 @@ const JOKER_DEFS = [
 ];
 
 const KAHVELER = [
-    { id: 'k1', ad: 'Sade Kahve', desc: 'Seçili taşı Okeye dönüştürür', fiyat: 3 },
-    { id: 'k2', ad: 'Orta Kahve', desc: 'Seçili taşın kopyasını oluşturur', fiyat: 3 },
+    { id: 'k1', ad: 'Sade Kahve', desc: 'Elindeki rastgele bir taşı Okeye dönüştürür', fiyat: 3 },
+    { id: 'k2', ad: 'Orta Kahve', desc: 'Elindeki rastgele bir taşın kopyasını oluşturur', fiyat: 3 },
     { id: 'k3', ad: 'Şekerli Kahve', desc: '+1 Açış Hakkı', fiyat: 3 },
     { id: 'k4', ad: 'Sütlü Kahve', desc: '+1 Değiştirme Hakkı', fiyat: 3 }
 ];
@@ -644,9 +644,18 @@ function createShopHTML(item, price, type) {
                 gameState.comboUpgrades[rndKey] = (gameState.comboUpgrades[rndKey] || 0) + 10;
                 alert(`${COMBOS[rndKey].ad} baz çipi +10 arttı!`);
             } else if (type === 'kahve') {
-                // Anında etki (Basitleştirilmiş)
-                if(item.id === 'k3') gameState.maxPlays++;
-                if(item.id === 'k4') gameState.maxDiscards++;
+                // Anında etki (Basitleştirilmiş): şans temelli rastgele taş hedeflenir.
+                if (item.id === 'k1' && gameState.hand.length > 0) {
+                    let idx = Math.floor(Math.random() * gameState.hand.length);
+                    gameState.hand[idx] = { id: gameState.hand[idx].id, color: gameState.okey.color, num: gameState.okey.num, isFake: false };
+                    renderHand();
+                } else if (item.id === 'k2' && gameState.hand.length > 0) {
+                    let idx = Math.floor(Math.random() * gameState.hand.length);
+                    let copy = { ...gameState.hand[idx], id: Date.now() + Math.random() };
+                    gameState.hand.push(copy);
+                    renderHand();
+                } else if (item.id === 'k3') gameState.maxPlays++;
+                else if (item.id === 'k4') gameState.maxDiscards++;
                 alert(`${item.ad} içildi!`);
             }
 

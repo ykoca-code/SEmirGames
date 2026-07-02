@@ -124,6 +124,19 @@ Filtre, seçilen yaş grubu ve daha düşük yaş gruplarını birlikte gösteri
 - **Tetris** — Klasik blok yığma oyunu (Arcade · 7+)
 - **2048** — Aynı sayıları birleştirerek 2048'e ulaş (Bulmaca · 7+)
 - **Hafıza** — Kart eşleştirme oyunu (Eğitici · 4+)
+- **OKEYTRO** — Okey 101 taşlarıyla roguelike puan oyunu (Masa Oyunu · 12+)
+
+### 🀄 OKEYTRO
+
+Balatro'nun roguelike döngüsünü Okey 101 taşlarıyla birleştiren tek dosyalık
+bir puan oyunu. 14 taşlık istekandan per ve seriler açarak puan barajlarını
+geç; kazandığın jetonlarla dükkândan pasif güç veren **Gösterge Taşları**,
+tek seferlik **Fal Kahveleri** ve kalıcı çip artışı sağlayan **Tavla Pulları**
+al. Her üçüncü baraj, özel kısıtlamalar getiren bir **Boss** elidir.
+Puanlama Balatro tarzında `(çip × çarpan)` üzerinden işler; okey (joker)
+klasik kurallardaki gibi göstergenin bir üstüdür.
+
+▶️ **Oyna:** [https://ykoca-code.github.io/SEmirGames/games/okeytro/](https://ykoca-code.github.io/SEmirGames/games/okeytro/)
 
 ## Lisans
 
