@@ -355,6 +355,17 @@
       "thumbnail": "games/okeytro-gemini/thumbnail.svg",
       "path": "games/okeytro-gemini/index.html",
       "tags": ["okey", "roguelike", "balatro", "taş", "strateji", "deste kurma"]
+    },
+    {
+      "id": "kule-kur",
+      "title": "Kule Kur Premium",
+      "description": "Klasik kule istifleme, premium sürüm! İzometrik 2.5D bloklar, perfect/kombo sistemi, değişen gökyüzü (gün batımı → gece → uzay), parçacık efektleri ve sentezlenmiş sesler.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "kule-kur/thumbnail.svg",
+      "path": "kule-kur/index.html",
+      "tags": ["arcade", "stack", "kule", "istifleme", "refleks", "premium"]
     }
   ]
 }

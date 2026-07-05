@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1026" />
+  <title>Kule Kur — Premium</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/logo.svg" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #0b1026;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none; -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+    #game { display: block; position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; }
+
+    .back-fab {
+      position: fixed; top: 12px; left: 12px; z-index: 40;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(0,0,0,0.4); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 20px; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(4px);
+    }
+    .sound-fab {
+      position: fixed; top: 12px; right: 12px; z-index: 40;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(0,0,0,0.4); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(4px); cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+  <button class="sound-fab" id="soundFab" aria-label="Ses">🔊</button>
+  <canvas id="game"></canvas>
+
+  <script src="../js/version.js?v=1.31.0"></script>
+  <script src="../js/pwa-back.js?v=1.31.0"></script>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // ========================================================================
+    // CONFIG — tüm ayarlanabilir değerler
+    // ========================================================================
+    const CONFIG = {
+      block: {
+        height: 34,              // logical px
+        baseWidth: 200,          // başlangıç genişliği (responsive clamp'lenir)
+        depth: 16,               // 2.5D derinlik ofseti
+        startYFromBottom: 150,   // foundation'ın ekran altından yüksekliği
+      },
+      move: {
+        baseSpeed: 150,          // px/s
+        speedStepEvery: 5,       // her 5 katta hızlan
+        speedStepFactor: 1.08,   // %8
+        speedCapFloor: 60,       // 60. kattan sonra sabit
+      },
+      perfect: {
+        tolerance: 4,            // ±px
+        widthBonus: 8,           // perfect'te genişleme
+      },
+      combo: {
+        goldAt: 3,               // 3+ altın bloklar
+        rayAt: 5,                // 5+ ışın efekti
+      },
+      camera: { lerp: 0.08 },
+      physics: { gravity: 1700, pieceSpin: 4 },
+      shake: { normal: 2, miss: 8, damp: 8 },
+      squash: { amount: 0.28, duration: 0.15 },
+      particles: { max: 150 },
+      color: { hueStep: 5, saturation: 62, light: 58 }, // hue kat başına kayar
+      milestones: {
+        10: "BULUTLARI GEÇTİN! ☁️",
+        25: "GECEYE YÜKSELDİN! 🌙",
+        50: "UZAYDASIN! 🚀",
+        100: "EFSANE OLDUN! 👑",
+      },
+    };
+
+    // ========================================================================
+    // Canvas + DPR
+    // ========================================================================
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    let W = 0, H = 0, DPR = 1;
+    function resize() {
+      DPR = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.floor(W * DPR);
+      canvas.height = Math.floor(H * DPR);
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("orientationchange", resize, { passive: true });
+    resize();
+
+    function baseWidth() { return Math.min(CONFIG.block.baseWidth, W * 0.62); }
+    function foundationScreenY() { return H - CONFIG.block.startYFromBottom; }
+
+    // ========================================================================
+    // AUDIO — Web Audio, dosyasız
+    // ========================================================================
+    const Audio = (function () {
+      let actx = null;
+      let enabled = (localStorage.getItem("kulekur_sound") ?? "on") !== "off";
+      function ac() {
+        if (!actx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return null;
+          actx = new AC();
+        }
+        if (actx.state === "suspended") actx.resume();
+        return actx;
+      }
+      function env(osc, gain, t0, dur, peak) {
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(peak, t0 + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.start(t0); osc.stop(t0 + dur + 0.02);
+      }
+      // Pentatonik dizi (C majör pentatonik, 2 oktav)
+      const PENTA = [523.25, 587.33, 659.25, 783.99, 880.0,
+                     1046.5, 1174.7, 1318.5, 1568.0, 1760.0];
+      return {
+        isEnabled: () => enabled,
+        toggle() {
+          enabled = !enabled;
+          localStorage.setItem("kulekur_sound", enabled ? "on" : "off");
+          if (enabled) ac();
+          return enabled;
+        },
+        unlock() { if (enabled) ac(); },
+        thud() {
+          if (!enabled) return; const a = ac(); if (!a) return;
+          const t = a.currentTime;
+          const o = a.createOscillator(), g = a.createGain();
+          o.type = "triangle";
+          o.frequency.setValueAtTime(180, t);
+          o.frequency.exponentialRampToValueAtTime(70, t + 0.14);
+          o.connect(g); g.connect(a.destination);
+          env(o, g, t, 0.16, 0.5);
+        },
+        ding(comboIndex) {
+          if (!enabled) return; const a = ac(); if (!a) return;
+          const t = a.currentTime;
+          const f = PENTA[Math.min(PENTA.length - 1, comboIndex)];
+          // iki katman: temel + oktav parlaklık
+          [[f, 0.28, "sine"], [f * 2, 0.18, "triangle"]].forEach(([freq, dur, type], i) => {
+            const o = a.createOscillator(), g = a.createGain();
+            o.type = type;
+            o.frequency.setValueAtTime(freq, t);
+            o.connect(g); g.connect(a.destination);
+            env(o, g, t + i * 0.01, dur, i === 0 ? 0.32 : 0.14);
+          });
+        },
+        crack() {
+          if (!enabled) return; const a = ac(); if (!a) return;
+          const t = a.currentTime;
+          const o = a.createOscillator(), g = a.createGain();
+          o.type = "square";
+          o.frequency.setValueAtTime(320, t);
+          o.frequency.exponentialRampToValueAtTime(120, t + 0.08);
+          o.connect(g); g.connect(a.destination);
+          env(o, g, t, 0.09, 0.22);
+        },
+        gameOver() {
+          if (!enabled) return; const a = ac(); if (!a) return;
+          const t = a.currentTime;
+          const o = a.createOscillator(), g = a.createGain();
+          o.type = "sawtooth";
+          o.frequency.setValueAtTime(440, t);
+          o.frequency.exponentialRampToValueAtTime(80, t + 0.9);
+          o.connect(g); g.connect(a.destination);
+          env(o, g, t, 1.0, 0.28);
+        },
+      };
+    })();
+
+    // ========================================================================
+    // Global state / state machine: MENU | PLAYING | GAMEOVER
+    // ========================================================================
+    const STATE = { MENU: "MENU", PLAYING: "PLAYING", GAMEOVER: "GAMEOVER" };
+    const G = {
+      state: STATE.MENU,
+      tower: [],          // [{x, w, hue}] — foundation index 0
+      current: null,      // {x, w, hue, dir, y(anim floor top)}
+      pieces: [],         // düşen kesik parçalar
+      particles: [],
+      camY: 0, camTargetY: 0,
+      camZoom: 1, camZoomTarget: 1,
+      floor: 0,
+      combo: 0,
+      maxCombo: 0,
+      perfects: 0,
+      startHue: 190,
+      dropAnim: 0,        // squash zamanlayıcı (0..duration)
+      shake: 0,
+      rings: [],          // perfect halkaları
+      flashText: null,    // {text, t, life, color}
+      confetti: [],
+      best: +(localStorage.getItem("kulekur_best") || 0),
+      demo: { timer: 0, dropIn: 0 },
+      raysT: 0,
+    };
+
+    function hueColor(hue, lightAdj = 0) {
+      return "hsl(" + ((hue % 360) + 360) % 360 + ", " + CONFIG.color.saturation + "%, " +
+             (CONFIG.color.light + lightAdj) + "%)";
+    }
+
+    // ========================================================================
+    // GAME — akış
+    // ========================================================================
+    function resetTower(forDemo) {
+      G.tower = [];
+      G.pieces = [];
+      G.particles = [];
+      G.rings = [];
+      G.confetti = [];
+      G.floor = 0;
+      G.combo = 0;
+      G.maxCombo = 0;
+      G.perfects = 0;
+      G.camY = 0; G.camTargetY = 0;
+      G.camZoom = 1; G.camZoomTarget = 1;
+      G.shake = 0;
+      G.flashText = null;
+      G.startHue = forDemo ? 190 : Math.floor(Math.random() * 360);
+      // Foundation block
+      G.tower.push({ x: W / 2, w: baseWidth(), hue: G.startHue });
+      spawnCurrent();
+    }
+
+    function currentSpeed() {
+      const f = Math.min(G.floor, CONFIG.move.speedCapFloor);
+      const steps = Math.floor(f / CONFIG.move.speedStepEvery);
+      return CONFIG.move.baseSpeed * Math.pow(CONFIG.move.speedStepFactor, steps);
+    }
+
+    function spawnCurrent() {
+      const top = G.tower[G.tower.length - 1];
+      const hue = G.startHue + (G.tower.length) * CONFIG.color.hueStep;
+      const fromLeft = (G.tower.length % 2 === 0);
+      G.current = {
+        x: fromLeft ? top.w / 2 + 10 : W - top.w / 2 - 10,
+        w: top.w,
+        hue: hue,
+        dir: fromLeft ? 1 : -1,
+        speed: currentSpeed(),
+      };
+    }
+
+    function startGame() {
+      G.state = STATE.PLAYING;
+      resetTower(false);
+    }
+
+    function dropBlock() {
+      if (!G.current) return;
+      const top = G.tower[G.tower.length - 1];
+      const cur = G.current;
+      const dx = cur.x - top.x;
+
+      // İki bloğun kesişimi
+      const curL = cur.x - cur.w / 2, curR = cur.x + cur.w / 2;
+      const topL = top.x - top.w / 2, topR = top.x + top.w / 2;
+      const overlapL = Math.max(curL, topL);
+      const overlapR = Math.min(curR, topR);
+      const overlapW = overlapR - overlapL;
+
+      // Tamamen kaçırdı → oyun biter
+      if (overlapW <= 0) {
+        // Bloğun tamamı düşsün
+        G.pieces.push(makePiece(cur.x, blockScreenTopY(G.tower.length), cur.w, cur.hue, cur.dir * 120));
+        triggerShake(CONFIG.shake.miss);
+        Audio.crack();
+        endGame();
+        return;
+      }
+
+      let newX, newW;
+      if (Math.abs(dx) <= CONFIG.perfect.tolerance) {
+        // PERFECT — kesilmez, hafif genişleme bonusu
+        newX = top.x;
+        newW = Math.min(baseWidth(), cur.w + CONFIG.perfect.widthBonus);
+        G.combo++;
+        G.maxCombo = Math.max(G.maxCombo, G.combo);
+        G.perfects++;
+        Audio.ding(G.combo);
+        // Parlak halka
+        G.rings.push({ x: newX, floor: G.tower.length, t: 0, life: 0.5 });
+        // Altın kıvılcım patlaması
+        goldBurst(newX, blockScreenTopY(G.tower.length));
+        flash("MÜKEMMEL!" + (G.combo > 1 ? " ×" + G.combo : ""), "#fde047", 0.7);
+      } else {
+        // Kesim — taşan parça düşer
+        newX = (overlapL + overlapR) / 2;
+        newW = overlapW;
+        // Taşan tarafı bul
+        const overhangOnRight = curR > topR;
+        const overhangW = cur.w - newW;
+        const pieceX = overhangOnRight ? (topR + overhangW / 2) : (topL - overhangW / 2);
+        G.pieces.push(makePiece(pieceX, blockScreenTopY(G.tower.length), overhangW, cur.hue,
+                                overhangOnRight ? 120 : -120));
+        if (G.combo > 0) comboBreakSmoke(newX, blockScreenTopY(G.tower.length));
+        G.combo = 0;
+        Audio.crack();
+        dustBurst(newX, blockScreenTopY(G.tower.length));
+      }
+
+      Audio.thud();
+      triggerShake(CONFIG.shake.normal);
+      G.dropAnim = CONFIG.squash.duration;
+
+      // Yeni blok
+      G.tower.push({ x: newX, w: newW, hue: cur.hue });
+      G.floor++;
+
+      // Milestone
+      const ms = CONFIG.milestones[G.floor];
+      if (ms) { flash(ms, "#5eead4", 1.4); confettiBurst(); }
+
+      // Çok inceldi → oyun biter
+      if (newW < 8) {
+        Audio.crack();
+        endGame();
+        return;
+      }
+
+      spawnCurrent();
+      updateCameraTarget();
+    }
+
+    function endGame() {
+      G.state = STATE.GAMEOVER;
+      G.current = null;
+      Audio.gameOver();
+      // Kamerayı dışarı zoom yaparak tüm kuleyi göster
+      G.camZoomTarget = Math.max(0.4, Math.min(1, (H * 0.7) / Math.max(1, (G.floor + 2) * CONFIG.block.height)));
+      // Zoom sonrası kuleyi ortalayacak kamera hedefi
+      const towerTopWorld = (G.tower.length) * CONFIG.block.height;
+      G.camTargetY = towerTopWorld / 2 - H * 0.15;
+      // Rekor
+      if (G.floor > G.best) {
+        G.best = G.floor;
+        localStorage.setItem("kulekur_best", String(G.best));
+        G.newRecord = true;
+        confettiBurst(); confettiBurst();
+      } else {
+        G.newRecord = false;
+      }
+    }
+
+    function updateCameraTarget() {
+      // En üst bloğu ekranda ~%52 seviyesinde tut
+      const towerTopWorld = (G.tower.length) * CONFIG.block.height;
+      G.camTargetY = Math.max(0, towerTopWorld - H * 0.48);
+    }
+
+    // Blok floor'unun ekran-y'si (üst kenar), kamera dahil
+    function blockScreenTopY(floorIndex) {
+      return foundationScreenY() - floorIndex * CONFIG.block.height + G.camY;
+    }
+
+    // ========================================================================
+    // PARTICLES
+    // ========================================================================
+    function makePiece(x, y, w, hue, vx) {
+      return {
+        x, y, w, h: CONFIG.block.height, hue,
+        vx: vx + (Math.random() - 0.5) * 40,
+        vy: -60 - Math.random() * 60,
+        rot: 0, vrot: (Math.random() - 0.5) * CONFIG.physics.pieceSpin,
+      };
+    }
+    function addParticle(p) {
+      if (G.particles.length >= CONFIG.particles.max) G.particles.shift();
+      G.particles.push(p);
+    }
+    function dustBurst(x, y) {
+      for (let i = 0; i < 10; i++) {
+        const a = Math.PI + (Math.random() - 0.5) * Math.PI;
+        const sp = 40 + Math.random() * 90;
+        addParticle({ x, y: y + CONFIG.block.height, vx: Math.cos(a) * sp, vy: -Math.abs(Math.sin(a)) * sp * 0.6,
+          life: 0, max: 0.5 + Math.random() * 0.3, size: 2 + Math.random() * 2,
+          color: "rgba(220,210,190,0.8)", grav: 500 });
+      }
+    }
+    function goldBurst(x, y) {
+      for (let i = 0; i < 18; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const sp = 120 + Math.random() * 220;
+        addParticle({ x, y: y + CONFIG.block.height / 2, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+          life: 0, max: 0.5 + Math.random() * 0.4, size: 2 + Math.random() * 2.5,
+          color: Math.random() < 0.5 ? "#fde047" : "#fbbf24", grav: 300 });
+      }
+    }
+    function comboBreakSmoke(x, y) {
+      for (let i = 0; i < 8; i++) {
+        const a = Math.PI + (Math.random() - 0.5) * 1.2;
+        const sp = 30 + Math.random() * 60;
+        addParticle({ x, y, vx: Math.cos(a) * sp, vy: -40 - Math.random() * 40,
+          life: 0, max: 0.6 + Math.random() * 0.4, size: 4 + Math.random() * 4,
+          color: "rgba(120,120,130,0.5)", grav: -60 });
+      }
+    }
+    function confettiBurst() {
+      const cols = ["#f43f5e", "#22d3ee", "#fde047", "#4ade80", "#a855f7", "#fb923c"];
+      for (let i = 0; i < 40; i++) {
+        G.confetti.push({
+          x: Math.random() * W, y: -20 - Math.random() * H * 0.3,
+          vx: (Math.random() - 0.5) * 120, vy: 80 + Math.random() * 160,
+          rot: Math.random() * Math.PI, vrot: (Math.random() - 0.5) * 10,
+          w: 6 + Math.random() * 6, h: 8 + Math.random() * 6,
+          color: cols[(Math.random() * cols.length) | 0],
+          life: 0, max: 2.5 + Math.random(),
+        });
+      }
+    }
+
+    // ========================================================================
+    // Efektler
+    // ========================================================================
+    function triggerShake(amount) { G.shake = Math.max(G.shake, amount); }
+    function flash(text, color, life) { G.flashText = { text, color, t: 0, life }; }
+
+    // ========================================================================
+    // Update
+    // ========================================================================
+    function update(dt) {
+      // Kamera lerp
+      G.camY += (G.camTargetY - G.camY) * CONFIG.camera.lerp;
+      G.camZoom += (G.camZoomTarget - G.camZoom) * CONFIG.camera.lerp;
+
+      // Shake sönümü
+      if (G.shake > 0) G.shake = Math.max(0, G.shake - CONFIG.shake.damp * dt * (G.shake));
+
+      // Drop squash animasyonu
+      if (G.dropAnim > 0) G.dropAnim = Math.max(0, G.dropAnim - dt);
+
+      // Rays timer (combo ışınları)
+      G.raysT += dt;
+
+      if (G.state === STATE.PLAYING && G.current) {
+        // Lineer ping-pong hareket
+        const cur = G.current;
+        cur.x += cur.dir * cur.speed * dt;
+        const halfW = cur.w / 2;
+        const leftB = halfW + 4, rightB = W - halfW - 4;
+        if (cur.x <= leftB) { cur.x = leftB; cur.dir = 1; }
+        else if (cur.x >= rightB) { cur.x = rightB; cur.dir = -1; }
+      }
+
+      if (G.state === STATE.MENU) updateDemo(dt);
+
+      // Düşen parçalar
+      for (let i = G.pieces.length - 1; i >= 0; i--) {
+        const p = G.pieces[i];
+        p.vy += CONFIG.physics.gravity * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.rot += p.vrot * dt;
+        if (p.y > H + 200) G.pieces.splice(i, 1);
+      }
+
+      // Parçacıklar
+      for (let i = G.particles.length - 1; i >= 0; i--) {
+        const pt = G.particles[i];
+        pt.vy += (pt.grav || 0) * dt;
+        pt.x += pt.vx * dt;
+        pt.y += pt.vy * dt;
+        pt.life += dt;
+        if (pt.life >= pt.max) G.particles.splice(i, 1);
+      }
+
+      // Perfect halkaları
+      for (let i = G.rings.length - 1; i >= 0; i--) {
+        G.rings[i].t += dt;
+        if (G.rings[i].t >= G.rings[i].life) G.rings.splice(i, 1);
+      }
+
+      // Konfeti
+      for (let i = G.confetti.length - 1; i >= 0; i--) {
+        const c = G.confetti[i];
+        c.vy += 200 * dt;
+        c.x += c.vx * dt; c.y += c.vy * dt;
+        c.rot += c.vrot * dt;
+        c.life += dt;
+        if (c.life >= c.max || c.y > H + 40) G.confetti.splice(i, 1);
+      }
+
+      // Flash text
+      if (G.flashText) {
+        G.flashText.t += dt;
+        if (G.flashText.t >= G.flashText.life) G.flashText = null;
+      }
+    }
+
+    function updateDemo(dt) {
+      // Otomatik oynayan demo kule
+      G.demo.dropIn -= dt;
+      if (G.current) {
+        const cur = G.current;
+        cur.x += cur.dir * cur.speed * dt;
+        const halfW = cur.w / 2;
+        const leftB = halfW + 4, rightB = W - halfW - 4;
+        if (cur.x <= leftB) { cur.x = leftB; cur.dir = 1; }
+        else if (cur.x >= rightB) { cur.x = rightB; cur.dir = -1; }
+      }
+      if (G.demo.dropIn <= 0 && G.current) {
+        // Hafif kusurlu bırak
+        const top = G.tower[G.tower.length - 1];
+        // Çoğu zaman iyi hizala
+        if (Math.random() < 0.55) G.current.x = top.x + (Math.random() - 0.5) * 6;
+        dropDemo();
+        G.demo.dropIn = 0.7 + Math.random() * 0.3;
+        if (G.tower.length > 9) { resetTower(true); }
+      }
+    }
+    function dropDemo() {
+      const top = G.tower[G.tower.length - 1];
+      const cur = G.current;
+      const curL = cur.x - cur.w / 2, curR = cur.x + cur.w / 2;
+      const topL = top.x - top.w / 2, topR = top.x + top.w / 2;
+      const oL = Math.max(curL, topL), oR = Math.min(curR, topR);
+      const oW = oR - oL;
+      if (oW <= 0) { resetTower(true); return; }
+      const dx = cur.x - top.x;
+      let nx, nw;
+      if (Math.abs(dx) <= CONFIG.perfect.tolerance) { nx = top.x; nw = Math.min(baseWidth(), cur.w + CONFIG.perfect.widthBonus); }
+      else {
+        nx = (oL + oR) / 2; nw = oW;
+        const overhangOnRight = curR > topR;
+        const overhangW = cur.w - nw;
+        const pieceX = overhangOnRight ? (topR + overhangW / 2) : (topL - overhangW / 2);
+        G.pieces.push(makePiece(pieceX, blockScreenTopY(G.tower.length), overhangW, cur.hue, overhangOnRight ? 120 : -120));
+      }
+      G.tower.push({ x: nx, w: nw, hue: cur.hue });
+      G.floor++;
+      spawnCurrent();
+      updateCameraTarget();
+    }
+
+    // ========================================================================
+    // RENDER
+    // ========================================================================
+    function lerpHex(a, b, t) {
+      const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+      const r = Math.round(((pa >> 16) & 255) + (((pb >> 16) & 255) - ((pa >> 16) & 255)) * t);
+      const g = Math.round(((pa >> 8) & 255) + (((pb >> 8) & 255) - ((pa >> 8) & 255)) * t);
+      const bl = Math.round((pa & 255) + ((pb & 255) - (pa & 255)) * t);
+      return "rgb(" + r + "," + g + "," + bl + ")";
+    }
+
+    function drawBackground() {
+      // Kule yüksekliğine göre gökyüzü
+      const f = G.floor;
+      // 3 kademe: gün batımı (0), gece (25), uzay (50)
+      let top, bot;
+      if (f < 25) {
+        const t = f / 25;
+        top = lerpHex("#1e3a8a", "#0b1026", t);
+        bot = lerpHex("#f97316", "#3b1d5e", t);
+      } else if (f < 50) {
+        const t = (f - 25) / 25;
+        top = lerpHex("#0b1026", "#05010f", t);
+        bot = lerpHex("#3b1d5e", "#1a0b2e", t);
+      } else {
+        const t = Math.min(1, (f - 50) / 40);
+        top = lerpHex("#05010f", "#0a0018", t);
+        bot = lerpHex("#1a0b2e", "#2d0a4e", t);
+      }
+      const grd = ctx.createLinearGradient(0, 0, 0, H);
+      grd.addColorStop(0, top);
+      grd.addColorStop(1, bot);
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // Yıldızlar (25+ kat)
+      if (f >= 18) {
+        const alpha = Math.min(1, (f - 18) / 12);
+        for (let i = 0; i < 40; i++) {
+          const sx = (i * 137.5) % W;
+          const sy = ((i * 91.7) % (H * 0.8));
+          const tw = 0.5 + 0.5 * Math.sin(G.raysT * 2 + i);
+          ctx.fillStyle = "rgba(255,255,255," + (alpha * tw * 0.8) + ")";
+          ctx.fillRect(sx, sy, 1.6, 1.6);
+        }
+      }
+      // Nebula (50+ kat)
+      if (f >= 45) {
+        const alpha = Math.min(0.5, (f - 45) / 40);
+        const neb = ctx.createRadialGradient(W * 0.3, H * 0.3, 10, W * 0.3, H * 0.3, W * 0.7);
+        neb.addColorStop(0, "rgba(168,85,247," + alpha + ")");
+        neb.addColorStop(1, "rgba(168,85,247,0)");
+        ctx.fillStyle = neb;
+        ctx.fillRect(0, 0, W, H);
+        const neb2 = ctx.createRadialGradient(W * 0.75, H * 0.55, 10, W * 0.75, H * 0.55, W * 0.6);
+        neb2.addColorStop(0, "rgba(34,211,238," + (alpha * 0.7) + ")");
+        neb2.addColorStop(1, "rgba(34,211,238,0)");
+        ctx.fillStyle = neb2;
+        ctx.fillRect(0, 0, W, H);
+      }
+    }
+
+    // 2.5D blok çizimi
+    function drawBlock(x, screenTopY, w, hue, opts) {
+      opts = opts || {};
+      const h = CONFIG.block.height;
+      const d = CONFIG.block.depth;
+      const half = w / 2;
+      const gold = opts.gold;
+
+      let front, top, side;
+      if (gold) {
+        front = "#f0b429"; top = "#fde047"; side = "#a16207";
+      } else {
+        front = hueColor(hue, 0);
+        top = hueColor(hue, 14);
+        side = hueColor(hue, -18);
+      }
+
+      const L = x - half, R = x + half;
+      const T = screenTopY, B = screenTopY + h;
+
+      // Yan yüz (sağ, koyu)
+      ctx.fillStyle = side;
+      ctx.beginPath();
+      ctx.moveTo(R, T);
+      ctx.lineTo(R + d, T - d);
+      ctx.lineTo(R + d, B - d);
+      ctx.lineTo(R, B);
+      ctx.closePath();
+      ctx.fill();
+
+      // Üst yüz (açık)
+      ctx.fillStyle = top;
+      ctx.beginPath();
+      ctx.moveTo(L, T);
+      ctx.lineTo(L + d, T - d);
+      ctx.lineTo(R + d, T - d);
+      ctx.lineTo(R, T);
+      ctx.closePath();
+      ctx.fill();
+
+      // Ön yüz (orta)
+      ctx.fillStyle = front;
+      ctx.fillRect(L, T, w, h);
+
+      // İnce kontur
+      ctx.strokeStyle = "rgba(0,0,0,0.18)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(L + 0.5, T + 0.5, w - 1, h - 1);
+    }
+
+    function render() {
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      drawBackground();
+
+      // Kamera dönüşümü (zoom + shake)
+      const shakeX = G.shake > 0.05 ? (Math.random() - 0.5) * G.shake : 0;
+      const shakeY = G.shake > 0.05 ? (Math.random() - 0.5) * G.shake : 0;
+      ctx.save();
+      // zoom kule merkezine göre
+      const zc = G.camZoom;
+      ctx.translate(W / 2 + shakeX, H / 2 + shakeY);
+      ctx.scale(zc, zc);
+      ctx.translate(-W / 2, -H / 2);
+
+      // Combo ışınları (5+)
+      if (G.state === STATE.PLAYING && G.combo >= CONFIG.combo.rayAt) {
+        const topBlock = G.tower[G.tower.length - 1];
+        const cy = blockScreenTopY(G.tower.length - 1) + CONFIG.block.height / 2;
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.translate(topBlock.x, cy);
+        ctx.rotate(G.raysT * 0.4);
+        for (let i = 0; i < 12; i++) {
+          ctx.rotate(Math.PI / 6);
+          ctx.fillStyle = "#fde047";
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-16, -Math.max(W, H));
+          ctx.lineTo(16, -Math.max(W, H));
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Tower blocks (alttan üste)
+      const goldOn = G.combo >= CONFIG.combo.goldAt;
+      for (let i = 0; i < G.tower.length; i++) {
+        const b = G.tower[i];
+        const yTop = blockScreenTopY(i);
+        if (yTop > H + 60 || yTop < -60) continue;   // ekran dışı atla
+        // sadece son birkaç blok combo altını olsun
+        const useGold = goldOn && (G.tower.length - i) <= (G.combo);
+        drawBlock(b.x, yTop, b.w, b.hue, { gold: useGold });
+      }
+
+      // Current moving block (squash & stretch)
+      if (G.state === STATE.PLAYING && G.current) {
+        const cur = G.current;
+        let w = cur.w, extraY = 0;
+        // squash sadece yeni oturan blokta değil, hareketli blokta hafif nefes
+        drawBlock(cur.x, blockScreenTopY(G.tower.length), w, cur.hue,
+                  { gold: goldOn });
+      }
+      // MENU demo current
+      if (G.state === STATE.MENU && G.current) {
+        drawBlock(G.current.x, blockScreenTopY(G.tower.length), G.current.w, G.current.hue, {});
+      }
+
+      // Squash animasyonu: en üstteki oturmuş bloğu ölçekle
+      if (G.dropAnim > 0 && G.tower.length > 0) {
+        // yeniden çiz üstündeki bloğu squash ile (görsel vurgu)
+        const b = G.tower[G.tower.length - 1];
+        const t = G.dropAnim / CONFIG.squash.duration;
+        const squash = 1 + CONFIG.squash.amount * t;      // yatay genişle
+        const yTop = blockScreenTopY(G.tower.length - 1);
+        ctx.save();
+        ctx.translate(b.x, yTop + CONFIG.block.height);
+        ctx.scale(squash, 2 - squash);
+        ctx.translate(-b.x, -(yTop + CONFIG.block.height));
+        drawBlock(b.x, yTop, b.w, b.hue, { gold: goldOn && (G.combo > 0) });
+        ctx.restore();
+      }
+
+      // Düşen parçalar
+      for (const p of G.pieces) {
+        ctx.save();
+        ctx.translate(p.x, p.y + p.h / 2);
+        ctx.rotate(p.rot);
+        drawBlock(0, -p.h / 2, p.w, p.hue, {});
+        ctx.restore();
+      }
+
+      // Perfect halkaları
+      for (const ring of G.rings) {
+        const prog = ring.t / ring.life;
+        const b = G.tower[ring.floor] || G.tower[G.tower.length - 1];
+        const cy = blockScreenTopY(ring.floor) + CONFIG.block.height / 2;
+        ctx.strokeStyle = "rgba(253,224,71," + (1 - prog) + ")";
+        ctx.lineWidth = 3 * (1 - prog) + 1;
+        ctx.beginPath();
+        ctx.arc(b ? b.x : W / 2, cy, 20 + prog * 60, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Parçacıklar
+      for (const pt of G.particles) {
+        const a = Math.max(0, 1 - pt.life / pt.max);
+        ctx.globalAlpha = a;
+        ctx.fillStyle = pt.color;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.restore(); // camera
+
+      // Konfeti (kamera dışı, ekran uzayında)
+      for (const c of G.confetti) {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.rot);
+        ctx.fillStyle = c.color;
+        ctx.globalAlpha = Math.max(0, 1 - c.life / c.max);
+        ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+
+      // UI katmanı
+      drawUI();
+    }
+
+    // ========================================================================
+    // UI
+    // ========================================================================
+    function drawUI() {
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      if (G.state === STATE.PLAYING) {
+        // Büyük kat sayısı
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.font = "900 64px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText(String(G.floor), W / 2, 90);
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.font = "700 13px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText("KAT", W / 2, 130);
+
+        // Combo göstergesi
+        if (G.combo > 1) {
+          const c = G.combo >= CONFIG.combo.goldAt ? "#fde047" : "#5eead4";
+          ctx.fillStyle = c;
+          ctx.font = "900 22px -apple-system, 'Segoe UI', Roboto, sans-serif";
+          ctx.fillText("KOMBO ×" + G.combo, W / 2, 158);
+        }
+      }
+
+      // Flash text
+      if (G.flashText) {
+        const t = G.flashText.t / G.flashText.life;
+        const scale = 1 + (1 - t) * 0.3;
+        ctx.save();
+        ctx.globalAlpha = t < 0.15 ? t / 0.15 : (1 - (t - 0.15) / 0.85);
+        ctx.translate(W / 2, H * 0.32);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = G.flashText.color;
+        ctx.font = "900 34px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.strokeStyle = "rgba(0,0,0,0.55)";
+        ctx.lineWidth = 5;
+        ctx.strokeText(G.flashText.text, 0, 0);
+        ctx.fillText(G.flashText.text, 0, 0);
+        ctx.restore();
+      }
+
+      if (G.state === STATE.MENU) {
+        // Başlık
+        ctx.save();
+        ctx.fillStyle = "rgba(11,16,38,0.35)";
+        ctx.fillRect(0, H * 0.30, W, H * 0.30);
+        ctx.restore();
+        ctx.fillStyle = "#5eead4";
+        ctx.font = "900 " + Math.min(58, W * 0.16) + "px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.strokeStyle = "rgba(0,0,0,0.4)";
+        ctx.lineWidth = 6;
+        ctx.strokeText("KULE KUR", W / 2, H * 0.40);
+        ctx.fillText("KULE KUR", W / 2, H * 0.40);
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.font = "700 14px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText("PREMIUM", W / 2, H * 0.40 + 40);
+
+        // Yanıp sönen "Başlamak için dokun"
+        const pulse = 0.55 + 0.45 * Math.sin(G.raysT * 3);
+        ctx.fillStyle = "rgba(255,255,255," + pulse + ")";
+        ctx.font = "800 18px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText("Başlamak için dokun", W / 2, H * 0.62);
+
+        if (G.best > 0) {
+          ctx.fillStyle = "rgba(253,224,71,0.85)";
+          ctx.font = "800 15px -apple-system, 'Segoe UI', Roboto, sans-serif";
+          ctx.fillText("🏆 Rekor: " + G.best + " kat", W / 2, H * 0.68);
+        }
+      }
+
+      if (G.state === STATE.GAMEOVER) {
+        ctx.fillStyle = "rgba(5,8,20,0.72)";
+        ctx.fillRect(0, 0, W, H);
+
+        let y = H * 0.24;
+        if (G.newRecord) {
+          const pulse = 1 + 0.08 * Math.sin(G.raysT * 6);
+          ctx.save();
+          ctx.translate(W / 2, y);
+          ctx.scale(pulse, pulse);
+          ctx.fillStyle = "#fde047";
+          ctx.font = "900 30px -apple-system, 'Segoe UI', Roboto, sans-serif";
+          ctx.fillText("🎉 YENİ REKOR! 🎉", 0, 0);
+          ctx.restore();
+          y += 46;
+        }
+
+        ctx.fillStyle = "rgba(255,255,255,0.6)";
+        ctx.font = "700 14px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText("KULENİN YÜKSEKLİĞİ", W / 2, y); y += 44;
+        ctx.fillStyle = "#fff";
+        ctx.font = "900 76px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText(String(G.floor), W / 2, y); y += 64;
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.font = "700 14px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText("kat", W / 2, y); y += 40;
+
+        // İstatistikler
+        ctx.font = "800 16px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillStyle = "#5eead4";
+        ctx.fillText("✨ Mükemmel: " + G.perfects, W / 2, y); y += 30;
+        ctx.fillStyle = "#fbbf24";
+        ctx.fillText("🔥 En uzun kombo: ×" + G.maxCombo, W / 2, y); y += 30;
+        ctx.fillStyle = "rgba(255,255,255,0.6)";
+        ctx.fillText("🏆 Rekor: " + G.best + " kat", W / 2, y); y += 46;
+
+        // Tekrar Oyna butonu
+        const bw = Math.min(240, W * 0.7), bh = 52;
+        const bx = W / 2 - bw / 2, by = y;
+        G._retryBtn = { x: bx, y: by, w: bw, h: bh };
+        ctx.fillStyle = "#16a34a";
+        roundRect(bx, by, bw, bh, 12); ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.font = "900 18px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText("🔁 Tekrar Oyna", W / 2, by + bh / 2);
+      }
+    }
+
+    function roundRect(x, y, w, h, r) {
+      ctx.beginPath();
+      if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    // ========================================================================
+    // Input
+    // ========================================================================
+    function handlePress(px, py) {
+      Audio.unlock();
+      if (G.state === STATE.MENU) {
+        startGame();
+      } else if (G.state === STATE.PLAYING) {
+        dropBlock();
+      } else if (G.state === STATE.GAMEOVER) {
+        // Butona mı bastı?
+        const b = G._retryBtn;
+        if (b && px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) {
+          startGame();
+        } else if (py < H * 0.6) {
+          // üst bölgeye dokunma yok sayılır; başka yere dokununca da tekrar
+          startGame();
+        } else {
+          startGame();
+        }
+      }
+    }
+
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      const rect = canvas.getBoundingClientRect();
+      handlePress(t.clientX - rect.left, t.clientY - rect.top);
+    }, { passive: false });
+
+    canvas.addEventListener("mousedown", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      handlePress(e.clientX - rect.left, e.clientY - rect.top);
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" || e.key === " ") {
+        e.preventDefault();
+        handlePress(W / 2, H / 2);
+      }
+    });
+
+    // Ses butonu
+    const soundFab = document.getElementById("soundFab");
+    soundFab.textContent = Audio.isEnabled() ? "🔊" : "🔇";
+    soundFab.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const on = Audio.toggle();
+      soundFab.textContent = on ? "🔊" : "🔇";
+    });
+
+    // ========================================================================
+    // Ana döngü — delta-time
+    // ========================================================================
+    let lastTs = 0;
+    function loop(ts) {
+      if (!lastTs) lastTs = ts;
+      const dt = Math.min(0.05, (ts - lastTs) / 1000);
+      lastTs = ts;
+      update(dt);
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    // ========================================================================
+    // Boot
+    // ========================================================================
+    function boot() {
+      G.state = STATE.MENU;
+      resetTower(true);
+      G.demo.dropIn = 0.8;
+      requestAnimationFrame(loop);
+    }
+
+    // Test harness API
+    window._kulekur = { G, CONFIG, STATE, startGame, dropBlock, spawnCurrent,
+      currentSpeed, endGame, resetTower,
+      setSize(w, h) { window.innerWidth = w; window.innerHeight = h; resize(); } };
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+    else boot();
+  })();
+  </script>
+</body>
+</html>
