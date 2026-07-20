@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#aee9ff">
+<title>Labirent Kaçışı 🦊 — SEmirK Games</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+    background: linear-gradient(160deg, #aee9ff 0%, #fff3c4 60%, #ffd9a0 100%);
+  }
+  #app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+    gap: 6px;
+  }
+  #header {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.92);
+    border-radius: 14px;
+    padding: 7px 14px 7px 46px;
+    font-weight: bold;
+    font-size: 15px;
+    color: #555;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    position: relative;
+  }
+  #hearts { letter-spacing: 1px; font-size: 17px; }
+  #powerBadge {
+    display: none;
+    background: #ffd166;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 13px;
+    color: #7a4b00;
+  }
+  #powerBadge.show { display: inline-block; animation: pulse 0.8s infinite alternate; }
+  @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.12); } }
+  #gameWrap {
+    flex: 1;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+  canvas {
+    background: #fffdf6;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    touch-action: none;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  canvas.shake { animation: shake 0.25s; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    75% { transform: translateX(7px); }
+  }
+  #msg {
+    min-height: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #c0392b;
+    text-align: center;
+  }
+  #controls {
+    display: grid;
+    grid-template-columns: repeat(3, 64px);
+    grid-template-rows: repeat(2, 54px);
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .dbtn {
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #6ec6ff, #4aa8e8);
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 4px 0 #2f7fb8;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    touch-action: manipulation;
+  }
+  .dbtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2f7fb8; }
+  #up   { grid-column: 2; grid-row: 1; }
+  #left { grid-column: 1; grid-row: 2; }
+  #down { grid-column: 2; grid-row: 2; }
+  #right{ grid-column: 3; grid-row: 2; }
+  .back-fab {
+    position: fixed; top: 12px; left: 12px; z-index: 30;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,0.92); color: #4aa8e8;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; font-size: 19px; font-weight: 900;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    z-index: 20;
+  }
+  .overlay.show { display: flex; }
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px 20px;
+    max-width: 330px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes popIn { from { transform: scale(0.75); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .card h2 { margin: 0 0 8px; color: #b5651d; font-size: 22px; }
+  #qTimerBar { height: 10px; background: #eee; border-radius: 5px; overflow: hidden; margin: 10px 0; }
+  #qTimerFill { height: 100%; width: 100%; background: linear-gradient(90deg,#3fb654,#ffd166,#ef6868); transition: width 0.95s linear; }
+  #questionText { font-size: 34px; font-weight: bold; margin: 12px 0 16px; color: #333; }
+  .answerRow { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .ansBtn {
+    flex: 1 1 72px; min-width: 72px;
+    padding: 14px 0;
+    font-size: 22px; font-weight: bold;
+    border: none; border-radius: 13px;
+    background: linear-gradient(180deg,#ffd166,#f4a623);
+    box-shadow: 0 4px 0 #b87800;
+    cursor: pointer;
+  }
+  .ansBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #b87800; }
+  .ansBtn.wrong { animation: shake 0.3s; background: linear-gradient(180deg,#ff9a9a,#ef6868); box-shadow: 0 4px 0 #b03434; }
+  .bigBtn {
+    margin-top: 16px;
+    padding: 14px 26px;
+    font-size: 18px; font-weight: bold;
+    border: none; border-radius: 15px;
+    background: linear-gradient(180deg,#7be08a,#3fb654);
+    color: white;
+    box-shadow: 0 4px 0 #228b3a;
+    cursor: pointer;
+  }
+  .bigBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #228b3a; }
+  .cardStat { font-size: 20px; font-weight: bold; color: #b5651d; margin: 8px 0; }
+  .cardSub { font-size: 15px; color: #777; margin: 6px 0; }
+</style>
+</head>
+<body>
+<a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+<div id="app">
+  <div id="header">
+    <span id="levelLabel">Bölüm 1</span>
+    <span id="hearts">❤️❤️❤️</span>
+    <span id="powerBadge">💪 <span id="powerSteps">0</span></span>
+    <span>⭐ <span id="scoreLabel">0</span></span>
+  </div>
+  <div id="gameWrap"><canvas id="canvas"></canvas></div>
+  <div id="msg">&nbsp;</div>
+  <div id="controls">
+    <button class="dbtn" id="up">⬆️</button>
+    <button class="dbtn" id="left">⬅️</button>
+    <button class="dbtn" id="down">⬇️</button>
+    <button class="dbtn" id="right">➡️</button>
+  </div>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <h2>🦊 Labirent Kaçışı</h2>
+    <p class="cardSub">Yıldızları topla, kilitli kapıları matematikle aç, 🏁 bayrağa ulaş!</p>
+    <p class="cardSub">👹 Canavardan kaç — ama 💪 gücü alırsan onu SEN yiyebilirsin!</p>
+    <p class="cardSub">Dikkat: duvara çarpmak, yanlış cevap ve süre bitimi can götürür! ❤️❤️❤️</p>
+    <button class="bigBtn" id="startBtn">▶️ Başla</button>
+  </div>
+</div>
+
+<div class="overlay" id="mathOverlay">
+  <div class="card">
+    <h2>🔒 Kilitli Kapı!</h2>
+    <div id="qTimerBar"><div id="qTimerFill"></div></div>
+    <div id="qTimeText" class="cardSub">10 saniye</div>
+    <div id="questionText">?</div>
+    <div class="answerRow" id="answerRow"></div>
+  </div>
+</div>
+
+<div class="overlay" id="levelOverlay">
+  <div class="card">
+    <h2 id="levelTitle">🎉 Bölüm Tamamlandı!</h2>
+    <div class="cardStat" id="levelStars">⭐ x 0</div>
+    <div class="cardSub" id="levelScoreInfo"></div>
+    <button class="bigBtn" id="nextBtn">Sonraki Bölüm →</button>
+  </div>
+</div>
+
+<div class="overlay" id="endOverlay">
+  <div class="card">
+    <h2 id="endTitle">Oyun Bitti</h2>
+    <div class="cardSub" id="endReason"></div>
+    <div class="cardStat" id="endScore">Skor: 0</div>
+    <button class="bigBtn" id="restartBtn">🔄 Tekrar Oyna</button>
+  </div>
+</div>
+
+<script src="../../js/version.js?v=1.32.0"></script>
+<script src="../../js/pwa-back.js?v=1.32.0"></script>
+
+<script>
+'use strict';
+// ---------- Ayarlar ----------
+const LEVELS = [
+  { size: 13, doors: 1, stars: 5, powerups: 1, monsterEvery: 3, qTime: 10, diff: 1 },
+  { size: 15, doors: 2, stars: 7, powerups: 2, monsterEvery: 3, qTime: 12, diff: 2 },
+  { size: 17, doors: 3, stars: 9, powerups: 2, monsterEvery: 2, qTime: 15, diff: 3 }
+];
+const CHASE_RADIUS = 9; // canavar bu mesafeden uzaktaysa peşine düşmez, gezinir
+const W=1, P=0, STAR=3, DOOR=2, POWER=4; // hücre tipleri
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let S = null;            // oyun durumu
+let qTimer = null;       // soru zamanlayıcı
+let busy = false;        // overlay açıkken hareket kilidi
+
+// ---------- Gerçek labirent üretimi (recursive backtracker) ----------
+function genMaze(n){
+  const g = Array.from({length:n}, ()=>Array(n).fill(W));
+  const stack = [[1,1]];
+  g[1][1] = P;
+  const dirs = [[-2,0],[2,0],[0,-2],[0,2]];
+  while(stack.length){
+    const [r,c] = stack[stack.length-1];
+    const opts = dirs
+      .map(([dr,dc])=>[r+dr,c+dc,r+dr/2,c+dc/2])
+      .filter(([nr,nc])=>nr>0&&nc>0&&nr<n-1&&nc<n-1&&g[nr][nc]===W);
+    if(opts.length){
+      const [nr,nc,wr,wc] = opts[Math.floor(Math.random()*opts.length)];
+      g[wr][wc]=P; g[nr][nc]=P;
+      stack.push([nr,nc]);
+    } else stack.pop();
+  }
+  // Örgüleme (braiding): bazı çıkmaz sokakların duvarını kırıp döngü oluştur.
+  // Hem labirent daha karmaşık görünür hem de canavardan kaçış yolları açılır.
+  for(let r=1;r<n-1;r++) for(let c=1;c<n-1;c++){
+    if(g[r][c]!==P) continue;
+    const nbs=[[-1,0],[1,0],[0,-1],[0,1]].filter(([dr,dc])=>g[r+dr][c+dc]!==W);
+    if(nbs.length===1 && Math.random()<0.55){
+      const walls=[[-1,0],[1,0],[0,-1],[0,1]].filter(([dr,dc])=>{
+        const wr=r+dr,wc=c+dc,or=r+2*dr,oc=c+2*dc;
+        return g[wr]&&g[wr][wc]===W&&or>0&&oc>0&&or<n-1&&oc<n-1&&g[or][oc]!==W;
+      });
+      if(walls.length){
+        const [dr,dc]=walls[Math.floor(Math.random()*walls.length)];
+        g[r+dr][c+dc]=P;
+      }
+    }
+  }
+  return g;
+}
+
+// BFS: start→exit yolu
+function bfsPath(g, start, goal){
+  const n=g.length, prev={}, seen=new Set([start.join(',')]);
+  const q=[start];
+  while(q.length){
+    const [r,c]=q.shift();
+    if(r===goal[0]&&c===goal[1]){
+      const path=[]; let k=goal.join(',');
+      while(k){ path.unshift(k.split(',').map(Number)); k=prev[k]; }
+      return path;
+    }
+    for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){
+      const nr=r+dr,nc=c+dc,key=nr+','+nc;
+      if(nr<0||nc<0||nr>=n||nc>=n||g[nr][nc]===W||seen.has(key)) continue;
+      seen.add(key); prev[key]=r+','+c; q.push([nr,nc]);
+    }
+  }
+  return null;
+}
+
+// Çıkmaz sokaklar (tek komşulu koridor hücreleri)
+function deadEnds(g){
+  const n=g.length, out=[];
+  for(let r=1;r<n-1;r++) for(let c=1;c<n-1;c++){
+    if(g[r][c]!==P) continue;
+    let nb=0;
+    for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]) if(g[r+dr][c+dc]!==W) nb++;
+    if(nb===1) out.push([r,c]);
+  }
+  return out;
+}
+
+function initLevel(idx){
+  const L = LEVELS[idx];
+  const n = L.size;
+  const grid = genMaze(n);
+  const start=[1,1], exit=[n-2,n-2];
+
+  // Kapılar: çözüm yolunun ortalarına
+  const path = bfsPath(grid,start,exit);
+  const doorSpots = [];
+  for(let i=1;i<L.doors+1;i++){
+    const pos = path[Math.floor(path.length*i/(L.doors+1))];
+    doorSpots.push(pos);
+  }
+  doorSpots.forEach(([r,c])=>grid[r][c]=DOOR);
+
+  // Yıldızlar: çıkmaz sokaklara (keşfi ödüllendir)
+  const ends = deadEnds(grid).filter(([r,c])=>!(r===start[0]&&c===start[1])&&!(r===exit[0]&&c===exit[1]));
+  ends.sort(()=>Math.random()-0.5);
+  ends.slice(0,L.stars).forEach(([r,c])=>grid[r][c]=STAR);
+
+  // Güç ikonu: boş koridor hücresine
+  const free=[];
+  for(let r=1;r<n-1;r++) for(let c=1;c<n-1;c++)
+    if(grid[r][c]===P && !(r===start[0]&&c===start[1]) && !(r===exit[0]&&c===exit[1])) free.push([r,c]);
+  free.sort(()=>Math.random()-0.5);
+  free.slice(0,L.powerups).forEach(([r,c])=>grid[r][c]=POWER);
+
+  // Canavar: oyuncudan uzak bir koridorda başlar
+  let monster=null, bestD=-1;
+  for(const [r,c] of free.slice(L.powerups)){
+    const d=Math.abs(r-start[0])+Math.abs(c-start[1]);
+    if(d>bestD){bestD=d;monster=[r,c];}
+  }
+
+  S = {
+    idx, grid, n,
+    player:[...start], exit, monster,
+    hearts: S ? S.hearts : 3,
+    score: S ? S.score : 0,
+    stars: 0,
+    moveCount: 0,
+    power: 0,          // kaç adım canavar yeme gücü
+  };
+  document.getElementById('levelLabel').textContent = `Bölüm ${idx+1}/${LEVELS.length}`;
+  updateHUD();
+  draw();
+}
+
+// ---------- Çizim (DPR-aware keskin render) ----------
+function draw(){
+  const n=S.n, cell=Math.floor(480/n);
+  const size=n*cell;
+  const DPR=Math.max(1, Math.min(3, window.devicePixelRatio||1));
+  canvas.width=size*DPR; canvas.height=size*DPR;
+  canvas.style.width=size+'px'; canvas.style.height=size+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,size,size);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++){
+    const v=S.grid[r][c], x=c*cell, y=r*cell;
+    if(v===W){
+      ctx.fillStyle='#5c8a5e';
+      ctx.fillRect(x,y,cell,cell);
+      ctx.fillStyle='#7cc47f';
+      ctx.fillRect(x+1,y+1,cell-2,cell-2);
+    } else {
+      ctx.fillStyle='#fff6e0';
+      ctx.fillRect(x,y,cell,cell);
+      if(v===DOOR){ ctx.font=`${cell*0.7}px serif`; ctx.fillText('🔒',x+cell/2,y+cell/2+1); }
+      else if(v===STAR){ ctx.font=`${cell*0.65}px serif`; ctx.fillText('⭐',x+cell/2,y+cell/2+1); }
+      else if(v===POWER){ ctx.font=`${cell*0.65}px serif`; ctx.fillText('💪',x+cell/2,y+cell/2+1); }
+    }
+  }
+  const [er,ec]=S.exit;
+  ctx.font=`${cell*0.72}px serif`;
+  ctx.fillText('🏁',ec*cell+cell/2,er*cell+cell/2+1);
+  if(S.monster){
+    const [mr,mc]=S.monster;
+    ctx.fillText(S.power>0?'😱':'👹',mc*cell+cell/2,mr*cell+cell/2+1);
+  }
+  const [pr,pc]=S.player;
+  ctx.fillText(S.power>0?'🦸':'🦊',pc*cell+cell/2,pr*cell+cell/2+1);
+}
+
+function updateHUD(){
+  document.getElementById('scoreLabel').textContent=S.score;
+  document.getElementById('hearts').textContent='❤️'.repeat(Math.max(0,S.hearts))||'💔';
+  const pb=document.getElementById('powerBadge');
+  if(S.power>0){ pb.classList.add('show'); document.getElementById('powerSteps').textContent=S.power; }
+  else pb.classList.remove('show');
+}
+
+function flash(text){
+  const m=document.getElementById('msg');
+  m.textContent=text;
+  clearTimeout(flash.t);
+  flash.t=setTimeout(()=>m.innerHTML='&nbsp;',1600);
+}
+
+function shake(){ canvas.classList.add('shake'); setTimeout(()=>canvas.classList.remove('shake'),250); }
+
+// ---------- Oynanış ----------
+function loseHeart(reason){
+  S.hearts--; shake(); flash('💔 '+reason);
+  updateHUD();
+  if(S.hearts<=0) endGame(false, reason);
+}
+
+function tryMove(dr,dc){
+  if(busy||!S) return;
+  const [r,c]=S.player, nr=r+dr, nc=c+dc;
+  if(nr<0||nc<0||nr>=S.n||nc>=S.n||S.grid[nr][nc]===W){ loseHeart('Duvara çarptın!'); return; }
+  const v=S.grid[nr][nc];
+  if(v===DOOR){ openDoorQuestion([nr,nc]); return; }
+  if(v===STAR){ S.grid[nr][nc]=P; S.score+=10; S.stars++; flash('⭐ +10'); }
+  if(v===POWER){ S.grid[nr][nc]=P; S.power=8; S.score+=15; flash('💪 Canavarı yiyebilirsin! (8 adım)'); }
+  S.player=[nr,nc];
+  afterPlayerMove();
+}
+
+function afterPlayerMove(){
+  S.moveCount++;
+  if(S.power>0){ S.power--; }
+  // Canavar hareketi
+  if(S.monster && S.moveCount % LEVELS[S.idx].monsterEvery===0) moveMonster();
+  updateHUD();
+  draw();
+  checkMonster();
+  checkExit();
+}
+
+function moveMonster(){
+  const goal = S.player, [sr,sc]=S.monster;
+  const validMoves = [[-1,0],[1,0],[0,-1],[0,1]]
+    .map(([dr,dc])=>[sr+dr,sc+dc])
+    .filter(([r,c])=>r>=0&&c>=0&&r<S.n&&c<S.n&&S.grid[r][c]!==W&&S.grid[r][c]!==DOOR);
+  if(!validMoves.length) return;
+
+  // BFS ile oyuncuya en kısa yol (kapılardan geçemez)
+  const prev={}, seen=new Set([sr+','+sc]), q=[[sr,sc]];
+  let found=false;
+  while(q.length){
+    const [r,c]=q.shift();
+    if(r===goal[0]&&c===goal[1]){found=true;break;}
+    for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){
+      const nr=r+dr,nc=c+dc,key=nr+','+nc;
+      if(nr<0||nc<0||nr>=S.n||nc>=S.n||seen.has(key)) continue;
+      const v=S.grid[nr][nc];
+      if(v===W||v===DOOR) continue;
+      seen.add(key); prev[key]=r+','+c; q.push([nr,nc]);
+    }
+  }
+  let steps=[];
+  if(found){
+    let k=goal.join(',');
+    while(k && k!==sr+','+sc){ steps.unshift(k); k=prev[k]; }
+  }
+  // Uzaktaysa (veya güç aktifse) kovalamaz: rastgele gezinir → kaçış her zaman mümkün
+  if(!found || steps.length>CHASE_RADIUS || S.power>0){
+    S.monster=validMoves[Math.floor(Math.random()*validMoves.length)];
+  } else {
+    S.monster=steps[0].split(',').map(Number);
+  }
+}
+
+function checkMonster(){
+  if(!S.monster) return;
+  if(S.player[0]===S.monster[0]&&S.player[1]===S.monster[1]){
+    if(S.power>0){
+      S.score+=50; S.power=0;
+      flash('😋 Canavarı yedin! +50');
+      respawnMonster();
+      updateHUD(); draw();
+    } else {
+      loseHeart('Canavar seni yakaladı!');
+      // canavarı biraz uzaklaştır ki üst üste can gitmesin
+      respawnMonster();
+      draw();
+    }
+  }
+}
+
+function respawnMonster(){
+  let best=null,bestD=-1;
+  for(let r=1;r<S.n-1;r++) for(let c=1;c<S.n-1;c++){
+    if(S.grid[r][c]!==P) continue;
+    const d=Math.abs(r-S.player[0])+Math.abs(c-S.player[1]);
+    if(d>bestD){bestD=d;best=[r,c];}
+  }
+  S.monster=best;
+}
+
+function checkExit(){
+  if(S.player[0]===S.exit[0]&&S.player[1]===S.exit[1]){
+    busy=true;
+    const last = S.idx===LEVELS.length-1;
+    document.getElementById('levelTitle').textContent = last?'🏆 Tüm Bölümler Bitti!':`🎉 Bölüm ${S.idx+1} Tamamlandı!`;
+    document.getElementById('levelStars').textContent = `⭐ x ${S.stars}`;
+    document.getElementById('levelScoreInfo').textContent = `Toplam skor: ${S.score}`;
+    document.getElementById('nextBtn').textContent = last?'Sonucu Gör 🏁':'Sonraki Bölüm →';
+    document.getElementById('levelOverlay').classList.add('show');
+  }
+}
+
+// ---------- Matematik kapısı ----------
+function makeQuestion(diff){
+  let a,b,op,ans;
+  if(diff===1){ // sadece küçük toplama
+    op='+'; a=rnd(1,9); b=rnd(1,9); ans=a+b;
+  }
+  else if(diff===2){ // biraz daha büyük toplama, kolay çıkarma
+    if(Math.random()<0.6){ op='+'; a=rnd(3,12); b=rnd(3,12); ans=a+b; }
+    else { op='-'; a=rnd(5,15); b=rnd(1,a-1); ans=a-b; }
+  } else { // orta toplama/çıkarma, ara sıra küçük çarpım
+    const roll=Math.random();
+    if(roll<0.25){ op='×'; a=rnd(2,5); b=rnd(2,5); ans=a*b; }
+    else if(roll<0.6){ op='-'; a=rnd(10,25); b=rnd(2,a-1); ans=a-b; }
+    else { op='+'; a=rnd(8,20); b=rnd(8,20); ans=a+b; }
+  }
+  const opts=new Set([ans]);
+  while(opts.size<3){
+    const w=ans+ (Math.random()<0.5?-1:1)*rnd(1,6);
+    if(w>=0&&w!==ans) opts.add(w);
+  }
+  return { text:`${a} ${op} ${b} = ?`, ans, opts:[...opts].sort(()=>Math.random()-0.5) };
+}
+function rnd(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+function openDoorQuestion(target){
+  busy=true;
+  const L=LEVELS[S.idx];
+  const q=makeQuestion(L.diff);
+  let remain=L.qTime;
+  document.getElementById('questionText').textContent=q.text;
+  document.getElementById('qTimeText').textContent=`${remain} saniye`;
+  document.getElementById('qTimerFill').style.width='100%';
+  const row=document.getElementById('answerRow'); row.innerHTML='';
+  q.opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='ansBtn'; b.textContent=o;
+    b.onclick=()=>{
+      if(o===q.ans){
+        closeQuestion();
+        S.grid[target[0]][target[1]]=P;
+        S.player=target;
+        S.score+=20;
+        flash('🔓 Kapı açıldı! +20');
+        afterPlayerMove();
+      } else {
+        b.classList.add('wrong');
+        setTimeout(()=>b.classList.remove('wrong'),300);
+        closeQuestion();
+        loseHeart('Yanlış cevap!');
+      }
+    };
+    row.appendChild(b);
+  });
+  document.getElementById('mathOverlay').classList.add('show');
+  qTimer=setInterval(()=>{
+    remain--;
+    document.getElementById('qTimeText').textContent=`${remain} saniye`;
+    document.getElementById('qTimerFill').style.width=(remain/L.qTime*100)+'%';
+    if(remain<=0){
+      closeQuestion();
+      loseHeart('Süre doldu!');
+    }
+  },1000);
+}
+function closeQuestion(){
+  clearInterval(qTimer);
+  document.getElementById('mathOverlay').classList.remove('show');
+  busy=false;
+}
+
+// ---------- Bitiş / Akış ----------
+function endGame(won,reason){
+  busy=true;
+  document.getElementById('endTitle').textContent = won?'🏆 Tebrikler!':'💔 Oyun Bitti';
+  document.getElementById('endReason').textContent = won?'Labirentten başarıyla kaçtın!':reason;
+  document.getElementById('endScore').textContent=`Skor: ${S.score}`;
+  document.getElementById('endOverlay').classList.add('show');
+}
+
+document.getElementById('startBtn').onclick=()=>{
+  document.getElementById('startOverlay').classList.remove('show');
+  busy=false;
+};
+document.getElementById('nextBtn').onclick=()=>{
+  document.getElementById('levelOverlay').classList.remove('show');
+  if(S.idx===LEVELS.length-1){ endGame(true); }
+  else { busy=false; initLevel(S.idx+1); }
+};
+document.getElementById('restartBtn').onclick=()=>{
+  document.getElementById('endOverlay').classList.remove('show');
+  S=null; busy=false;
+  initLevel(0);
+};
+
+// ---------- Girdi: butonlar + klavye + kaydırma ----------
+document.getElementById('up').onclick=()=>tryMove(-1,0);
+document.getElementById('down').onclick=()=>tryMove(1,0);
+document.getElementById('left').onclick=()=>tryMove(0,-1);
+document.getElementById('right').onclick=()=>tryMove(0,1);
+
+document.addEventListener('keydown',e=>{
+  if(busy) return;
+  const map={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+  if(map[e.key]){ e.preventDefault(); tryMove(...map[e.key]); }
+});
+
+let touchStart=null;
+canvas.addEventListener('touchstart',e=>{ touchStart=[e.touches[0].clientX,e.touches[0].clientY]; },{passive:true});
+canvas.addEventListener('touchend',e=>{
+  if(!touchStart) return;
+  const dx=e.changedTouches[0].clientX-touchStart[0];
+  const dy=e.changedTouches[0].clientY-touchStart[1];
+  touchStart=null;
+  if(Math.abs(dx)<24&&Math.abs(dy)<24) return;
+  if(Math.abs(dx)>Math.abs(dy)) tryMove(0, dx>0?1:-1);
+  else tryMove(dy>0?1:-1, 0);
+},{passive:true});
+
+// ---------- Test harness API ----------
+window._labirent = {
+  get S(){ return S; },
+  set S(v){ S=v; },
+  LEVELS, W, P, STAR, DOOR, POWER,
+  genMaze, bfsPath, deadEnds, initLevel, tryMove, makeQuestion,
+  setBusy(v){ busy=v; },
+  isBusy(){ return busy; },
+};
+
+// ---------- Başlat ----------
+busy=true;
+initLevel(0);
+document.getElementById('startOverlay').classList.add('show');
+</script>
+</body>
+</html>

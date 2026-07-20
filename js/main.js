@@ -13,7 +13,12 @@
     activeCategory: "all",
     activeAge: "all",
     query: "",
+    aboutMode: false,   // "Hakkında" tıklanınca sadece gizli oyunlar görünür
   };
+
+  // Bu oyunlar normal katalogda GİZLİDİR; yalnızca üstteki "Hakkında"ya
+  // tıklanınca (ve sadece onlar) listelenir.
+  const HIDDEN_IDS = new Set(["wheel", "okeytro", "okeytro-gemini"]);
 
   const els = {
     grid: document.getElementById("gamesGrid"),
@@ -40,17 +45,33 @@
 
         renderChips(els.categoryChips, state.categories, state.activeCategory, (id) => {
           state.activeCategory = id;
+          exitAboutMode();
           render();
         });
         renderChips(els.ageChips, state.ageGroups, state.activeAge, (id) => {
           state.activeAge = id;
+          exitAboutMode();
           render();
         });
 
         els.search.addEventListener("input", (e) => {
           state.query = e.target.value.trim().toLocaleLowerCase("tr");
+          if (state.query) state.aboutMode = false; // arama gizli moddan çıkarır
           render();
         });
+
+        // "Hakkında" → gizli oyunları göster/gizle
+        const aboutLink = document.querySelector(".header-link");
+        if (aboutLink) {
+          aboutLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            state.aboutMode = !state.aboutMode;
+            aboutLink.classList.toggle("active", state.aboutMode);
+            render();
+            const sec = document.querySelector(".games-section");
+            if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        }
 
         render();
       })
@@ -78,8 +99,21 @@
     });
   }
 
+  function exitAboutMode() {
+    state.aboutMode = false;
+    const aboutLink = document.querySelector(".header-link");
+    if (aboutLink) aboutLink.classList.remove("active");
+  }
+
   function filterGames() {
+    // "Hakkında" modunda SADECE gizli oyunlar (Çekiliş Çarkı, Okeytro,
+    // Okeytro Klasik) görünür; diğer filtreler yok sayılır.
+    if (state.aboutMode) {
+      return state.games.filter((g) => HIDDEN_IDS.has(g.id));
+    }
     return state.games.filter((g) => {
+      // Gizli oyunlar normal katalogda görünmez
+      if (HIDDEN_IDS.has(g.id)) return false;
       if (state.activeCategory !== "all" && g.category !== state.activeCategory) {
         return false;
       }
@@ -119,6 +153,10 @@
 
     games.forEach((g) => els.grid.appendChild(buildCard(g)));
 
+    if (state.aboutMode) {
+      els.sectionTitle.textContent = "Hakkında — Özel Oyunlar";
+      return;
+    }
     const cat = state.categories.find((c) => c.id === state.activeCategory);
     els.sectionTitle.textContent =
       state.activeCategory === "all" && state.activeAge === "all"
