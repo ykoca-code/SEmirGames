@@ -1,18 +1,51 @@
 {
   "categories": [
-    { "id": "all", "label": "Tümü" },
-    { "id": "puzzle", "label": "Bulmaca" },
-    { "id": "logic", "label": "Mantık" },
-    { "id": "arcade", "label": "Arcade" },
-    { "id": "board", "label": "Masa Oyunu" },
-    { "id": "educational", "label": "Eğitici" }
+    {
+      "id": "all",
+      "label": "Tümü"
+    },
+    {
+      "id": "puzzle",
+      "label": "Bulmaca"
+    },
+    {
+      "id": "logic",
+      "label": "Mantık"
+    },
+    {
+      "id": "arcade",
+      "label": "Arcade"
+    },
+    {
+      "id": "board",
+      "label": "Masa Oyunu"
+    },
+    {
+      "id": "educational",
+      "label": "Eğitici"
+    }
   ],
   "ageGroups": [
-    { "id": "all", "label": "Tüm Yaşlar" },
-    { "id": "4+", "label": "4+" },
-    { "id": "7+", "label": "7+" },
-    { "id": "12+", "label": "12+" },
-    { "id": "16+", "label": "16+" }
+    {
+      "id": "all",
+      "label": "Tüm Yaşlar"
+    },
+    {
+      "id": "4+",
+      "label": "4+"
+    },
+    {
+      "id": "7+",
+      "label": "7+"
+    },
+    {
+      "id": "12+",
+      "label": "12+"
+    },
+    {
+      "id": "16+",
+      "label": "16+"
+    }
   ],
   "games": [
     {
@@ -24,7 +57,12 @@
       "ageRating": "7+",
       "thumbnail": "games/sudoku/thumbnail.svg",
       "path": "games/sudoku/index.html",
-      "tags": ["bulmaca", "sudoku", "zeka", "mantık"]
+      "tags": [
+        "bulmaca",
+        "sudoku",
+        "zeka",
+        "mantık"
+      ]
     },
     {
       "id": "tetris",
@@ -35,7 +73,12 @@
       "ageRating": "7+",
       "thumbnail": "games/tetris/thumbnail.svg",
       "path": "games/tetris/index.html",
-      "tags": ["arcade", "tetris", "klasik", "blok"]
+      "tags": [
+        "arcade",
+        "tetris",
+        "klasik",
+        "blok"
+      ]
     },
     {
       "id": "2048",
@@ -46,7 +89,12 @@
       "ageRating": "7+",
       "thumbnail": "games/2048/thumbnail.svg",
       "path": "games/2048/index.html",
-      "tags": ["bulmaca", "2048", "sayı", "klasik"]
+      "tags": [
+        "bulmaca",
+        "2048",
+        "sayı",
+        "klasik"
+      ]
     },
     {
       "id": "memory",
@@ -57,7 +105,12 @@
       "ageRating": "4+",
       "thumbnail": "games/memory/thumbnail.svg",
       "path": "games/memory/index.html",
-      "tags": ["hafıza", "eşleştirme", "konsantrasyon", "çocuk"]
+      "tags": [
+        "hafıza",
+        "eşleştirme",
+        "konsantrasyon",
+        "çocuk"
+      ]
     },
     {
       "id": "slonky",
@@ -68,7 +121,13 @@
       "ageRating": "4+",
       "thumbnail": "games/slonky/thumbnail.svg",
       "path": "games/slonky/index.html",
-      "tags": ["arcade", "plinko", "top", "şans", "fizik"]
+      "tags": [
+        "arcade",
+        "plinko",
+        "top",
+        "şans",
+        "fizik"
+      ]
     },
     {
       "id": "monster",
@@ -79,7 +138,12 @@
       "ageRating": "4+",
       "thumbnail": "games/monster/thumbnail.svg",
       "path": "games/monster/index.html",
-      "tags": ["bulmaca", "match-3", "eşleştirme", "canavar"]
+      "tags": [
+        "bulmaca",
+        "match-3",
+        "eşleştirme",
+        "canavar"
+      ]
     },
     {
       "id": "emoji",
@@ -90,7 +154,13 @@
       "ageRating": "7+",
       "thumbnail": "games/emoji/thumbnail.svg",
       "path": "games/emoji/index.html",
-      "tags": ["bulmaca", "kelime", "emoji", "tahmin", "eğlence"]
+      "tags": [
+        "bulmaca",
+        "kelime",
+        "emoji",
+        "tahmin",
+        "eğlence"
+      ]
     },
     {
       "id": "snake",
@@ -101,7 +171,12 @@
       "ageRating": "4+",
       "thumbnail": "games/snake/thumbnail.svg",
       "path": "games/snake/index.html",
-      "tags": ["arcade", "klasik", "yılan", "snake"]
+      "tags": [
+        "arcade",
+        "klasik",
+        "yılan",
+        "snake"
+      ]
     },
     {
       "id": "mines",
@@ -112,7 +187,12 @@
       "ageRating": "7+",
       "thumbnail": "games/mines/thumbnail.svg",
       "path": "games/mines/index.html",
-      "tags": ["mantık", "bulmaca", "mayın", "minesweeper"]
+      "tags": [
+        "mantık",
+        "bulmaca",
+        "mayın",
+        "minesweeper"
+      ]
     },
     {
       "id": "english",
@@ -123,7 +203,12 @@
       "ageRating": "4+",
       "thumbnail": "games/english/thumbnail.svg",
       "path": "games/english/index.html",
-      "tags": ["eğitici", "ingilizce", "kelime", "çocuk"]
+      "tags": [
+        "eğitici",
+        "ingilizce",
+        "kelime",
+        "çocuk"
+      ]
     },
     {
       "id": "xox",
@@ -134,7 +219,12 @@
       "ageRating": "4+",
       "thumbnail": "games/xox/thumbnail.svg",
       "path": "games/xox/index.html",
-      "tags": ["masa", "klasik", "xox", "tic-tac-toe"]
+      "tags": [
+        "masa",
+        "klasik",
+        "xox",
+        "tic-tac-toe"
+      ]
     },
     {
       "id": "flags",
@@ -145,7 +235,12 @@
       "ageRating": "7+",
       "thumbnail": "games/flags/thumbnail.svg",
       "path": "games/flags/index.html",
-      "tags": ["eğitici", "bayrak", "ülke", "coğrafya"]
+      "tags": [
+        "eğitici",
+        "bayrak",
+        "ülke",
+        "coğrafya"
+      ]
     },
     {
       "id": "capitals",
@@ -156,7 +251,11 @@
       "ageRating": "7+",
       "thumbnail": "games/capitals/thumbnail.svg",
       "path": "games/capitals/index.html",
-      "tags": ["eğitici", "başkent", "coğrafya"]
+      "tags": [
+        "eğitici",
+        "başkent",
+        "coğrafya"
+      ]
     },
     {
       "id": "worldle",
@@ -167,7 +266,12 @@
       "ageRating": "10+",
       "thumbnail": "games/worldle/thumbnail.svg",
       "path": "games/worldle/index.html",
-      "tags": ["eğitici", "ülke", "coğrafya", "tahmin"]
+      "tags": [
+        "eğitici",
+        "ülke",
+        "coğrafya",
+        "tahmin"
+      ]
     },
     {
       "id": "target",
@@ -178,7 +282,12 @@
       "ageRating": "7+",
       "thumbnail": "games/target/thumbnail.svg",
       "path": "games/target/index.html",
-      "tags": ["mantık", "matematik", "iki-kişilik", "toplama"]
+      "tags": [
+        "mantık",
+        "matematik",
+        "iki-kişilik",
+        "toplama"
+      ]
     },
     {
       "id": "pong",
@@ -189,7 +298,12 @@
       "ageRating": "4+",
       "thumbnail": "games/pong/thumbnail.svg",
       "path": "games/pong/index.html",
-      "tags": ["arcade", "klasik", "pong", "masa tenisi"]
+      "tags": [
+        "arcade",
+        "klasik",
+        "pong",
+        "masa tenisi"
+      ]
     },
     {
       "id": "wheel",
@@ -200,7 +314,13 @@
       "ageRating": "4+",
       "thumbnail": "games/wheel/thumbnail.svg",
       "path": "games/wheel/index.html",
-      "tags": ["çekiliş", "çark", "101 okey", "araç", "rastgele"]
+      "tags": [
+        "çekiliş",
+        "çark",
+        "101 okey",
+        "araç",
+        "rastgele"
+      ]
     },
     {
       "id": "dama",
@@ -211,7 +331,13 @@
       "ageRating": "7+",
       "thumbnail": "games/dama/thumbnail.svg",
       "path": "games/dama/index.html",
-      "tags": ["masa", "strateji", "dama", "iki-kişilik", "klasik"]
+      "tags": [
+        "masa",
+        "strateji",
+        "dama",
+        "iki-kişilik",
+        "klasik"
+      ]
     },
     {
       "id": "scooter",
@@ -222,7 +348,13 @@
       "ageRating": "4+",
       "thumbnail": "games/scooter/thumbnail.svg",
       "path": "games/scooter/index.html",
-      "tags": ["arcade", "endless runner", "scooter", "kaçış", "altın"]
+      "tags": [
+        "arcade",
+        "endless runner",
+        "scooter",
+        "kaçış",
+        "altın"
+      ]
     },
     {
       "id": "bricks",
@@ -233,7 +365,13 @@
       "ageRating": "4+",
       "thumbnail": "games/bricks/thumbnail.svg",
       "path": "games/bricks/index.html",
-      "tags": ["arcade", "brick", "breakout", "power-up", "tuğla"]
+      "tags": [
+        "arcade",
+        "brick",
+        "breakout",
+        "power-up",
+        "tuğla"
+      ]
     },
     {
       "id": "wolf",
@@ -244,7 +382,13 @@
       "ageRating": "4+",
       "thumbnail": "games/wolf/thumbnail.svg",
       "path": "games/wolf/index.html",
-      "tags": ["3d", "platformer", "macera", "çocuk", "kurt"]
+      "tags": [
+        "3d",
+        "platformer",
+        "macera",
+        "çocuk",
+        "kurt"
+      ]
     },
     {
       "id": "tower",
@@ -255,7 +399,14 @@
       "ageRating": "4+",
       "thumbnail": "games/tower/thumbnail.svg",
       "path": "games/tower/index.html",
-      "tags": ["arcade", "kule", "tower", "blok", "denge", "zamanlama"]
+      "tags": [
+        "arcade",
+        "kule",
+        "tower",
+        "blok",
+        "denge",
+        "zamanlama"
+      ]
     },
     {
       "id": "runner",
@@ -266,7 +417,13 @@
       "ageRating": "4+",
       "thumbnail": "games/runner/thumbnail.svg",
       "path": "games/runner/index.html",
-      "tags": ["arcade", "endless runner", "dino", "okul", "zıplama"]
+      "tags": [
+        "arcade",
+        "endless runner",
+        "dino",
+        "okul",
+        "zıplama"
+      ]
     },
     {
       "id": "towerultra",
@@ -277,7 +434,15 @@
       "ageRating": "4+",
       "thumbnail": "games/towerultra/thumbnail.svg",
       "path": "games/towerultra/index.html",
-      "tags": ["arcade", "kule", "tower", "3d", "pendulum", "sarkaç", "bina"]
+      "tags": [
+        "arcade",
+        "kule",
+        "tower",
+        "3d",
+        "pendulum",
+        "sarkaç",
+        "bina"
+      ]
     },
     {
       "id": "zip",
@@ -288,7 +453,13 @@
       "ageRating": "7+",
       "thumbnail": "games/zip/thumbnail.svg",
       "path": "games/zip/index.html",
-      "tags": ["puzzle", "bulmaca", "mantık", "yol", "hamilton"]
+      "tags": [
+        "puzzle",
+        "bulmaca",
+        "mantık",
+        "yol",
+        "hamilton"
+      ]
     },
     {
       "id": "cargo",
@@ -299,7 +470,14 @@
       "ageRating": "7+",
       "thumbnail": "games/cargo/thumbnail.svg",
       "path": "games/cargo/index.html",
-      "tags": ["arcade", "uzay", "fizik", "kütleçekim", "kargo", "simülasyon"]
+      "tags": [
+        "arcade",
+        "uzay",
+        "fizik",
+        "kütleçekim",
+        "kargo",
+        "simülasyon"
+      ]
     },
     {
       "id": "ecocity",
@@ -310,7 +488,14 @@
       "ageRating": "7+",
       "thumbnail": "games/ecocity/thumbnail.svg",
       "path": "games/ecocity/index.html",
-      "tags": ["şehir", "strateji", "geri dönüşüm", "kaynak yönetimi", "çocuk", "eğitici"]
+      "tags": [
+        "şehir",
+        "strateji",
+        "geri dönüşüm",
+        "kaynak yönetimi",
+        "çocuk",
+        "eğitici"
+      ]
     },
     {
       "id": "facecatch",
@@ -321,7 +506,13 @@
       "ageRating": "7+",
       "thumbnail": "games/facecatch/thumbnail.svg",
       "path": "games/facecatch/index.html",
-      "tags": ["arcade", "kamera", "yüz takibi", "refleks", "sağlıklı beslenme"]
+      "tags": [
+        "arcade",
+        "kamera",
+        "yüz takibi",
+        "refleks",
+        "sağlıklı beslenme"
+      ]
     },
     {
       "id": "sliceit",
@@ -332,7 +523,13 @@
       "ageRating": "7+",
       "thumbnail": "games/sliceit/thumbnail.svg",
       "path": "games/sliceit/index.html",
-      "tags": ["arcade", "kamera", "göz kırpma", "meyve kesme", "refleks"]
+      "tags": [
+        "arcade",
+        "kamera",
+        "göz kırpma",
+        "meyve kesme",
+        "refleks"
+      ]
     },
     {
       "id": "okeytro",
@@ -343,7 +540,14 @@
       "ageRating": "12+",
       "thumbnail": "games/okeytro/thumbnail.svg",
       "path": "games/okeytro/index.html",
-      "tags": ["okey", "roguelike", "strateji", "masa", "puan", "balatro"]
+      "tags": [
+        "okey",
+        "roguelike",
+        "strateji",
+        "masa",
+        "puan",
+        "balatro"
+      ]
     },
     {
       "id": "okeytro-gemini",
@@ -354,7 +558,14 @@
       "ageRating": "7+",
       "thumbnail": "games/okeytro-gemini/thumbnail.svg",
       "path": "games/okeytro-gemini/index.html",
-      "tags": ["okey", "roguelike", "balatro", "taş", "strateji", "deste kurma"]
+      "tags": [
+        "okey",
+        "roguelike",
+        "balatro",
+        "taş",
+        "strateji",
+        "deste kurma"
+      ]
     },
     {
       "id": "kule-kur",
@@ -365,7 +576,32 @@
       "ageRating": "4+",
       "thumbnail": "kule-kur/thumbnail.svg",
       "path": "kule-kur/index.html",
-      "tags": ["arcade", "stack", "kule", "istifleme", "refleks", "premium"]
+      "tags": [
+        "arcade",
+        "stack",
+        "kule",
+        "istifleme",
+        "refleks",
+        "premium"
+      ]
+    },
+    {
+      "id": "labirent",
+      "title": "Labirent Kaçışı",
+      "description": "Tilki ile labirentten kaç! Yıldızları topla, kilitli kapıları matematikle aç, canavardan kaç — güç alırsan onu sen ye. 3 bölüm, artan zorluk.",
+      "category": "educational",
+      "categoryLabel": "Eğitici",
+      "ageRating": "7+",
+      "thumbnail": "games/labirent/thumbnail.svg",
+      "path": "games/labirent/index.html",
+      "tags": [
+        "labirent",
+        "matematik",
+        "eğitici",
+        "macera",
+        "çocuk",
+        "bulmaca"
+      ]
     }
   ]
 }
