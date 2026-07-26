@@ -57,8 +57,8 @@
     .swatches::-webkit-scrollbar { display: none; }
     .swatch {
       flex: 0 0 auto;
-      width: 38px; height: 38px; border-radius: 50%;
-      border: 3px solid transparent;
+      width: 33px; height: 33px; border-radius: 50%;
+      border: 2.5px solid transparent;
       cursor: pointer;
       position: relative;
       touch-action: manipulation;
@@ -114,14 +114,18 @@
       <div class="swatches" id="swatches"></div>
       <div class="row">
         <span class="brush-label">Fırça</span>
-        <input type="range" id="brush" min="1" max="10" value="4" />
+        <input type="range" id="brush" min="0" max="16" step="1" value="4" />
+        <span class="brush-label" id="brushVal">4</span>
+      </div>
+      <div class="row">
+        <button class="ctrl-btn primary" id="saveBtn">💾 Kaydet</button>
         <button class="ctrl-btn" id="clearBtn">🧹 Temizle</button>
       </div>
     </div>
   </div>
 
-  <script src="../../js/version.js?v=1.34.1"></script>
-  <script src="../../js/pwa-back.js?v=1.34.1"></script>
+  <script src="../../js/version.js?v=1.35.0"></script>
+  <script src="../../js/pwa-back.js?v=1.35.0"></script>
 
   <script>
   (function () {
@@ -198,10 +202,19 @@
 
     const SWATCHES = [
       { id: "rainbow", label: "🌈" },
-      { hex: "#f4d35e" }, // kum sarısı
-      { hex: "#ef4444" }, { hex: "#f59e0b" }, { hex: "#84cc16" },
-      { hex: "#06b6d4" }, { hex: "#3b82f6" }, { hex: "#a855f7" },
-      { hex: "#ec4899" }, { hex: "#ffffff" }, { hex: "#111827" },
+      // Kum & toprak tonları
+      { hex: "#f4d35e" }, { hex: "#d4a373" }, { hex: "#8b5a2b" }, { hex: "#5c4033" },
+      // Kırmızı-turuncu ailesi
+      { hex: "#7f1d1d" }, { hex: "#ef4444" }, { hex: "#fb923c" }, { hex: "#f59e0b" },
+      // Sarı-yeşil ailesi
+      { hex: "#fde047" }, { hex: "#a3e635" }, { hex: "#84cc16" }, { hex: "#166534" },
+      // Turkuaz-mavi ailesi
+      { hex: "#2dd4bf" }, { hex: "#06b6d4" }, { hex: "#3b82f6" }, { hex: "#1e3a8a" },
+      // Mor-pembe ailesi
+      { hex: "#a855f7" }, { hex: "#6b21a8" }, { hex: "#ec4899" }, { hex: "#fda4af" },
+      // Pasteller & nötrler
+      { hex: "#fef3c7" }, { hex: "#bae6fd" }, { hex: "#ffffff" },
+      { hex: "#9ca3af" }, { hex: "#4b5563" }, { hex: "#111827" },
     ];
 
     const state = {
@@ -247,8 +260,18 @@
       scanLeft = !scanLeft;
     }
 
-    // Fırça: bir disk içine kum ekle (boş hücrelere)
+    // Fırça: bir disk içine kum ekle (boş hücrelere).
+    // radius 0 = tek tane damla (en ince); küçük fırçalar tam dolar,
+    // büyükler seyrek dolar (delikli görünüm → doğal akış).
     function pourAt(cx, cy, radius, color) {
+      if (radius <= 0) {
+        if (cy >= 0 && cy < rows && cx >= 0 && cx < cols) {
+          const idx = cy * cols + cx;
+          if (buf[idx] === 0) buf[idx] = color;
+        }
+        return;
+      }
+      const dens = radius <= 1 ? 1 : radius <= 3 ? 0.8 : 0.6;
       const r2 = radius * radius;
       for (let dy = -radius; dy <= radius; dy++) {
         const y = cy + dy;
@@ -258,8 +281,7 @@
           if (x < 0 || x >= cols) continue;
           if (dx * dx + dy * dy > r2) continue;
           const idx = y * cols + x;
-          // seyrek doldur (delikli görünüm → doğal akış); merkez daha yoğun
-          if (buf[idx] === 0 && Math.random() < 0.6) buf[idx] = color;
+          if (buf[idx] === 0 && Math.random() < dens) buf[idx] = color;
         }
       }
     }
@@ -359,8 +381,29 @@
       swatchWrap.appendChild(el);
     });
 
-    document.getElementById("brush").addEventListener("input", (e) => { state.brush = +e.target.value; });
+    document.getElementById("brush").addEventListener("input", (e) => {
+      state.brush = +e.target.value;
+      document.getElementById("brushVal").textContent = state.brush === 0 ? "💧" : state.brush;
+    });
     document.getElementById("clearBtn").addEventListener("click", clearSand);
+
+    // Görüntüyü PNG olarak indir — ızgarayı 4x keskin (nearest) büyüterek
+    function saveImage() {
+      const scale = 4;
+      const out = document.createElement("canvas");
+      out.width = cols * scale;
+      out.height = rows * scale;
+      const octx = out.getContext("2d");
+      octx.imageSmoothingEnabled = false;
+      octx.drawImage(canvas, 0, 0, out.width, out.height);
+      const a = document.createElement("a");
+      a.download = "kum-boyama.png";
+      a.href = out.toDataURL("image/png");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+    document.getElementById("saveBtn").addEventListener("click", saveImage);
 
     // ========================================================================
     // Boot
