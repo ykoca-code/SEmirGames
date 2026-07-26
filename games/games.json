@@ -602,6 +602,24 @@
         "çocuk",
         "bulmaca"
       ]
+    },
+    {
+      "id": "kumboyama",
+      "title": "Kum Boyama",
+      "description": "Parmağınla renkli kum dök! Kum yer çekimiyle akar, yığılır ve tepe oluşturur. Gökkuşağı fırçasıyla rengârenk desenler yap. Rahatlatıcı kum sanatı.",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/kumboyama/thumbnail.svg",
+      "path": "games/kumboyama/index.html",
+      "tags": [
+        "kum",
+        "boyama",
+        "rahatlatıcı",
+        "sanat",
+        "gökkuşağı",
+        "fizik"
+      ]
     }
   ]
 }

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0f18" />
+  <title>Kum Boyama — SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #0d0f18;
+      color: #e5e7eb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none; -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+    .back-fab {
+      position: fixed; top: 10px; left: 10px; z-index: 30;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.5); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 20px; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(4px);
+    }
+    .stage { position: fixed; inset: 0; display: flex; flex-direction: column; }
+    .canvas-wrap {
+      flex: 1 1 auto; position: relative; min-height: 0;
+      display: flex; align-items: stretch; justify-content: stretch;
+    }
+    #sand {
+      width: 100%; height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      touch-action: none;
+    }
+
+    /* Bottom toolbar */
+    .toolbar {
+      flex-shrink: 0;
+      background: rgba(13,15,24,0.95);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .swatches {
+      display: flex; gap: 6px; overflow-x: auto;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      padding: 2px;
+    }
+    .swatches::-webkit-scrollbar { display: none; }
+    .swatch {
+      flex: 0 0 auto;
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      position: relative;
+      touch-action: manipulation;
+    }
+    .swatch.active { border-color: #fff; transform: scale(1.08); }
+    .swatch.rainbow {
+      background: conic-gradient(#ef4444,#f59e0b,#fde047,#84cc16,#06b6d4,#3b82f6,#a855f7,#ec4899,#ef4444);
+    }
+    .swatch.rainbow::after {
+      content: "🌈"; position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .row {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .ctrl-btn {
+      flex: 1;
+      background: #1f2233; color: #e5e7eb;
+      border: 1px solid #313753;
+      border-radius: 10px;
+      padding: 9px 8px;
+      font-size: 13px; font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .ctrl-btn:active { transform: translateY(1px); }
+    .ctrl-btn.primary { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+    .brush-label { font-size: 11px; color: #94a3b8; font-weight: 700; white-space: nowrap; }
+    input[type=range] { flex: 1; accent-color: #7c3aed; }
+    .hint {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 20;
+      background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px; padding: 5px 12px;
+      font-size: 12px; font-weight: 700;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    .hint.hidden { opacity: 0; }
+  </style>
+</head>
+<body>
+  <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+  <div class="hint" id="hint">👆 Parmağınla kum dök</div>
+
+  <div class="stage">
+    <div class="canvas-wrap">
+      <canvas id="sand"></canvas>
+    </div>
+    <div class="toolbar">
+      <div class="swatches" id="swatches"></div>
+      <div class="row">
+        <span class="brush-label">Fırça</span>
+        <input type="range" id="brush" min="1" max="10" value="4" />
+        <button class="ctrl-btn" id="clearBtn">🧹 Temizle</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/version.js?v=1.34.0"></script>
+  <script src="../../js/pwa-back.js?v=1.34.0"></script>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // ========================================================================
+    // Canvas — grid resolution, CSS-scaled with pixelated rendering
+    // ========================================================================
+    const canvas = document.getElementById("sand");
+    const ctx = canvas.getContext("2d", { willReadFrequently: false, alpha: false });
+
+    const GRAIN_PX = 4;          // her kum tanesinin yaklaşık ekran boyutu
+    const MAX_CELLS = 90000;     // güvenlik: ızgara bunu aşarsa taneyi büyüt
+    const BG = 0xff181420;       // koyu arkaplan (ABGR little-endian)
+
+    let cols = 0, rows = 0;
+    let buf = null;              // Uint32Array — 0 = boş, değilse ABGR renk
+    let img = null;              // ImageData
+    let img32 = null;            // Uint32 view
+    let dispW = 0, dispH = 0;
+
+    function setupGrid() {
+      const wrap = canvas.parentElement.getBoundingClientRect();
+      dispW = Math.max(1, Math.floor(wrap.width));
+      dispH = Math.max(1, Math.floor(wrap.height));
+      let gpx = GRAIN_PX;
+      let c = Math.max(40, Math.round(dispW / gpx));
+      let r = Math.max(40, Math.round(dispH / gpx));
+      while (c * r > MAX_CELLS) { gpx += 1; c = Math.round(dispW / gpx); r = Math.round(dispH / gpx); }
+      cols = c; rows = r;
+
+      // Var olan kumu koru (yeniden boyutlandırmada)
+      const old = buf, oc = canvas._cols || 0, orr = canvas._rows || 0;
+      buf = new Uint32Array(cols * rows);
+      if (old && oc && orr) {
+        const cc = Math.min(cols, oc), rr = Math.min(rows, orr);
+        for (let y = 0; y < rr; y++)
+          for (let x = 0; x < cc; x++)
+            buf[y * cols + x] = old[y * oc + x];
+      }
+      canvas._cols = cols; canvas._rows = rows;
+
+      canvas.width = cols; canvas.height = rows;
+      img = ctx.createImageData(cols, rows);
+      img32 = new Uint32Array(img.data.buffer);
+    }
+    window.addEventListener("resize", setupGrid, { passive: true });
+    window.addEventListener("orientationchange", () => setTimeout(setupGrid, 60), { passive: true });
+
+    // ========================================================================
+    // Renk
+    // ========================================================================
+    // hsl → ABGR (little-endian: 0xAABBGGRR)
+    function hslToABGR(h, s, l) {
+      h = ((h % 360) + 360) % 360; s /= 100; l /= 100;
+      const c = (1 - Math.abs(2 * l - 1)) * s;
+      const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+      const m = l - c / 2;
+      let r, g, b;
+      if (h < 60) { r = c; g = x; b = 0; }
+      else if (h < 120) { r = x; g = c; b = 0; }
+      else if (h < 180) { r = 0; g = c; b = x; }
+      else if (h < 240) { r = 0; g = x; b = c; }
+      else if (h < 300) { r = x; g = 0; b = c; }
+      else { r = c; g = 0; b = x; }
+      const R = Math.round((r + m) * 255), G = Math.round((g + m) * 255), B = Math.round((b + m) * 255);
+      return (255 << 24) | (B << 16) | (G << 8) | R;
+    }
+    function hexToABGR(hex) {
+      const n = parseInt(hex.slice(1), 16);
+      const R = (n >> 16) & 255, G = (n >> 8) & 255, B = n & 255;
+      return (255 << 24) | (B << 16) | (G << 8) | R;
+    }
+
+    const SWATCHES = [
+      { id: "rainbow", label: "🌈" },
+      { hex: "#f4d35e" }, // kum sarısı
+      { hex: "#ef4444" }, { hex: "#f59e0b" }, { hex: "#84cc16" },
+      { hex: "#06b6d4" }, { hex: "#3b82f6" }, { hex: "#a855f7" },
+      { hex: "#ec4899" }, { hex: "#ffffff" }, { hex: "#111827" },
+    ];
+
+    const state = {
+      mode: "rainbow",       // "rainbow" | "solid"
+      solidColor: hexToABGR("#f4d35e"),
+      hue: 0,                // gökkuşağı için ilerleyen ton
+      brush: 4,
+      pouring: false,
+      px: -1, py: -1,        // ızgara koordinatında fırça merkezi
+      lastPx: -1, lastPy: -1,
+    };
+
+    function currentColor() {
+      if (state.mode === "rainbow") return hslToABGR(state.hue, 85, 58);
+      return state.solidColor;
+    }
+
+    // ========================================================================
+    // Kum fiziği — düşen kum hücresel otomatı
+    // ========================================================================
+    let scanLeft = true;
+    function stepSand() {
+      // Alttan üste tara ki taneler bir karede birden fazla düşmesin
+      for (let y = rows - 2; y >= 0; y--) {
+        const rowBase = y * cols;
+        for (let ii = 0; ii < cols; ii++) {
+          const x = scanLeft ? ii : (cols - 1 - ii);
+          const idx = rowBase + x;
+          const c = buf[idx];
+          if (c === 0) continue;
+          const below = idx + cols;
+          if (buf[below] === 0) { buf[below] = c; buf[idx] = 0; continue; }
+          // Çapraz kayma
+          const canL = x > 0 && buf[below - 1] === 0;
+          const canR = x < cols - 1 && buf[below + 1] === 0;
+          if (canL && canR) {
+            if ((Math.random() * 2) | 0) buf[below - 1] = c; else buf[below + 1] = c;
+            buf[idx] = 0;
+          } else if (canL) { buf[below - 1] = c; buf[idx] = 0; }
+          else if (canR) { buf[below + 1] = c; buf[idx] = 0; }
+        }
+      }
+      scanLeft = !scanLeft;
+    }
+
+    // Fırça: bir disk içine kum ekle (boş hücrelere)
+    function pourAt(cx, cy, radius, color) {
+      const r2 = radius * radius;
+      for (let dy = -radius; dy <= radius; dy++) {
+        const y = cy + dy;
+        if (y < 0 || y >= rows) continue;
+        for (let dx = -radius; dx <= radius; dx++) {
+          const x = cx + dx;
+          if (x < 0 || x >= cols) continue;
+          if (dx * dx + dy * dy > r2) continue;
+          const idx = y * cols + x;
+          // seyrek doldur (delikli görünüm → doğal akış); merkez daha yoğun
+          if (buf[idx] === 0 && Math.random() < 0.6) buf[idx] = color;
+        }
+      }
+    }
+
+    // İki nokta arası çizgi boyunca dök (hızlı sürüklemede boşluk kalmasın)
+    function pourLine(x0, y0, x1, y1, radius, colorFn) {
+      const dist = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
+      const steps = Math.max(1, dist);
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const x = Math.round(x0 + (x1 - x0) * t);
+        const y = Math.round(y0 + (y1 - y0) * t);
+        pourAt(x, y, radius, colorFn());
+        if (state.mode === "rainbow") state.hue += 1.4;  // ton ilerlesin
+      }
+    }
+
+    function clearSand() { buf.fill(0); }
+    function countGrains() { let n = 0; for (let i = 0; i < buf.length; i++) if (buf[i] !== 0) n++; return n; }
+
+    // ========================================================================
+    // Render
+    // ========================================================================
+    function render() {
+      const b = buf, o = img32, bg = BG;
+      for (let i = 0; i < b.length; i++) {
+        const c = b[i];
+        o[i] = c === 0 ? bg : c;
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+
+    // ========================================================================
+    // Döngü
+    // ========================================================================
+    function loop() {
+      // Basılı tutarken sürekli dök
+      if (state.pouring && state.px >= 0) {
+        if (state.lastPx >= 0) pourLine(state.lastPx, state.lastPy, state.px, state.py, state.brush, currentColor);
+        else pourAt(state.px, state.py, state.brush, currentColor());
+        state.lastPx = state.px; state.lastPy = state.py;
+      }
+      stepSand();
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    // ========================================================================
+    // Girdi
+    // ========================================================================
+    function toGrid(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((clientX - rect.left) / rect.width * cols);
+      const y = Math.floor((clientY - rect.top) / rect.height * rows);
+      return [x, y];
+    }
+    function down(clientX, clientY) {
+      const [x, y] = toGrid(clientX, clientY);
+      state.pouring = true; state.px = x; state.py = y;
+      state.lastPx = -1; state.lastPy = -1;
+      hideHint();
+    }
+    function move(clientX, clientY) {
+      if (!state.pouring) return;
+      const [x, y] = toGrid(clientX, clientY);
+      state.px = x; state.py = y;
+    }
+    function up() { state.pouring = false; state.lastPx = -1; state.lastPy = -1; }
+
+    canvas.addEventListener("touchstart", (e) => { e.preventDefault(); const t = e.touches[0]; down(t.clientX, t.clientY); }, { passive: false });
+    canvas.addEventListener("touchmove", (e) => { e.preventDefault(); const t = e.touches[0]; move(t.clientX, t.clientY); }, { passive: false });
+    canvas.addEventListener("touchend", (e) => { e.preventDefault(); up(); }, { passive: false });
+    canvas.addEventListener("touchcancel", up, { passive: true });
+    canvas.addEventListener("mousedown", (e) => down(e.clientX, e.clientY));
+    canvas.addEventListener("mousemove", (e) => move(e.clientX, e.clientY));
+    window.addEventListener("mouseup", up);
+
+    let hintTimer = null;
+    function hideHint() {
+      const h = document.getElementById("hint");
+      h.classList.add("hidden");
+    }
+
+    // Swatch UI
+    const swatchWrap = document.getElementById("swatches");
+    SWATCHES.forEach((sw, i) => {
+      const el = document.createElement("div");
+      el.className = "swatch" + (sw.id === "rainbow" ? " rainbow" : "");
+      if (!sw.id) el.style.background = sw.hex;
+      if ((state.mode === "rainbow" && sw.id === "rainbow")) el.classList.add("active");
+      el.addEventListener("click", () => {
+        document.querySelectorAll(".swatch").forEach(s => s.classList.remove("active"));
+        el.classList.add("active");
+        if (sw.id === "rainbow") state.mode = "rainbow";
+        else { state.mode = "solid"; state.solidColor = hexToABGR(sw.hex); }
+      });
+      swatchWrap.appendChild(el);
+    });
+
+    document.getElementById("brush").addEventListener("input", (e) => { state.brush = +e.target.value; });
+    document.getElementById("clearBtn").addEventListener("click", clearSand);
+
+    // ========================================================================
+    // Boot
+    // ========================================================================
+    setupGrid();
+    requestAnimationFrame(loop);
+
+    // Test harness API
+    window._sand = {
+      state,
+      get cols() { return cols; }, get rows() { return rows; }, get buf() { return buf; },
+      stepSand, pourAt, pourLine, clearSand, countGrains, currentColor,
+      hslToABGR, hexToABGR, setupGrid,
+    };
+  })();
+  </script>
+</body>
+</html>

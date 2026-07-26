@@ -1,0 +1,14 @@
+{
+  "id": "kumboyama",
+  "title": "Kum Boyama",
+  "description": "Parmağınla renkli kum dök! Kum yer çekimiyle akar, yığılır ve tepe oluşturur. Gökkuşağı fırçasıyla rengârenk desenler yap. Rahatlatıcı, sonsuz kum sanatı.",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["kum", "boyama", "rahatlatıcı", "sanat", "gökkuşağı", "fizik"],
+  "author": "SEmirK Games",
+  "controls": ["Parmağını sürükle: kum dök", "Renk seç veya gökkuşağı modu", "Temizle: sıfırla"]
+}
