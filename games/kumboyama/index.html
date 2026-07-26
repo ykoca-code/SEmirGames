@@ -71,6 +71,14 @@
       content: "🌈"; position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center; font-size: 16px;
     }
+    .swatch.eraser {
+      background:
+        repeating-conic-gradient(#2a2f45 0% 25%, #3d4463 0% 50%) 0 0 / 12px 12px;
+    }
+    .swatch.eraser::after {
+      content: "🧽"; position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
     .row {
       display: flex; gap: 8px; align-items: center;
     }
@@ -124,8 +132,8 @@
     </div>
   </div>
 
-  <script src="../../js/version.js?v=1.35.0"></script>
-  <script src="../../js/pwa-back.js?v=1.35.0"></script>
+  <script src="../../js/version.js?v=1.35.1"></script>
+  <script src="../../js/pwa-back.js?v=1.35.1"></script>
 
   <script>
   (function () {
@@ -202,6 +210,7 @@
 
     const SWATCHES = [
       { id: "rainbow", label: "🌈" },
+      { id: "eraser", label: "🧽" },
       // Kum & toprak tonları
       { hex: "#f4d35e" }, { hex: "#d4a373" }, { hex: "#8b5a2b" }, { hex: "#5c4033" },
       // Kırmızı-turuncu ailesi
@@ -299,6 +308,32 @@
       }
     }
 
+    // Silgi: disk içindeki TÜM taneleri sil (deterministik; delik yok)
+    function eraseAt(cx, cy, radius) {
+      if (radius <= 0) {
+        if (cy >= 0 && cy < rows && cx >= 0 && cx < cols) buf[cy * cols + cx] = 0;
+        return;
+      }
+      const r2 = radius * radius;
+      for (let dy = -radius; dy <= radius; dy++) {
+        const y = cy + dy;
+        if (y < 0 || y >= rows) continue;
+        for (let dx = -radius; dx <= radius; dx++) {
+          const x = cx + dx;
+          if (x < 0 || x >= cols) continue;
+          if (dx * dx + dy * dy > r2) continue;
+          buf[y * cols + x] = 0;
+        }
+      }
+    }
+    function eraseLine(x0, y0, x1, y1, radius) {
+      const steps = Math.max(1, Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)));
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        eraseAt(Math.round(x0 + (x1 - x0) * t), Math.round(y0 + (y1 - y0) * t), radius);
+      }
+    }
+
     function clearSand() { buf.fill(0); }
     function countGrains() { let n = 0; for (let i = 0; i < buf.length; i++) if (buf[i] !== 0) n++; return n; }
 
@@ -320,8 +355,14 @@
     function loop() {
       // Basılı tutarken sürekli dök
       if (state.pouring && state.px >= 0) {
-        if (state.lastPx >= 0) pourLine(state.lastPx, state.lastPy, state.px, state.py, state.brush, currentColor);
-        else pourAt(state.px, state.py, state.brush, currentColor());
+        if (state.mode === "eraser") {
+          if (state.lastPx >= 0) eraseLine(state.lastPx, state.lastPy, state.px, state.py, state.brush);
+          else eraseAt(state.px, state.py, state.brush);
+        } else if (state.lastPx >= 0) {
+          pourLine(state.lastPx, state.lastPy, state.px, state.py, state.brush, currentColor);
+        } else {
+          pourAt(state.px, state.py, state.brush, currentColor());
+        }
         state.lastPx = state.px; state.lastPy = state.py;
       }
       stepSand();
@@ -369,13 +410,14 @@
     const swatchWrap = document.getElementById("swatches");
     SWATCHES.forEach((sw, i) => {
       const el = document.createElement("div");
-      el.className = "swatch" + (sw.id === "rainbow" ? " rainbow" : "");
+      el.className = "swatch" + (sw.id === "rainbow" ? " rainbow" : "") + (sw.id === "eraser" ? " eraser" : "");
       if (!sw.id) el.style.background = sw.hex;
       if ((state.mode === "rainbow" && sw.id === "rainbow")) el.classList.add("active");
       el.addEventListener("click", () => {
         document.querySelectorAll(".swatch").forEach(s => s.classList.remove("active"));
         el.classList.add("active");
         if (sw.id === "rainbow") state.mode = "rainbow";
+        else if (sw.id === "eraser") state.mode = "eraser";
         else { state.mode = "solid"; state.solidColor = hexToABGR(sw.hex); }
       });
       swatchWrap.appendChild(el);
@@ -415,7 +457,7 @@
     window._sand = {
       state,
       get cols() { return cols; }, get rows() { return rows; }, get buf() { return buf; },
-      stepSand, pourAt, pourLine, clearSand, countGrains, currentColor,
+      stepSand, pourAt, pourLine, eraseAt, eraseLine, clearSand, countGrains, currentColor,
       hslToABGR, hexToABGR, setupGrid,
     };
   })();
