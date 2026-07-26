@@ -219,16 +219,33 @@
   </div>
 </div>
 
-<script src="../../js/version.js?v=1.32.0"></script>
-<script src="../../js/pwa-back.js?v=1.32.0"></script>
+<script src="../../js/version.js?v=1.33.0"></script>
+<script src="../../js/pwa-back.js?v=1.33.0"></script>
 
 <script>
 'use strict';
 // ---------- Ayarlar ----------
 const LEVELS = [
-  { size: 13, doors: 1, stars: 5, powerups: 1, monsterEvery: 3, qTime: 10, diff: 1 },
-  { size: 15, doors: 2, stars: 7, powerups: 2, monsterEvery: 3, qTime: 12, diff: 2 },
-  { size: 17, doors: 3, stars: 9, powerups: 2, monsterEvery: 2, qTime: 15, diff: 3 }
+  { size: 13, doors: 1, stars: 5,  powerups: 1, monsterEvery: 3, qTime: 10, diff: 1 },
+  { size: 13, doors: 1, stars: 6,  powerups: 1, monsterEvery: 3, qTime: 10, diff: 1 },
+  { size: 15, doors: 2, stars: 7,  powerups: 2, monsterEvery: 3, qTime: 12, diff: 1 },
+  { size: 15, doors: 2, stars: 7,  powerups: 2, monsterEvery: 3, qTime: 12, diff: 2 },
+  { size: 15, doors: 2, stars: 8,  powerups: 2, monsterEvery: 3, qTime: 12, diff: 2 },
+  { size: 17, doors: 2, stars: 8,  powerups: 2, monsterEvery: 3, qTime: 13, diff: 2 },
+  { size: 17, doors: 3, stars: 9,  powerups: 2, monsterEvery: 2, qTime: 13, diff: 2 },
+  { size: 17, doors: 3, stars: 9,  powerups: 2, monsterEvery: 2, qTime: 14, diff: 3 },
+  { size: 19, doors: 3, stars: 10, powerups: 2, monsterEvery: 2, qTime: 14, diff: 3 },
+  { size: 19, doors: 3, stars: 10, powerups: 2, monsterEvery: 2, qTime: 14, diff: 3 },
+  { size: 19, doors: 4, stars: 11, powerups: 2, monsterEvery: 2, qTime: 15, diff: 3 },
+  { size: 21, doors: 4, stars: 11, powerups: 3, monsterEvery: 2, qTime: 15, diff: 3 },
+  { size: 21, doors: 4, stars: 12, powerups: 3, monsterEvery: 2, qTime: 15, diff: 4 },
+  { size: 21, doors: 4, stars: 12, powerups: 3, monsterEvery: 2, qTime: 16, diff: 4 },
+  { size: 23, doors: 5, stars: 13, powerups: 3, monsterEvery: 2, qTime: 16, diff: 4 },
+  { size: 23, doors: 5, stars: 13, powerups: 3, monsterEvery: 2, qTime: 16, diff: 4 },
+  { size: 23, doors: 5, stars: 14, powerups: 3, monsterEvery: 2, qTime: 17, diff: 5 },
+  { size: 25, doors: 5, stars: 14, powerups: 3, monsterEvery: 2, qTime: 17, diff: 5 },
+  { size: 25, doors: 6, stars: 15, powerups: 3, monsterEvery: 2, qTime: 18, diff: 5 },
+  { size: 25, doors: 6, stars: 16, powerups: 3, monsterEvery: 2, qTime: 18, diff: 5 }
 ];
 const CHASE_RADIUS = 9; // canavar bu mesafeden uzaktaysa peşine düşmez, gezinir
 const W=1, P=0, STAR=3, DOOR=2, POWER=4; // hücre tipleri
@@ -521,11 +538,22 @@ function makeQuestion(diff){
   else if(diff===2){ // biraz daha büyük toplama, kolay çıkarma
     if(Math.random()<0.6){ op='+'; a=rnd(3,12); b=rnd(3,12); ans=a+b; }
     else { op='-'; a=rnd(5,15); b=rnd(1,a-1); ans=a-b; }
-  } else { // orta toplama/çıkarma, ara sıra küçük çarpım
+  } else if(diff===3){ // orta toplama/çıkarma, ara sıra küçük çarpım
     const roll=Math.random();
     if(roll<0.25){ op='×'; a=rnd(2,5); b=rnd(2,5); ans=a*b; }
     else if(roll<0.6){ op='-'; a=rnd(10,25); b=rnd(2,a-1); ans=a-b; }
     else { op='+'; a=rnd(8,20); b=rnd(8,20); ans=a+b; }
+  } else if(diff===4){ // daha büyük çarpım + iki basamaklı toplama/çıkarma
+    const roll=Math.random();
+    if(roll<0.4){ op='×'; a=rnd(2,9); b=rnd(2,9); ans=a*b; }
+    else if(roll<0.7){ op='-'; a=rnd(20,50); b=rnd(5,a-1); ans=a-b; }
+    else { op='+'; a=rnd(15,40); b=rnd(15,40); ans=a+b; }
+  } else { // diff 5: çarpım, tam bölme ve iki basamaklı işlemler
+    const roll=Math.random();
+    if(roll<0.35){ op='×'; a=rnd(3,12); b=rnd(3,9); ans=a*b; }
+    else if(roll<0.6){ op='÷'; b=rnd(2,9); ans=rnd(2,9); a=b*ans; } // tam bölünen
+    else if(roll<0.8){ op='-'; a=rnd(40,90); b=rnd(10,a-1); ans=a-b; }
+    else { op='+'; a=rnd(25,60); b=rnd(25,60); ans=a+b; }
   }
   const opts=new Set([ans]);
   while(opts.size<3){
