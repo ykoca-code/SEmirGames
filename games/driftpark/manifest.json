@@ -1,0 +1,14 @@
+{
+  "id": "driftpark",
+  "title": "Drift Park",
+  "description": "Fizik tabanlı top-down drift & park etme! El freniyle kay, lastik izi bırak, dar alanlara park et. 3 bölüm: sürücü kursu, paralel park, AVM otoparkı. Yıldız topla!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "araba", "drift", "park", "fizik", "sürüş"],
+  "author": "SEmirK Games",
+  "controls": ["Sol: ◀ ▶ direksiyon", "Sağ: gaz / fren-geri / el freni", "Klavye: ok tuşları + Space"]
+}

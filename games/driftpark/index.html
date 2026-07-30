@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1b1e26" />
+  <title>Drift Park — SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #1b1e26;
+      color: #e5e7eb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none; -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+    #game { display: block; position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; }
+
+    .back-fab {
+      position: fixed; top: 10px; left: 10px; z-index: 40;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.5); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 20px; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(4px);
+    }
+
+    /* ---------- HUD ---------- */
+    .hud {
+      position: fixed; top: 8px; left: 54px; right: 8px;
+      z-index: 20;
+      display: flex; gap: 5px; flex-wrap: wrap;
+      pointer-events: none;
+    }
+    .pill {
+      background: rgba(15,17,24,0.78);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px; font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      backdrop-filter: blur(3px);
+    }
+    .pill .lbl { font-size: 9px; color: #94a3b8; letter-spacing: 0.06em; margin-right: 3px; }
+    .pill.time  { color: #34d399; }
+    .pill.drift { color: #fb923c; }
+    .pill.crash { color: #f87171; }
+
+    /* ---------- Dokunmatik kontroller ---------- */
+    .tbtn {
+      position: fixed; z-index: 30;
+      border: 2px solid rgba(255,255,255,0.25);
+      background: rgba(30,34,46,0.55);
+      color: #fff;
+      border-radius: 18px;
+      font-size: 24px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      touch-action: none;
+      backdrop-filter: blur(3px);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tbtn.pressed { background: rgba(124,58,237,0.65); border-color: #a78bfa; }
+    #btnLeft  { left: 14px;  bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 74px; height: 74px; }
+    #btnRight { left: 100px; bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 74px; height: 74px; }
+    #btnGas   { right: 14px; bottom: calc(96px + env(safe-area-inset-bottom,0px)); width: 78px; height: 66px; font-size: 15px; background: rgba(22,101,52,0.55); }
+    #btnBrake { right: 14px; bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 78px; height: 66px; font-size: 15px; background: rgba(127,29,29,0.55); }
+    #btnHand  { right: 100px; bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 66px; height: 66px; font-size: 13px; background: rgba(146,64,14,0.55); }
+    #btnGas.pressed   { background: rgba(34,197,94,0.7); }
+    #btnBrake.pressed { background: rgba(239,68,68,0.7); }
+    #btnHand.pressed  { background: rgba(251,146,60,0.75); }
+
+    /* ---------- Modal ---------- */
+    .overlay {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(10,12,18,0.9);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(5px);
+    }
+    .overlay.hidden { display: none; }
+    .panel {
+      background: linear-gradient(180deg, #232838, #171b28);
+      border: 1px solid #333a52;
+      border-radius: 16px;
+      padding: 20px;
+      width: min(400px, 100%);
+      max-height: 92vh; overflow-y: auto;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+    .panel h2 { font-size: 22px; margin-bottom: 8px; color: #fb923c; }
+    .panel p  { font-size: 13px; color: #cbd5e1; margin-bottom: 10px; line-height: 1.55; }
+    .stars { font-size: 34px; letter-spacing: 4px; margin: 8px 0; }
+    .statline { font-size: 14px; font-weight: 800; margin: 4px 0; }
+    .statline.drift { color: #fb923c; }
+    .statline.crash { color: #f87171; }
+    .row { display: flex; gap: 8px; margin-top: 14px; }
+    .btn {
+      flex: 1;
+      background: #7c3aed; color: #fff; border: 0;
+      padding: 12px; font-size: 14px; font-weight: 900;
+      border-radius: 12px; cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn.secondary { background: #262b3d; border: 1px solid #3a4160; color: #cbd5e1; }
+    .btn:active { transform: translateY(1px); }
+    .lvlrow { display: flex; gap: 8px; margin: 10px 0; }
+    .lvlbtn {
+      flex: 1;
+      background: #262b3d; border: 1.5px solid #3a4160; color: #e5e7eb;
+      border-radius: 12px; padding: 10px 4px;
+      font-weight: 900; font-size: 14px; cursor: pointer;
+      touch-action: manipulation;
+    }
+    .lvlbtn .st { display: block; font-size: 11px; margin-top: 3px; color: #fde047; }
+  </style>
+</head>
+<body>
+  <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+  <canvas id="game"></canvas>
+
+  <div class="hud">
+    <span class="pill"><span class="lbl">BÖLÜM</span><span id="hudLevel">1</span></span>
+    <span class="pill time"><span class="lbl">SÜRE</span><span id="hudTime">60</span></span>
+    <span class="pill drift"><span class="lbl">DRIFT</span><span id="hudDrift">0</span></span>
+    <span class="pill crash"><span class="lbl">ÇARPMA</span><span id="hudCrash">0</span></span>
+  </div>
+
+  <div class="tbtn" id="btnLeft">◀</div>
+  <div class="tbtn" id="btnRight">▶</div>
+  <div class="tbtn" id="btnGas">GAZ</div>
+  <div class="tbtn" id="btnBrake">FREN</div>
+  <div class="tbtn" id="btnHand">EL<br>FRENİ</div>
+
+  <div class="overlay" id="overlay">
+    <div class="panel" id="panel">
+      <h2>🚗 Drift Park</h2>
+      <p>El freniyle drift yap, lastik izi bırak ve <b>yeşil park alanına</b> hizalanıp 2 saniye dur!<br>
+      Sol butonlar direksiyon, sağda GAZ / FREN-GERİ / EL FRENİ.<br>
+      Az çarp, hızlı bitir → ⭐⭐⭐</p>
+      <div class="lvlrow" id="lvlRow"></div>
+      <div class="row"><button class="btn" id="startBtn">▶ Başla</button></div>
+    </div>
+  </div>
+
+  <script src="../../js/version.js?v=1.36.0"></script>
+  <script src="../../js/pwa-back.js?v=1.36.0"></script>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // ========================================================================
+    // CONFIG
+    // ========================================================================
+    const CFG = {
+      car: {
+        len: 46, wid: 24,             // gövde (uzunluk yön ekseninde)
+        accel: 300, brake: 420, revAccel: 200,
+        maxSpeed: 360, maxRev: 140,
+        turnRate: 2.6,                // rad/s tam hızda
+        gripNormal: 9,                // yanal sönümleme (üstel katsayı)
+        gripHand: 1.3,                // el freni: yanal tutunma çok düşük → drift
+        gripFast: 3.2,                // yüksek hız + sert dönüş
+        drag: 0.5,                    // ileri sürtünme (üstel)
+        driftThreshold: 55,           // |vL| bunu aşınca drift sayılır
+      },
+      park: { angleTol: 10 * Math.PI / 180, stillSpeed: 12, holdSec: 2 },
+      collision: { restitution: 0.35, damp: 0.65, penalty: 50, cooldownMs: 600 },
+      skid: { life: 4.0, max: 400 },
+      smoke: { max: 120 },
+      camera: { lerp: 0.1 },
+    };
+
+    // ========================================================================
+    // Canvas + DPR
+    // ========================================================================
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    let W = 0, H = 0, DPR = 1;
+    function resize() {
+      DPR = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.floor(W * DPR);
+      canvas.height = Math.floor(H * DPR);
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("orientationchange", resize, { passive: true });
+    resize();
+
+    // ========================================================================
+    // AUDIO — Web Audio, dosyasız sentez
+    // ========================================================================
+    const SFX = (function () {
+      let actx = null, engineOsc = null, engineGain = null, skidSrc = null, skidGain = null;
+      function ac() {
+        if (!actx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return null;
+          actx = new AC();
+        }
+        if (actx.state === "suspended") actx.resume();
+        return actx;
+      }
+      function ensureEngine() {
+        const a = ac(); if (!a || engineOsc) return;
+        engineOsc = a.createOscillator();
+        engineOsc.type = "sawtooth";
+        engineGain = a.createGain();
+        engineGain.gain.value = 0;
+        engineOsc.connect(engineGain); engineGain.connect(a.destination);
+        engineOsc.start();
+        // Beyaz gürültü döngüsü (drift cırlaması)
+        const len = a.sampleRate * 0.5;
+        const nb = a.createBuffer(1, len, a.sampleRate);
+        const d = nb.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+        skidSrc = a.createBufferSource();
+        skidSrc.buffer = nb; skidSrc.loop = true;
+        const flt = a.createBiquadFilter();
+        flt.type = "highpass"; flt.frequency.value = 2500;
+        skidGain = a.createGain(); skidGain.gain.value = 0;
+        skidSrc.connect(flt); flt.connect(skidGain); skidGain.connect(a.destination);
+        skidSrc.start();
+      }
+      function tone(freq, dur, opts) {
+        const a = ac(); if (!a) return;
+        opts = opts || {};
+        const o = a.createOscillator(), g = a.createGain();
+        const t0 = a.currentTime + (opts.delay || 0);
+        o.type = opts.type || "square";
+        o.frequency.setValueAtTime(freq, t0);
+        if (opts.slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + opts.slide), t0 + dur);
+        g.gain.setValueAtTime(opts.vol || 0.08, t0);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        o.connect(g); g.connect(a.destination);
+        o.start(t0); o.stop(t0 + dur + 0.02);
+      }
+      return {
+        unlock() { ac(); ensureEngine(); },
+        engine(speed, throttle) {
+          if (!engineOsc) return;
+          const a = actx;
+          engineOsc.frequency.setTargetAtTime(55 + Math.abs(speed) * 0.45, a.currentTime, 0.05);
+          engineGain.gain.setTargetAtTime(throttle ? 0.045 : (Math.abs(speed) > 15 ? 0.02 : 0.006), a.currentTime, 0.08);
+        },
+        skid(on) {
+          if (!skidGain) return;
+          skidGain.gain.setTargetAtTime(on ? 0.05 : 0, actx.currentTime, 0.05);
+        },
+        thud() { tone(140, 0.2, { type: "triangle", slide: -80, vol: 0.16 }); },
+        victory() {
+          tone(523, 0.12); tone(659, 0.12, { delay: 0.11 });
+          tone(784, 0.12, { delay: 0.22 }); tone(1047, 0.3, { delay: 0.33 });
+        },
+        fail() { tone(300, 0.35, { type: "sawtooth", slide: -180, vol: 0.1 }); },
+        stopAll() { this.engine(0, false); this.skid(false); },
+      };
+    })();
+
+    // ========================================================================
+    // COLLISION — OBB (SAT) + daire yardımcıları
+    // ========================================================================
+    function obbCorners(cx, cy, halfL, halfW, angle) {
+      const c = Math.cos(angle), s = Math.sin(angle);
+      const fx = c * halfL, fy = s * halfL;   // ileri eksen
+      const lx = -s * halfW, ly = c * halfW;  // yanal eksen
+      return [
+        { x: cx + fx + lx, y: cy + fy + ly },
+        { x: cx + fx - lx, y: cy + fy - ly },
+        { x: cx - fx - lx, y: cy - fy - ly },
+        { x: cx - fx + lx, y: cy - fy + ly },
+      ];
+    }
+    function projectPoly(corners, ax, ay) {
+      let mn = Infinity, mx = -Infinity;
+      for (const p of corners) {
+        const d = p.x * ax + p.y * ay;
+        if (d < mn) mn = d;
+        if (d > mx) mx = d;
+      }
+      return [mn, mx];
+    }
+    // SAT: iki OBB. Çakışıyorsa {nx, ny, depth} (A'yı ayırma yönü), yoksa null
+    function satOBB(A, B) {
+      const ca = obbCorners(A.x, A.y, A.halfL, A.halfW, A.angle);
+      const cb = obbCorners(B.x, B.y, B.halfL, B.halfW, B.angle);
+      const axes = [];
+      for (const [p, q] of [[ca[0], ca[1]], [ca[1], ca[2]], [cb[0], cb[1]], [cb[1], cb[2]]]) {
+        const ex = q.x - p.x, ey = q.y - p.y;
+        const L = Math.hypot(ex, ey) || 1;
+        axes.push([-ey / L, ex / L]);
+      }
+      let minDepth = Infinity, best = null;
+      for (const [ax, ay] of axes) {
+        const [a0, a1] = projectPoly(ca, ax, ay);
+        const [b0, b1] = projectPoly(cb, ax, ay);
+        const overlap = Math.min(a1, b1) - Math.max(a0, b0);
+        if (overlap <= 0) return null;
+        if (overlap < minDepth) { minDepth = overlap; best = [ax, ay]; }
+      }
+      // Yön: A merkezinden B'ye göre işaretle
+      const dx = A.x - B.x, dy = A.y - B.y;
+      let [nx, ny] = best;
+      if (nx * dx + ny * dy < 0) { nx = -nx; ny = -ny; }
+      return { nx, ny, depth: minDepth };
+    }
+    // Daire vs OBB: en yakın nokta yöntemi
+    function circleVsOBB(cx, cy, r, B) {
+      const c = Math.cos(-B.angle), s = Math.sin(-B.angle);
+      const relX = cx - B.x, relY = cy - B.y;
+      const localX = relX * c - relY * s;
+      const localY = relX * s + relY * c;
+      const qx = Math.max(-B.halfL, Math.min(B.halfL, localX));
+      const qy = Math.max(-B.halfW, Math.min(B.halfW, localY));
+      const dx = localX - qx, dy = localY - qy;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > r * r) return null;
+      const d = Math.sqrt(d2) || 0.001;
+      // dünya uzayına normal
+      const wc = Math.cos(B.angle), ws = Math.sin(B.angle);
+      const nxl = dx / d, nyl = dy / d;
+      return { nx: nxl * wc - nyl * ws, ny: nxl * ws + nyl * wc, depth: r - d };
+    }
+    function pointInOBB(px, py, B) {
+      const c = Math.cos(-B.angle), s = Math.sin(-B.angle);
+      const relX = px - B.x, relY = py - B.y;
+      const lx = relX * c - relY * s;
+      const ly = relX * s + relY * c;
+      return Math.abs(lx) <= B.halfL && Math.abs(ly) <= B.halfW;
+    }
+
+    // ========================================================================
+    // LEVELS — 3 bölüm
+    // ========================================================================
+    function wall(x, y, w, h, angle) { return { x, y, halfL: w / 2, halfW: h / 2, angle: angle || 0, type: "wall" }; }
+    function parked(x, y, angle, color) { return { x, y, halfL: 24, halfW: 13, angle: angle || 0, type: "car", color: color || "#3b82f6" }; }
+
+    const LEVELS = [
+      { // Bölüm 1 — Sürücü Kursu
+        name: "Sürücü Kursu",
+        worldW: 900, worldH: 640, timeLimit: 60,
+        start: { x: 120, y: 320, angle: 0 },
+        spot: { x: 780, y: 320, w: 100, h: 56, angle: 0 },
+        walls: [
+          wall(450, 8, 900, 16), wall(450, 632, 900, 16),
+          wall(8, 320, 16, 640), wall(892, 320, 16, 640),
+        ],
+        cones: [
+          { x: 300, y: 180 }, { x: 300, y: 320 }, { x: 300, y: 460 },
+          { x: 500, y: 120 }, { x: 500, y: 250 }, { x: 500, y: 390 }, { x: 500, y: 520 },
+        ],
+        cars: [], peds: [],
+      },
+      { // Bölüm 2 — Paralel Park & Dar Alan
+        name: "Paralel Park",
+        worldW: 960, worldH: 640, timeLimit: 75,
+        start: { x: 100, y: 540, angle: 0 },
+        spot: { x: 620, y: 78, w: 96, h: 46, angle: 0 },   // iki araç arası paralel cep
+        walls: [
+          wall(480, 8, 960, 16), wall(480, 632, 960, 16),
+          wall(8, 320, 16, 640), wall(952, 320, 16, 640),
+          // Kaldırım (park cebinin arkası)
+          wall(480, 40, 960, 20),
+          // Dar S koridoru duvarları
+          wall(300, 430, 380, 18), wall(660, 260, 420, 18),
+        ],
+        cones: [{ x: 180, y: 320 }, { x: 480, y: 540 }, { x: 800, y: 420 }],
+        cars: [
+          parked(500, 78, 0, "#0ea5e9"), parked(740, 78, 0, "#84cc16"),
+          parked(140, 78, 0, "#a855f7"), parked(880, 78, 0, "#ec4899"),
+        ],
+        peds: [],
+      },
+      { // Bölüm 3 — AVM Otoparkı
+        name: "AVM Otoparkı",
+        worldW: 1000, worldH: 720, timeLimit: 90,
+        start: { x: 110, y: 620, angle: -Math.PI / 2 },
+        spot: { x: 500, y: 96, w: 56, h: 96, angle: Math.PI / 2 },  // dikey cep — geri geri girmek en rahatı
+        walls: [
+          wall(500, 8, 1000, 16), wall(500, 712, 1000, 16),
+          wall(8, 360, 16, 720), wall(992, 360, 16, 720),
+          // Sütunlar
+          wall(320, 260, 34, 34), wall(680, 260, 34, 34),
+          wall(320, 500, 34, 34), wall(680, 500, 34, 34),
+        ],
+        cones: [{ x: 500, y: 380 }],
+        cars: [
+          parked(420, 96, Math.PI / 2, "#0ea5e9"), parked(580, 96, Math.PI / 2, "#f59e0b"),
+          parked(180, 96, Math.PI / 2, "#84cc16"), parked(260, 96, Math.PI / 2, "#64748b"),
+          parked(740, 96, Math.PI / 2, "#a855f7"), parked(820, 96, Math.PI / 2, "#ef4444"),
+          parked(200, 620, 0, "#0ea5e9"), parked(340, 620, 0, "#ec4899"),
+        ],
+        peds: [
+          { x1: 250, y1: 380, x2: 750, y2: 380, speed: 40 },
+          { x1: 850, y1: 180, x2: 850, y2: 560, speed: 32 },
+        ],
+      },
+    ];
+
+    // ========================================================================
+    // GAME STATE
+    // ========================================================================
+    const G = {
+      phase: "menu",              // menu | playing | done | failed
+      levelIdx: 0,
+      car: null,                  // {x,y,angle,vF,vL,angularVel}
+      timeLeft: 0,
+      driftScore: 0,
+      crashes: 0,
+      lastCrashAt: -1e9,
+      parkTimer: 0,
+      skids: [],                  // {x1,y1,x2,y2,life}
+      smoke: [],
+      peds: [],                   // {x,y,...path}
+      cam: { x: 0, y: 0, zoom: 1 },
+      input: { left: false, right: false, gas: false, brake: false, hand: false },
+      lastTs: 0,
+      elapsed: 0,
+      stars: JSON.parse(localStorage.getItem("driftpark_stars") || "[0,0,0]"),
+    };
+
+    function level() { return LEVELS[G.levelIdx]; }
+
+    function startLevel(idx) {
+      G.levelIdx = idx;
+      const L = level();
+      G.car = { x: L.start.x, y: L.start.y, angle: L.start.angle, vF: 0, vL: 0, angularVel: 0 };
+      G.timeLeft = L.timeLimit;
+      G.driftScore = 0;
+      G.crashes = 0;
+      G.parkTimer = 0;
+      G.skids = []; G.smoke = [];
+      G.peds = L.peds.map(p => ({ ...p, x: p.x1, y: p.y1, dir: 1 }));
+      G.elapsed = 0;
+      G.lastTs = 0;
+      G.phase = "playing";
+      document.getElementById("overlay").classList.add("hidden");
+      updateHUD();
+      requestAnimationFrame(loop);
+    }
+
+    // ========================================================================
+    // PHYSICS — vektörel araç dinamiği
+    // ========================================================================
+    function carOBB() {
+      return { x: G.car.x, y: G.car.y, halfL: CFG.car.len / 2, halfW: CFG.car.wid / 2, angle: G.car.angle };
+    }
+    function wheelPoints() {
+      // 4 teker (park kontrolü için): gövdeden hafif içeride
+      return obbCorners(G.car.x, G.car.y, CFG.car.len / 2 - 6, CFG.car.wid / 2 - 4, G.car.angle);
+    }
+
+    function stepPhysics(dt) {
+      const c = G.car, K = CFG.car;
+      const inp = G.input;
+
+      // İleri ivme / fren / geri
+      if (inp.gas) c.vF += K.accel * dt;
+      if (inp.brake) {
+        if (c.vF > 8) c.vF -= K.brake * dt;          // fren
+        else c.vF -= K.revAccel * dt;                 // geri vites
+      }
+      // Sürükleme
+      c.vF *= Math.exp(-K.drag * dt);
+      c.vF = Math.max(-K.maxRev, Math.min(K.maxSpeed, c.vF));
+
+      // Direksiyon: hızla orantılı; el freni dönüşü keskinleştirir
+      const steer = (inp.right ? 1 : 0) - (inp.left ? 1 : 0);
+      const speedFrac = Math.max(-1, Math.min(1, c.vF / K.maxSpeed * 2.2));
+      const handBoost = inp.hand ? 1.45 : 1;
+      c.angularVel = steer * K.turnRate * speedFrac * handBoost;
+      c.angle += c.angularVel * dt;
+
+      // Dönüşte yanal hız üretimi (merkezkaç): açısal hız * ileri hız
+      c.vL += -c.angularVel * c.vF * dt * 0.9;
+
+      // Yanal tutunma: normal / el freni / yüksek hız + sert dönüş
+      let grip = K.gripNormal;
+      if (inp.hand) grip = K.gripHand;
+      else if (Math.abs(c.vF) > K.maxSpeed * 0.6 && steer !== 0) grip = K.gripFast;
+      c.vL *= Math.exp(-grip * dt);
+
+      // Dünya hız vektörü + konum entegrasyonu
+      const cosA = Math.cos(c.angle), sinA = Math.sin(c.angle);
+      const vx = cosA * c.vF - sinA * c.vL;
+      const vy = sinA * c.vF + cosA * c.vL;
+      c.x += vx * dt;
+      c.y += vy * dt;
+
+      // Drift algısı → puan, iz, duman, ses
+      const drifting = Math.abs(c.vL) > K.driftThreshold && Math.abs(c.vF) > 40;
+      if (drifting) {
+        G.driftScore += Math.abs(c.vL) * dt * 0.35;
+        // Arka teker izleri
+        const rear = obbCorners(c.x, c.y, K.len / 2 - 8, K.wid / 2 - 3, c.angle);
+        for (const p of [rear[2], rear[3]]) {
+          G.skids.push({ x1: p.x - vx * dt, y1: p.y - vy * dt, x2: p.x, y2: p.y, life: CFG.skid.life });
+          if (G.skids.length > CFG.skid.max) G.skids.shift();
+        }
+        if (G.smoke.length < CFG.smoke.max && Math.random() < 0.7) {
+          G.smoke.push({ x: c.x - cosA * 18, y: c.y - sinA * 18,
+            vx: (Math.random() - 0.5) * 30, vy: (Math.random() - 0.5) * 30,
+            r: 4 + Math.random() * 5, life: 0, max: 0.8 });
+        }
+      }
+      SFX.skid(drifting);
+      SFX.engine(c.vF, inp.gas);
+
+      return { vx, vy, drifting };
+    }
+
+    // Çarpışma çözümü: MTV kadar dışarı it + hız yansıt + ceza
+    function resolveHit(hit) {
+      const c = G.car;
+      c.x += hit.nx * hit.depth;
+      c.y += hit.ny * hit.depth;
+      // Hızı dünya uzayında yansıt
+      const cosA = Math.cos(c.angle), sinA = Math.sin(c.angle);
+      let vx = cosA * c.vF - sinA * c.vL;
+      let vy = sinA * c.vF + cosA * c.vL;
+      const dot = vx * hit.nx + vy * hit.ny;
+      if (dot < 0) {
+        vx -= (1 + CFG.collision.restitution) * dot * hit.nx;
+        vy -= (1 + CFG.collision.restitution) * dot * hit.ny;
+      }
+      vx *= CFG.collision.damp; vy *= CFG.collision.damp;
+      // Geri lokal bileşenlere çevir
+      c.vF = vx * cosA + vy * sinA;
+      c.vL = -vx * sinA + vy * cosA;
+
+      const now = G.elapsed * 1000;
+      if (now - G.lastCrashAt > CFG.collision.cooldownMs) {
+        G.lastCrashAt = now;
+        G.crashes++;
+        G.driftScore = Math.max(0, G.driftScore - CFG.collision.penalty);
+        SFX.thud();
+        if (navigator.vibrate) navigator.vibrate(80);
+        updateHUD();
+      }
+    }
+
+    function checkCollisions() {
+      const L = level();
+      const me = carOBB();
+      for (const wl of L.walls) {
+        const hit = satOBB(me, wl);
+        if (hit) { resolveHit(hit); return; }
+      }
+      for (const pc of L.cars) {
+        const hit = satOBB(me, pc);
+        if (hit) { resolveHit(hit); return; }
+      }
+      for (const cn of L.cones) {
+        const hit = circleVsOBB(cn.x, cn.y, 10, me);
+        if (hit) { resolveHit({ nx: -hit.nx, ny: -hit.ny, depth: hit.depth }); return; }
+      }
+      for (const pd of G.peds) {
+        const hit = circleVsOBB(pd.x, pd.y, 11, me);
+        if (hit) { resolveHit({ nx: -hit.nx, ny: -hit.ny, depth: hit.depth }); return; }
+      }
+    }
+
+    // ========================================================================
+    // PARK KONTROLÜ
+    // ========================================================================
+    function angleDiff(a, b) {
+      let d = (a - b) % (Math.PI * 2);
+      if (d > Math.PI) d -= Math.PI * 2;
+      if (d < -Math.PI) d += Math.PI * 2;
+      return d;
+    }
+    function checkParking(dt) {
+      const L = level();
+      const s = L.spot;
+      const spotB = { x: s.x, y: s.y, halfL: s.w / 2, halfW: s.h / 2, angle: s.angle };
+      const wheels = wheelPoints();
+      const allIn = wheels.every(p => pointInOBB(p.x, p.y, spotB));
+      // Açı toleransı — düz veya geri park (180° simetri) kabul
+      let dA = Math.abs(angleDiff(G.car.angle, s.angle)) % Math.PI;
+      dA = Math.min(dA, Math.PI - dA);
+      const aligned = dA <= CFG.park.angleTol;
+      const speed = Math.hypot(G.car.vF, G.car.vL);
+      const still = speed < CFG.park.stillSpeed;
+
+      if (allIn && aligned && still) {
+        G.parkTimer += dt;
+        if (G.parkTimer >= CFG.park.holdSec) { finishLevel(true); return true; }
+      } else {
+        G.parkTimer = 0;
+      }
+      return false;
+    }
+
+    function calcStars() {
+      const L = level();
+      const timeFrac = (L.timeLimit - G.timeLeft) / L.timeLimit;
+      if (G.crashes === 0 && timeFrac < 0.6) return 3;
+      if (G.crashes <= 2) return 2;
+      return 1;
+    }
+
+    function finishLevel(won) {
+      G.phase = won ? "done" : "failed";
+      SFX.stopAll();
+      const panel = document.getElementById("panel");
+      if (won) {
+        const st = calcStars();
+        if (st > G.stars[G.levelIdx]) {
+          G.stars[G.levelIdx] = st;
+          localStorage.setItem("driftpark_stars", JSON.stringify(G.stars));
+        }
+        SFX.victory();
+        const total = Math.round(G.driftScore) + st * 100;
+        panel.innerHTML =
+          '<h2>🎉 Tebrikler!</h2>' +
+          '<div class="stars">' + "⭐".repeat(st) + "☆".repeat(3 - st) + '</div>' +
+          '<div class="statline drift">Drift Puanı: ' + Math.round(G.driftScore) + '</div>' +
+          '<div class="statline crash">Çarpma: ' + G.crashes + '</div>' +
+          '<div class="statline">Toplam: ' + total + '</div>' +
+          '<div class="row">' +
+          '  <button class="btn secondary" id="retryBtn">🔄 Yeniden</button>' +
+          (G.levelIdx < LEVELS.length - 1
+            ? '  <button class="btn" id="nextBtn">Sonraki →</button>'
+            : '  <button class="btn" id="menuBtn">🏁 Menü</button>') +
+          '</div>';
+        wireEnd();
+      } else {
+        SFX.fail();
+        panel.innerHTML =
+          '<h2>⏰ Süre Doldu!</h2>' +
+          '<p>Park alanına yetişemedin.</p>' +
+          '<div class="row">' +
+          '  <button class="btn secondary" id="menuBtn">Menü</button>' +
+          '  <button class="btn" id="retryBtn">🔄 Yeniden Dene</button>' +
+          '</div>';
+        wireEnd();
+      }
+      document.getElementById("overlay").classList.remove("hidden");
+    }
+
+    function wireEnd() {
+      const r = document.getElementById("retryBtn");
+      if (r) r.addEventListener("click", () => startLevel(G.levelIdx));
+      const n = document.getElementById("nextBtn");
+      if (n) n.addEventListener("click", () => startLevel(G.levelIdx + 1));
+      const m = document.getElementById("menuBtn");
+      if (m) m.addEventListener("click", showMenu);
+    }
+
+    function showMenu() {
+      G.phase = "menu";
+      SFX.stopAll();
+      const panel = document.getElementById("panel");
+      panel.innerHTML =
+        '<h2>🚗 Drift Park</h2>' +
+        '<p>El freniyle drift yap, lastik izi bırak ve <b>yeşil park alanına</b> hizalanıp 2 saniye dur!<br>' +
+        'Sol butonlar direksiyon, sağda GAZ / FREN-GERİ / EL FRENİ.</p>' +
+        '<div class="lvlrow" id="lvlRow"></div>' +
+        '<div class="row"><button class="btn" id="startBtn">▶ Başla</button></div>';
+      buildMenu();
+      document.getElementById("overlay").classList.remove("hidden");
+    }
+
+    let menuPick = 0;
+    function buildMenu() {
+      const row = document.getElementById("lvlRow");
+      row.innerHTML = "";
+      LEVELS.forEach((L, i) => {
+        const b = document.createElement("button");
+        b.className = "lvlbtn";
+        const locked = i > 0 && G.stars[i - 1] === 0;
+        b.innerHTML = (locked ? "🔒 " : "") + (i + 1) + ". " + L.name +
+          '<span class="st">' + (G.stars[i] ? "⭐".repeat(G.stars[i]) : "—") + '</span>';
+        if (locked) b.style.opacity = "0.5";
+        b.addEventListener("click", () => {
+          if (locked) return;
+          menuPick = i;
+          [...row.children].forEach(x => x.style.borderColor = "#3a4160");
+          b.style.borderColor = "#fb923c";
+        });
+        if (i === menuPick) b.style.borderColor = "#fb923c";
+        row.appendChild(b);
+      });
+      const sb = document.getElementById("startBtn");
+      if (sb) sb.addEventListener("click", () => { SFX.unlock(); startLevel(menuPick); });
+    }
+
+    // ========================================================================
+    // RENDER
+    // ========================================================================
+    function updateCam(dt) {
+      const L = level();
+      const zoom = Math.max(0.55, Math.min(1.1, Math.min(W / 640, H / 640)));
+      G.cam.zoom += (zoom - G.cam.zoom) * 0.1;
+      G.cam.x += (G.car.x - G.cam.x) * CFG.camera.lerp;
+      G.cam.y += (G.car.y - G.cam.y) * CFG.camera.lerp;
+      // Dünya sınırlarına kelepçele
+      const vw = W / G.cam.zoom / 2, vh = H / G.cam.zoom / 2;
+      G.cam.x = Math.max(Math.min(G.cam.x, L.worldW - vw), vw);
+      G.cam.y = Math.max(Math.min(G.cam.y, L.worldH - vh), vh);
+      if (L.worldW < vw * 2) G.cam.x = L.worldW / 2;
+      if (L.worldH < vh * 2) G.cam.y = L.worldH / 2;
+    }
+
+    function render() {
+      const L = level();
+      ctx.fillStyle = "#14161d";
+      ctx.fillRect(0, 0, W, H);
+      ctx.save();
+      ctx.translate(W / 2, H / 2);
+      ctx.scale(G.cam.zoom, G.cam.zoom);
+      ctx.translate(-G.cam.x, -G.cam.y);
+
+      // Asfalt
+      ctx.fillStyle = "#2b2f38";
+      ctx.fillRect(0, 0, L.worldW, L.worldH);
+      // Zemin dokusu (seyrek noktalar)
+      ctx.fillStyle = "rgba(255,255,255,0.03)";
+      for (let i = 0; i < 60; i++) {
+        ctx.fillRect((i * 173) % L.worldW, (i * 97) % L.worldH, 3, 3);
+      }
+
+      // Park alanı (yeşil, yarı saydam) + parkTimer ilerledikçe parlar
+      const s = L.spot;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.angle);
+      const glow = G.parkTimer > 0 ? 0.25 + 0.35 * (G.parkTimer / CFG.park.holdSec) : 0.22;
+      ctx.fillStyle = "rgba(34,197,94," + glow + ")";
+      ctx.fillRect(-s.w / 2, -s.h / 2, s.w, s.h);
+      ctx.strokeStyle = "#22c55e";
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 6]);
+      ctx.strokeRect(-s.w / 2, -s.h / 2, s.w, s.h);
+      ctx.setLineDash([]);
+      // P harfi
+      ctx.fillStyle = "rgba(255,255,255,0.7)";
+      ctx.font = "bold 26px Arial";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("P", 0, 0);
+      ctx.restore();
+
+      // Lastik izleri
+      ctx.lineCap = "round";
+      for (const sk of G.skids) {
+        ctx.strokeStyle = "rgba(10,10,12," + (0.5 * sk.life / CFG.skid.life) + ")";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(sk.x1, sk.y1);
+        ctx.lineTo(sk.x2, sk.y2);
+        ctx.stroke();
+      }
+
+      // Duvarlar
+      for (const wl of L.walls) {
+        ctx.save();
+        ctx.translate(wl.x, wl.y);
+        ctx.rotate(wl.angle);
+        ctx.fillStyle = "#454b5c";
+        ctx.fillRect(-wl.halfL, -wl.halfW, wl.halfL * 2, wl.halfW * 2);
+        ctx.strokeStyle = "#5b6275";
+        ctx.strokeRect(-wl.halfL, -wl.halfW, wl.halfL * 2, wl.halfW * 2);
+        ctx.restore();
+      }
+
+      // Park halindeki araçlar
+      for (const pc of L.cars) drawCarBody(pc.x, pc.y, pc.angle, pc.color, false);
+
+      // Koniler
+      for (const cn of L.cones) {
+        ctx.fillStyle = "#f97316";
+        ctx.beginPath();
+        ctx.arc(cn.x, cn.y, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#7c2d12";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(cn.x, cn.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Yayalar
+      for (const pd of G.peds) {
+        ctx.fillStyle = "#fde68a";
+        ctx.beginPath(); ctx.arc(pd.x, pd.y, 9, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#92400e"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = "#1f2937";
+        ctx.beginPath(); ctx.arc(pd.x, pd.y - 2, 3.5, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // Duman
+      for (const sm of G.smoke) {
+        ctx.globalAlpha = Math.max(0, 1 - sm.life / sm.max) * 0.4;
+        ctx.fillStyle = "#a0a0aa";
+        ctx.beginPath();
+        ctx.arc(sm.x, sm.y, sm.r * (1 + sm.life), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // Oyuncu aracı
+      drawCarBody(G.car.x, G.car.y, G.car.angle, "#dc2626", true);
+
+      ctx.restore();
+
+      // Yön oku (spot ekran dışındaysa)
+      drawArrow();
+    }
+
+    function drawCarBody(x, y, angle, color, isPlayer) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      const hl = CFG.car.len / 2, hw = CFG.car.wid / 2;
+      // Gölge
+      ctx.fillStyle = "rgba(0,0,0,0.3)";
+      ctx.fillRect(-hl + 2, -hw + 3, hl * 2, hw * 2);
+      // Gövde
+      ctx.fillStyle = color;
+      ctx.fillRect(-hl, -hw, hl * 2, hw * 2);
+      ctx.strokeStyle = "rgba(0,0,0,0.45)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-hl, -hw, hl * 2, hw * 2);
+      // Cam
+      ctx.fillStyle = "rgba(147,197,253,0.85)";
+      ctx.fillRect(-hl * 0.25, -hw + 3, hl * 0.55, hw * 2 - 6);
+      // Farlar (ön = +x)
+      ctx.fillStyle = "#fde047";
+      ctx.fillRect(hl - 4, -hw + 2, 3, 5);
+      ctx.fillRect(hl - 4, hw - 7, 3, 5);
+      if (isPlayer) {
+        // Tekerler
+        ctx.fillStyle = "#111318";
+        ctx.fillRect(-hl + 3, -hw - 2, 9, 4);
+        ctx.fillRect(-hl + 3, hw - 2, 9, 4);
+        ctx.fillRect(hl - 12, -hw - 2, 9, 4);
+        ctx.fillRect(hl - 12, hw - 2, 9, 4);
+      }
+      ctx.restore();
+    }
+
+    function drawArrow() {
+      if (G.phase !== "playing") return;
+      const L = level(), s = L.spot;
+      // Spot ekranda mı?
+      const sx = (s.x - G.cam.x) * G.cam.zoom + W / 2;
+      const sy = (s.y - G.cam.y) * G.cam.zoom + H / 2;
+      if (sx > 40 && sx < W - 40 && sy > 60 && sy < H - 120) return;
+      const ang = Math.atan2(s.y - G.car.y, s.x - G.car.x);
+      const cx = W / 2, cy = H / 2 - 40;
+      ctx.save();
+      ctx.translate(cx + Math.cos(ang) * 70, cy + Math.sin(ang) * 70);
+      ctx.rotate(ang);
+      ctx.fillStyle = "#22c55e";
+      ctx.strokeStyle = "rgba(0,0,0,0.5)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(16, 0); ctx.lineTo(-10, 9); ctx.lineTo(-5, 0); ctx.lineTo(-10, -9);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+
+    // ========================================================================
+    // UI
+    // ========================================================================
+    function updateHUD() {
+      document.getElementById("hudLevel").textContent = (G.levelIdx + 1) + "/" + LEVELS.length;
+      document.getElementById("hudTime").textContent = Math.ceil(G.timeLeft);
+      document.getElementById("hudDrift").textContent = Math.round(G.driftScore);
+      document.getElementById("hudCrash").textContent = G.crashes;
+    }
+
+    // ========================================================================
+    // LOOP — delta time
+    // ========================================================================
+    function loop(ts) {
+      if (G.phase !== "playing") return;
+      if (!G.lastTs) G.lastTs = ts;
+      const dt = Math.min(0.05, (ts - G.lastTs) / 1000);
+      G.lastTs = ts;
+      G.elapsed += dt;
+
+      G.timeLeft -= dt;
+      if (G.timeLeft <= 0) { G.timeLeft = 0; updateHUD(); finishLevel(false); return; }
+
+      stepPhysics(dt);
+      checkCollisions();
+
+      // Yayalar (ping-pong devriye)
+      for (const pd of G.peds) {
+        const tx = pd.dir > 0 ? pd.x2 : pd.x1;
+        const ty = pd.dir > 0 ? pd.y2 : pd.y1;
+        const dx = tx - pd.x, dy = ty - pd.y;
+        const d = Math.hypot(dx, dy);
+        if (d < 3) pd.dir *= -1;
+        else { pd.x += dx / d * pd.speed * dt; pd.y += dy / d * pd.speed * dt; }
+      }
+
+      // İz / duman ömürleri
+      for (let i = G.skids.length - 1; i >= 0; i--) {
+        G.skids[i].life -= dt;
+        if (G.skids[i].life <= 0) G.skids.splice(i, 1);
+      }
+      for (let i = G.smoke.length - 1; i >= 0; i--) {
+        const sm = G.smoke[i];
+        sm.x += sm.vx * dt; sm.y += sm.vy * dt; sm.life += dt;
+        if (sm.life >= sm.max) G.smoke.splice(i, 1);
+      }
+
+      if (checkParking(dt)) return;   // kazandıysa loop durur
+      updateCam(dt);
+      render();
+      updateHUD();
+      requestAnimationFrame(loop);
+    }
+
+    // ========================================================================
+    // INPUT — çoklu dokunma + klavye
+    // ========================================================================
+    function bindBtn(id, key) {
+      const el = document.getElementById(id);
+      const on = (e) => { e.preventDefault(); G.input[key] = true; el.classList.add("pressed"); SFX.unlock(); };
+      const off = (e) => { if (e) e.preventDefault(); G.input[key] = false; el.classList.remove("pressed"); };
+      el.addEventListener("touchstart", on, { passive: false });
+      el.addEventListener("touchend", off, { passive: false });
+      el.addEventListener("touchcancel", off, { passive: false });
+      el.addEventListener("mousedown", on);
+      el.addEventListener("mouseup", off);
+      el.addEventListener("mouseleave", () => off());
+    }
+    bindBtn("btnLeft", "left");
+    bindBtn("btnRight", "right");
+    bindBtn("btnGas", "gas");
+    bindBtn("btnBrake", "brake");
+    bindBtn("btnHand", "hand");
+
+    const KEYMAP = { ArrowLeft: "left", ArrowRight: "right", ArrowUp: "gas", ArrowDown: "brake", " ": "hand" };
+    window.addEventListener("keydown", (e) => {
+      const k = KEYMAP[e.key];
+      if (k) { e.preventDefault(); G.input[k] = true; SFX.unlock(); }
+    });
+    window.addEventListener("keyup", (e) => {
+      const k = KEYMAP[e.key];
+      if (k) G.input[k] = false;
+    });
+
+    // ========================================================================
+    // Boot
+    // ========================================================================
+    buildMenu();
+
+    // Test harness API
+    window._drift = {
+      G, CFG, LEVELS,
+      startLevel, stepPhysics, checkCollisions, checkParking, calcStars, finishLevel,
+      satOBB, circleVsOBB, pointInOBB, obbCorners, carOBB, wheelPoints, angleDiff,
+      setInput(k, v) { G.input[k] = v; },
+    };
+  })();
+  </script>
+</body>
+</html>

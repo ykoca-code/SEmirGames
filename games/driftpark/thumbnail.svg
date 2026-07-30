@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <!-- asfalt zemin -->
+  <rect width="240" height="240" fill="#2b2f38"/>
+  <!-- park çizgileri -->
+  <g stroke="#e5e7eb" stroke-width="3" opacity="0.8">
+    <line x1="150" y1="30" x2="150" y2="90"/>
+    <line x1="195" y1="30" x2="195" y2="90"/>
+    <line x1="150" y1="30" x2="195" y2="30"/>
+  </g>
+  <!-- yeşil park alanı -->
+  <rect x="153" y="33" width="39" height="54" fill="rgba(34,197,94,0.35)" stroke="#22c55e" stroke-width="2"/>
+  <!-- drift lastik izleri (kavisli) -->
+  <g stroke="#0d0f14" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.85">
+    <path d="M 30 210 Q 70 180 90 150 Q 110 120 150 105"/>
+    <path d="M 44 218 Q 84 188 104 158 Q 122 130 158 116"/>
+  </g>
+  <!-- duman -->
+  <g fill="rgba(160,160,170,0.5)">
+    <circle cx="60" cy="195" r="8"/>
+    <circle cx="75" cy="182" r="6"/>
+    <circle cx="90" cy="168" r="7"/>
+    <circle cx="48" cy="205" r="5"/>
+  </g>
+  <!-- koniler -->
+  <g>
+    <polygon points="50,90 58,110 42,110" fill="#f97316" stroke="#7c2d12" stroke-width="1.5"/>
+    <rect x="40" y="108" width="20" height="4" fill="#7c2d12"/>
+    <polygon points="90,60 98,80 82,80" fill="#f97316" stroke="#7c2d12" stroke-width="1.5"/>
+    <rect x="80" y="78" width="20" height="4" fill="#7c2d12"/>
+  </g>
+  <!-- drift yapan araba (döndürülmüş) -->
+  <g transform="translate(120,140) rotate(-35)">
+    <rect x="-23" y="-12" width="46" height="24" rx="5" fill="#dc2626" stroke="#7f1d1d" stroke-width="2"/>
+    <rect x="-12" y="-9" width="16" height="18" rx="3" fill="#93c5fd" opacity="0.9"/>
+    <rect x="-21" y="-13" width="8" height="4" fill="#1f2937"/>
+    <rect x="-21" y="9" width="8" height="4" fill="#1f2937"/>
+    <rect x="13" y="-13" width="8" height="4" fill="#1f2937"/>
+    <rect x="13" y="9" width="8" height="4" fill="#1f2937"/>
+    <rect x="19" y="-8" width="4" height="16" fill="#fbbf24"/>
+  </g>
+  <!-- yıldızlar -->
+  <g fill="#fde047">
+    <text x="24" y="40" font-size="22">⭐</text>
+    <text x="50" y="40" font-size="22">⭐</text>
+    <text x="76" y="40" font-size="22">⭐</text>
+  </g>
+  <!-- başlık rozeti -->
+  <g transform="translate(8,206)">
+    <rect width="100" height="24" rx="5" fill="rgba(0,0,0,0.65)"/>
+    <text x="50" y="17" font-family="Helvetica,Arial,sans-serif" font-size="12" font-weight="900" text-anchor="middle" fill="#fb923c">DRIFT PARK</text>
+  </g>
+</svg>
