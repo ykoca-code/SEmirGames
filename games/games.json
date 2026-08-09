@@ -725,6 +725,24 @@
     "boss",
     "neon"
    ]
+  },
+  {
+   "id": "nebulasling",
+   "title": "Nebula Sling",
+   "description": "Yerçekimi sapanı! Yıldız yörüngesinde dön, dokunup bırakınca fırla, yeni yıldızlara yakalan. Kristal topla, kombo yap; asteroid ve kara deliklerden kaç!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "7+",
+   "thumbnail": "games/nebulasling/thumbnail.svg",
+   "path": "games/nebulasling/index.html",
+   "tags": [
+    "arcade",
+    "uzay",
+    "refleks",
+    "tek dokunuş",
+    "sonsuz",
+    "yörünge"
+   ]
   }
  ]
 }

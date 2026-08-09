@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#020108">
+<title>Nebula Sling - SEmirK Games</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+    width:100%; height:100%;
+    background:#020108;
+    overflow:hidden;
+    touch-action:none;
+    user-select:none; -webkit-user-select:none;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+#wrap {
+    position:fixed; inset:0;
+    display:flex; justify-content:center; align-items:center;
+}
+canvas {
+    display:block;
+    width:100%; height:100%;
+    touch-action:none;
+}
+#ui {
+    position:fixed; inset:0; pointer-events:none; z-index:10;
+}
+#hud {
+    position:absolute; top:max(12px, env(safe-area-inset-top));
+    left:max(16px, env(safe-area-inset-left));
+    right:max(16px, env(safe-area-inset-right));
+    display:flex; justify-content:space-between; align-items:flex-start;
+}
+.hud-item {
+    color:#e0e0ff; font-size:13px; font-weight:600; letter-spacing:1.5px;
+    text-shadow:0 0 8px rgba(100,200,255,0.6);
+    background:rgba(10,10,30,0.5); padding:6px 12px; border-radius:20px;
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(100,200,255,0.15);
+}
+.hud-item span { color:#00f0ff; font-weight:800; }
+#combo {
+    position:absolute; top:max(50px, calc(env(safe-area-inset-top) + 38px));
+    left:50%; transform:translateX(-50%);
+    color:#ffd700; font-size:22px; font-weight:900;
+    text-shadow:0 0 15px rgba(255,215,0,0.8);
+    opacity:0; transition:opacity 0.3s, transform 0.3s;
+    pointer-events:none;
+}
+#combo.show { opacity:1; transform:translateX(-50%) scale(1.1); }
+#screen {
+    position:fixed; inset:0;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    background:rgba(2,1,8,0.88);
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    pointer-events:auto; z-index:20;
+    transition:opacity 0.6s cubic-bezier(0.4,0,0.2,1);
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+#screen.off { opacity:0; pointer-events:none; }
+#screen h1 {
+    font-size:clamp(36px, 10vw, 72px); font-weight:900; letter-spacing:4px;
+    background:linear-gradient(135deg, #00f0ff 0%, #ff00a0 50%, #ffd700 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    text-shadow:none; filter:drop-shadow(0 0 20px rgba(0,240,255,0.4));
+    margin-bottom:8px; animation:titlePulse 3s ease-in-out infinite;
+}
+@keyframes titlePulse { 0%,100%{filter:drop-shadow(0 0 20px rgba(0,240,255,0.4))} 50%{filter:drop-shadow(0 0 35px rgba(255,0,160,0.5))} }
+#screen .subtitle {
+    color:rgba(200,200,255,0.6); font-size:14px; letter-spacing:3px; margin-bottom:40px;
+}
+#screen .instructions {
+    color:rgba(200,200,255,0.7); font-size:15px; line-height:1.8;
+    text-align:center; max-width:320px; margin-bottom:40px;
+}
+#screen .instructions strong { color:#00f0ff; font-weight:700; }
+#startBtn {
+    padding:16px 56px; border-radius:50px; border:none;
+    background:linear-gradient(135deg, #00f0ff, #0080ff);
+    color:#fff; font-size:17px; font-weight:800; letter-spacing:2px;
+    cursor:pointer; pointer-events:auto;
+    box-shadow:0 0 30px rgba(0,240,255,0.3), 0 8px 20px rgba(0,0,0,0.4);
+    transition:transform 0.2s, box-shadow 0.2s;
+    position:relative; overflow:hidden;
+}
+#startBtn::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+    opacity:0; transition:opacity 0.3s;
+}
+#startBtn:hover::after, #startBtn:active::after { opacity:1; }
+#startBtn:active { transform:scale(0.96); }
+#highScore { color:#ffd700; font-size:13px; margin-top:16px; opacity:0.8; }
+#tutorialHand {
+    position:absolute; bottom:30%; left:50%; transform:translateX(-50%);
+    width:60px; height:60px; pointer-events:none; opacity:0;
+    transition:opacity 0.5s;
+}
+#tutorialHand svg { width:100%; height:100%; fill:rgba(255,255,255,0.5); filter:drop-shadow(0 0 10px rgba(0,240,255,0.5)); }
+#tutorialHand.show { opacity:1; animation:handAnim 2s ease-in-out infinite; }
+@keyframes handAnim { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-30px)} }
+.back-fab {
+    position:fixed; top:calc(10px + env(safe-area-inset-top, 0px)); left:10px; z-index:30;
+    width:36px; height:36px; border-radius:50%;
+    background:rgba(0,0,0,0.55); color:#00f0ff;
+    display:flex; align-items:center; justify-content:center;
+    text-decoration:none; font-size:20px; font-weight:700;
+    border:1px solid rgba(0,240,255,0.35);
+}
+#hud { padding-left:44px; }
+</style>
+</head>
+<body>
+<a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+<div id="wrap"><canvas id="c"></canvas></div>
+<div id="ui">
+    <div id="hud">
+        <div class="hud-item">SKOR <span id="sc">0</span></div>
+        <div class="hud-item">YILDIZ <span id="st">0</span></div>
+        <div class="hud-item">REKOR <span id="hs">0</span></div>
+    </div>
+    <div id="combo">x1</div>
+    <div id="tutorialHand">
+        <svg viewBox="0 0 24 24"><path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.17 10 7v6.5c0 .28.22.5.5.5h.24c.97 0 1.89.43 2.51 1.17l4.54 5.71c.28.35.22.86-.13 1.14-.35.28-.86.22-1.14-.13l-4.54-5.71c-.34-.43-.86-.68-1.41-.68H11c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2s2 .9 2 2v3.5h.76c.45 0 .88.11 1.27.31l4.54 2.26c.71.36 1.15 1.08 1.15 1.88 0 .69-.35 1.33-.92 1.71z"/></svg>
+    </div>
+</div>
+<div id="screen">
+    <h1>NEBULA SLING</h1>
+    <div class="subtitle">GRAVITY SLINGSHOT RUNNER</div>
+    <div class="instructions">
+        <strong>Dokun ve Bırak</strong> — Yıldızın etrafında dön.<br>
+        Bırakınca <strong>tangent</strong> yörüngede fırlatılırsın.<br>
+        Başka yıldızlara <strong>yakalan</strong>, kristal topla.<br>
+        Asteroidlerden ve kara deliklerden <strong>kaç</strong>!
+    </div>
+    <button id="startBtn">BAŞLA</button>
+    <div id="highScore"></div>
+</div>
+
+<script>
+// ===================== AUDIO ENGINE =====================
+let audioCtx = null;
+function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+function tone(freq, type, dur, vol, delay) {
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime + (delay||0);
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t); o.stop(t + dur);
+}
+function sfx(n) {
+    if (!audioCtx) return;
+    switch(n) {
+        case 'launch': tone(400,'sine',0.15,0.12); tone(600,'sine',0.1,0.08,0.05); break;
+        case 'capture': tone(800,'sine',0.2,0.1); tone(1200,'sine',0.15,0.06,0.1); break;
+        case 'crystal': tone(1500,'sine',0.12,0.08); tone(2000,'sine',0.08,0.05,0.06); break;
+        case 'combo': [600,800,1000,1200].forEach((f,i)=>tone(f,'sine',0.1,0.06,i*0.05)); break;
+        case 'hit': tone(200,'sawtooth',0.3,0.12); tone(100,'square',0.4,0.1,0.1); break;
+        case 'die': [500,300,150,80].forEach((f,i)=>tone(f,'sawtooth',0.25,0.1,i*0.1)); break;
+        case 'overtone': tone(440,'sine',0.6,0.04); tone(554,'sine',0.6,0.04,0.1); tone(659,'sine',0.8,0.04,0.2); break;
+    }
+}
+
+// ===================== CANVAS & DPI =====================
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, DPR = Math.min(window.devicePixelRatio || 1, 3);
+let gameW = 1000, gameH = 1000; // virtual coords
+let scale = 1, offsetX = 0, offsetY = 0;
+
+function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 3);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    // "contain": sanal 1000x1000 oyun alanının TAMAMI her ekranda görünür.
+    // (Eski "cover" ölçekleme dikey telefonda alanın sadece ~460 birimini
+    // gösteriyordu — hedef yıldızlar ekran dışında doğuyordu.)
+    scale = Math.min((W * DPR) / gameW, (H * DPR) / gameH);
+    offsetX = (W * DPR - gameW * scale) / 2;
+    offsetY = (H * DPR - gameH * scale) / 2;
+    // Transform draw() içinde her kare kurulur (arka plan tam canvas'a çizilir)
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ===================== INPUT =====================
+const input = { down:false, x:0, y:0, sx:0, sy:0, active:false, justReleased:false };
+function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+        x: (clientX - r.left) * DPR / scale - offsetX / scale,
+        y: (clientY - r.top) * DPR / scale - offsetY / scale
+    };
+}
+function onDown(e) {
+    e.preventDefault();
+    const p = getPos(e);
+    input.down = true; input.active = true; input.justReleased = false;
+    input.sx = p.x; input.sy = p.y; input.x = p.x; input.y = p.y;
+}
+function onMove(e) {
+    if (!input.down) return;
+    e.preventDefault();
+    const p = getPos(e);
+    input.x = p.x; input.y = p.y;
+}
+function onUp(e) {
+    if (!input.down) return;
+    e.preventDefault();
+    input.down = false; input.active = false; input.justReleased = true;
+}
+canvas.addEventListener('mousedown', onDown);
+canvas.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup', onUp);
+canvas.addEventListener('touchstart', onDown, {passive:false});
+canvas.addEventListener('touchmove', onMove, {passive:false});
+canvas.addEventListener('touchend', onUp, {passive:false});
+canvas.addEventListener('touchcancel', onUp, {passive:false});
+
+// ===================== UTILS =====================
+const rand = (a,b) => Math.random()*(b-a)+a;
+const dist = (a,b) => Math.hypot(a.x-b.x, a.y-b.y);
+const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+const angle = (a,b) => Math.atan2(b.y-a.y, b.x-a.x);
+
+// ===================== CLASSES =====================
+class Particle {
+    constructor(x,y,vx,vy,life,color,size,glow) {
+        this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.life=life; this.maxLife=life;
+        this.color=color; this.size=size; this.glow=glow;
+    }
+    update(dt) {
+        this.x += this.vx * dt; this.y += this.vy * dt;
+        const drag = Math.pow(0.97, dt);
+        this.vx *= drag; this.vy *= drag;
+        this.life -= dt;
+        this.size *= Math.pow(0.96, dt);
+    }
+    draw(ctx) {
+        const a = this.life / this.maxLife;
+        ctx.globalAlpha = a;
+        if (this.glow) { ctx.shadowBlur = 12; ctx.shadowColor = this.color; }
+        ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    }
+}
+
+class Star {
+    constructor(x,y,r,power) {
+        this.x=x; this.y=y; this.r=r; this.power=power;
+        this.pulse = rand(0, Math.PI*2);
+        this.captured = false;
+        this.visited = false;
+        this.type = Math.random() < 0.15 ? 'nova' : (Math.random() < 0.1 ? 'blackhole' : 'normal');
+        if (this.type === 'blackhole') { this.r = r * 1.5; this.power = power * 2; }
+        this.angle = rand(0, Math.PI*2);
+        this.rotSpeed = rand(-0.02, 0.02);
+        this.spikes = 5 + Math.floor(rand(0, 4));
+    }
+    update(dt) {
+        this.pulse += 0.03 * dt;
+        this.angle += this.rotSpeed * dt;
+    }
+    draw(ctx, player) {
+        const pulseR = this.r + Math.sin(this.pulse) * 3;
+        const isTarget = player && player.star === this;
+        const isNear = player && !player.star && dist(player, this) < this.r + 80;
+
+        ctx.save(); ctx.translate(this.x, this.y);
+
+        if (this.type === 'blackhole') {
+            // Accretion disk
+            ctx.shadowBlur = 30; ctx.shadowColor = '#ff00ff';
+            const grad = ctx.createRadialGradient(0,0,2,0,0,pulseR);
+            grad.addColorStop(0,'#000'); grad.addColorStop(0.3,'#ff00ff'); grad.addColorStop(1,'transparent');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(0,0,pulseR,0,Math.PI*2); ctx.fill();
+            // Swirl
+            ctx.strokeStyle = 'rgba(255,0,255,0.3)'; ctx.lineWidth = 2;
+            for (let i=0; i<3; i++) {
+                ctx.beginPath();
+                const a = this.angle * (2+i) + i * 2;
+                ctx.arc(0,0, pulseR * (0.4 + i*0.2), a, a + Math.PI);
+                ctx.stroke();
+            }
+        } else {
+            // Glow
+            ctx.shadowBlur = isTarget ? 40 : 25;
+            ctx.shadowColor = this.type === 'nova' ? '#ffd700' : '#00f0ff';
+            // Core
+            const grad = ctx.createRadialGradient(0,0,3,0,0,pulseR);
+            grad.addColorStop(0, '#fff');
+            grad.addColorStop(0.3, this.type === 'nova' ? '#ffd700' : '#00f0ff');
+            grad.addColorStop(0.7, this.type === 'nova' ? 'rgba(255,160,0,0.3)' : 'rgba(0,100,255,0.3)');
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(0,0,pulseR,0,Math.PI*2); ctx.fill();
+
+            // Ring
+            ctx.strokeStyle = this.type === 'nova' ? 'rgba(255,215,0,0.5)' : 'rgba(0,240,255,0.4)';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(0,0,pulseR*0.7,0,Math.PI*2); ctx.stroke();
+
+            // Spikes
+            ctx.strokeStyle = this.type === 'nova' ? 'rgba(255,200,0,0.3)' : 'rgba(0,200,255,0.25)';
+            ctx.lineWidth = 1.5;
+            for (let i=0; i<this.spikes; i++) {
+                const a = this.angle + (i/this.spikes)*Math.PI*2;
+                ctx.beginPath(); ctx.moveTo(Math.cos(a)*pulseR*0.5, Math.sin(a)*pulseR*0.5);
+                ctx.lineTo(Math.cos(a)*pulseR*1.3, Math.sin(a)*pulseR*1.3); ctx.stroke();
+            }
+        }
+
+        // Capture ring when near
+        if (isNear && !isTarget) {
+            ctx.strokeStyle = 'rgba(0,255,100,0.6)'; ctx.lineWidth = 2;
+            ctx.setLineDash([5,5]);
+            ctx.beginPath(); ctx.arc(0,0,this.r+40+Math.sin(Date.now()*0.01)*5,0,Math.PI*2); ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        ctx.shadowBlur = 0; ctx.restore();
+    }
+}
+
+class Asteroid {
+    constructor(x,y,r) {
+        this.x=x; this.y=y; this.r=r; this.vx=rand(-1,1); this.vy=rand(-1,1);
+        this.rot = rand(0,Math.PI*2); this.rotSpeed = rand(-0.03,0.03);
+        this.points = [];
+        const sides = 6 + Math.floor(rand(0,5));
+        for (let i=0; i<sides; i++) {
+            const a = (i/sides)*Math.PI*2;
+            this.points.push({x:Math.cos(a)*r*(0.7+rand(0,0.3)), y:Math.sin(a)*r*(0.7+rand(0,0.3))});
+        }
+    }
+    update(dt) {
+        this.x += this.vx * dt; this.y += this.vy * dt; this.rot += this.rotSpeed * dt;
+    }
+    draw(ctx) {
+        ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rot);
+        ctx.shadowBlur = 10; ctx.shadowColor = '#ff4444';
+        ctx.fillStyle = '#1a0a0a'; ctx.strokeStyle = '#ff4444'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(this.points[0].x, this.points[0].y);
+        for (let i=1; i<this.points.length; i++) ctx.lineTo(this.points[i].x, this.points[i].y);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.shadowBlur = 0; ctx.restore();
+    }
+}
+
+class Crystal {
+    constructor(x,y) {
+        this.x=x; this.y=y; this.r=10; this.collected=false;
+        this.bob = rand(0,10);
+    }
+    draw(ctx) {
+        if (this.collected) return;
+        const yOff = Math.sin(Date.now()*0.004 + this.bob) * 5;
+        ctx.save(); ctx.translate(this.x, this.y + yOff);
+        ctx.shadowBlur = 20; ctx.shadowColor = '#ffd700';
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath(); ctx.moveTo(0,-10); ctx.lineTo(8,0); ctx.lineTo(0,10); ctx.lineTo(-8,0); ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(3,0); ctx.lineTo(0,4); ctx.lineTo(-3,0); ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 0; ctx.restore();
+    }
+}
+
+class Trail {
+    constructor() { this.points = []; }
+    add(x,y) {
+        this.points.push({x,y,life:30});
+        if (this.points.length > 40) this.points.shift();
+    }
+    update(dt) {
+        for (let i=this.points.length-1; i>=0; i--) {
+            this.points[i].life -= dt;
+            if (this.points[i].life <= 0) this.points.splice(i,1);
+        }
+    }
+    draw(ctx) {
+        if (this.points.length < 2) return;
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        for (let i=1; i<this.points.length; i++) {
+            const a = this.points[i].life / 30;
+            ctx.strokeStyle = `rgba(0,240,255,${a*0.6})`;
+            ctx.lineWidth = a * 6;
+            ctx.beginPath(); ctx.moveTo(this.points[i-1].x, this.points[i-1].y); ctx.lineTo(this.points[i].x, this.points[i].y); ctx.stroke();
+        }
+    }
+}
+
+// ===================== GAME =====================
+class Game {
+    constructor() {
+        this.state = 'menu';
+        this.score = 0; this.starsVisited = 0; this.combo = 0; this.comboTimer = 0;
+        this.highScore = 0; this.difficulty = 1;
+        this.player = { x:500, y:500, vx:0, vy:0, r:8, star:null, lastStar:null, graceTimer:0, orbitAngle:0, orbitSpeed:0.04, dead:false };
+        this.stars = []; this.asteroids = []; this.crystals = []; this.particles = [];
+        this.trail = new Trail();
+        this.camX = 0; this.camY = 0;
+        this.targetStar = null; // for aiming
+        this.loadHS();
+        this.loop = this.loop.bind(this);
+        requestAnimationFrame(this.loop);
+    }
+    loadHS() { try { this.highScore = parseInt(localStorage.getItem('nebulaHS')||'0'); } catch(e){} this.updateUI(); }
+    saveHS() { if (this.score > this.highScore) { this.highScore = this.score; try { localStorage.setItem('nebulaHS', this.score); } catch(e){} } }
+    updateUI() {
+        document.getElementById('sc').textContent = this.score;
+        document.getElementById('st').textContent = this.starsVisited;
+        document.getElementById('hs').textContent = this.highScore;
+        const cmb = document.getElementById('combo');
+        if (this.combo > 1) { cmb.textContent = 'x' + this.combo; cmb.classList.add('show'); }
+        else { cmb.classList.remove('show'); }
+    }
+    start() {
+        initAudio(); sfx('overtone');
+        // Menüdeki dokunuş oyuna taşınmasın (açılışta istemsiz fırlatma)
+        input.down = false; input.active = false; input.justReleased = false;
+        this.state = 'playing';
+        this.lastTime = undefined;
+        this.score = 0; this.starsVisited = 0; this.combo = 0; this.difficulty = 1;
+        this.player = { x:500, y:500, vx:0, vy:0, r:8, star:null, lastStar:null, graceTimer:0, orbitAngle:0, orbitSpeed:0.04, dead:false };
+        this.stars = []; this.asteroids = []; this.crystals = []; this.particles = [];
+        this.trail = new Trail();
+        // Initial star
+        this.stars.push(new Star(500, 500, 50, 3));
+        this.player.star = this.stars[0];
+        this.player.orbitAngle = 0;
+        this.generateAhead();
+        document.getElementById('screen').classList.add('off');
+        document.getElementById('tutorialHand').classList.add('show');
+        setTimeout(() => document.getElementById('tutorialHand').classList.remove('show'), 4000);
+        this.updateUI();
+    }
+    generateAhead() {
+        // Generate stars/asteroids/crystals ahead of player
+        const aheadDist = 800;
+        const cx = this.player.x, cy = this.player.y;
+        // Remove far behind
+        this.stars = this.stars.filter(s => dist(s, this.player) < 1500);
+        this.asteroids = this.asteroids.filter(a => dist(a, this.player) < 1500);
+        this.crystals = this.crystals.filter(c => dist(c, this.player) < 1500);
+
+        // Count ahead (deneme sınırı: çakışmalar sonsuz döngü yaratmasın)
+        let aheadStars = this.stars.filter(s => dist(s, {x:cx,y:cy}) > 100 && dist(s, {x:cx,y:cy}) < aheadDist).length;
+        let tries = 0;
+        while (aheadStars < 3 && tries++ < 40) {
+            const dir = rand(0, Math.PI*2);
+            const d = rand(250, aheadDist);
+            const x = cx + Math.cos(dir) * d;
+            const y = cy + Math.sin(dir) * d;
+            // Don't overlap
+            let ok = true;
+            for (let s of this.stars) if (dist({x,y}, s) < 120) ok = false;
+            if (ok) {
+                const r = rand(35, 55);
+                const p = 3 + this.difficulty * 0.3;
+                this.stars.push(new Star(x, y, r, p));
+                aheadStars++;
+                // Crystal between stars
+                if (Math.random() < 0.6) {
+                    const midX = (cx + x) / 2 + rand(-50,50);
+                    const midY = (cy + y) / 2 + rand(-50,50);
+                    this.crystals.push(new Crystal(midX, midY));
+                }
+            }
+        }
+        // Asteroids
+        if (this.asteroids.length < 2 + this.difficulty) {
+            const dir = rand(0, Math.PI*2);
+            const d = rand(300, 700);
+            this.asteroids.push(new Asteroid(cx + Math.cos(dir)*d, cy + Math.sin(dir)*d, rand(15, 30)));
+        }
+    }
+    die() {
+        if (this.player.dead) return;
+        this.player.dead = true; sfx('die');
+        for (let i=0; i<30; i++) {
+            const a = rand(0,Math.PI*2);
+            const s = rand(2,6);
+            this.particles.push(new Particle(this.player.x, this.player.y, Math.cos(a)*s, Math.sin(a)*s, rand(30,60), '#00f0ff', rand(2,5), true));
+        }
+        this.saveHS();
+        setTimeout(() => {
+            this.state = 'gameover';
+            document.getElementById('screen').classList.remove('off');
+            document.querySelector('#screen h1').textContent = 'KAYBETTİN';
+            document.querySelector('.subtitle').textContent = 'YILDIZLAR ARASI YOLCULUK SON BULDU';
+            document.querySelector('.instructions').innerHTML = 'Skorun: <strong style="color:#00f0ff">' + this.score + '</strong><br>Ziyaret: <strong style="color:#ffd700">' + this.starsVisited + '</strong>';
+            document.getElementById('startBtn').textContent = 'TEKRAR DENE';
+            document.getElementById('highScore').textContent = 'Rekor: ' + this.highScore;
+        }, 1200);
+    }
+    update(dt) {
+        if (this.state !== 'playing') return;
+        const p = this.player;
+
+        // Ölü oyuncu: sadece partiküller ve iz sönümlensin
+        if (p.dead) {
+            this.trail.update(dt);
+            for (let i=this.particles.length-1; i>=0; i--) {
+                this.particles[i].update(dt);
+                if (this.particles[i].life <= 0) this.particles.splice(i,1);
+            }
+            return;
+        }
+
+        // Difficulty scaling
+        this.difficulty = 1 + this.starsVisited * 0.15;
+
+        // Combo timer
+        if (this.comboTimer > 0) { this.comboTimer -= dt; if (this.comboTimer <= 0) this.combo = 0; }
+
+        if (p.star) {
+            // Orbiting
+            p.orbitAngle += p.orbitSpeed * dt;
+            p.x = p.star.x + Math.cos(p.orbitAngle) * (p.star.r + 20);
+            p.y = p.star.y + Math.sin(p.orbitAngle) * (p.star.r + 20);
+            p.vx = 0; p.vy = 0;
+
+            // Input: aim
+            if (input.down) {
+                // Find nearest star in aim direction
+                const aimAngle = angle({x:p.x,y:p.y}, {x:input.x,y:input.y});
+                let best = null, bestScore = -Infinity;
+                for (let s of this.stars) {
+                    if (s === p.star) continue;
+                    const d = dist(p, s);
+                    if (d > 600) continue;
+                    const a = angle(p, s);
+                    const diff = Math.abs(((a - aimAngle + Math.PI) % (Math.PI*2)) - Math.PI);
+                    const score = (1 - diff/Math.PI) * 100 - d * 0.1;
+                    if (score > bestScore) { bestScore = score; best = s; }
+                }
+                this.targetStar = best;
+            }
+
+            // Launch on release
+            if (input.justReleased) {
+                input.justReleased = false;
+                const launchDir = this.targetStar ? angle(p, this.targetStar) : angle({x:p.x,y:p.y}, {x:input.x,y:input.y});
+                const power = Math.min(dist({x:p.x,y:p.y}, {x:input.sx,y:input.sy}), 200) / 200 * 8 + 6;
+                p.vx = Math.cos(launchDir) * power;
+                p.vy = Math.sin(launchDir) * power;
+                // Fırlatma muafiyeti: yörünge yarıçapı (r+20) yakalama menzilinin (r+30)
+                // içinde — muafiyet olmazsa eski yıldız oyuncuyu anında geri yutuyor
+                p.lastStar = p.star;
+                p.graceTimer = 30;
+                p.star = null;
+                sfx('launch');
+                // Launch particles
+                for (let i=0; i<10; i++) {
+                    const a = launchDir + rand(-0.3,0.3);
+                    this.particles.push(new Particle(p.x, p.y, Math.cos(a)*rand(2,5), Math.sin(a)*rand(2,5), rand(20,40), '#00f0ff', rand(2,4), true));
+                }
+                this.targetStar = null;
+            }
+        } else {
+            // Flying
+            p.x += p.vx * dt; p.y += p.vy * dt;
+            const drag = Math.pow(0.995, dt);
+            p.vx *= drag; p.vy *= drag; // tiny drag
+
+            // Trail
+            this.trail.add(p.x, p.y);
+
+            // Capture by star
+            if (p.graceTimer > 0) p.graceTimer -= dt;
+            let captured = false;
+            for (let s of this.stars) {
+                if (s === p.lastStar && p.graceTimer > 0) continue; // fırlatma muafiyeti
+                const d = dist(p, s);
+                if (d < s.r + 30) {
+                    if (s.type === 'blackhole') {
+                        // Black hole pull
+                        const pull = s.power * 0.02;
+                        p.vx += (s.x - p.x) / d * pull * dt;
+                        p.vy += (s.y - p.y) / d * pull * dt;
+                        if (d < s.r * 0.5) { this.die(); return; }
+                    } else {
+                        // Capture
+                        p.star = s;
+                        p.orbitAngle = angle(s, p);
+                        // Yörünge yönü geliş yönüyle uyumlu olsun (çapraz çarpım işareti) —
+                        // aksi halde yakalanma anında ani yön kırılması hissediliyor
+                        const cross = (p.x - s.x) * p.vy - (p.y - s.y) * p.vx;
+                        const spd = 0.03 + this.difficulty * 0.005;
+                        p.orbitSpeed = cross >= 0 ? spd : -spd;
+                        if (!s.visited) {
+                            s.visited = true; this.starsVisited++;
+                            this.combo++; this.comboTimer = 120;
+                            const pts = 100 * this.combo;
+                            this.score += pts;
+                            sfx(this.combo > 1 ? 'combo' : 'capture');
+                            // Capture particles
+                            for (let i=0; i<15; i++) {
+                                const a = rand(0,Math.PI*2);
+                                this.particles.push(new Particle(p.x, p.y, Math.cos(a)*rand(1,4), Math.sin(a)*rand(1,4), rand(30,50), s.type==='nova'?'#ffd700':'#00f0ff', rand(3,6), true));
+                            }
+                        } else {
+                            sfx('capture');
+                        }
+                        captured = true;
+                        break;
+                    }
+                }
+            }
+
+            // Out of bounds
+            if (!captured) {
+                let nearestStarDist = Infinity;
+                for (let s of this.stars) nearestStarDist = Math.min(nearestStarDist, dist(p,s));
+                if (nearestStarDist > 900) { this.die(); return; }
+            }
+        }
+
+        // Asteroid collision
+        for (let a of this.asteroids) {
+            a.update(dt);
+            if (dist(p, a) < p.r + a.r - 5) {
+                this.die(); return;
+            }
+        }
+
+        // Crystal collection
+        for (let c of this.crystals) {
+            if (!c.collected && dist(p, c) < p.r + c.r + 5) {
+                c.collected = true; this.score += 50;
+                sfx('crystal');
+                for (let i=0; i<8; i++) {
+                    const a = rand(0,Math.PI*2);
+                    this.particles.push(new Particle(c.x, c.y, Math.cos(a)*rand(1,3), Math.sin(a)*rand(1,3), rand(20,35), '#ffd700', rand(2,4), true));
+                }
+            }
+        }
+
+        // Update entities
+        for (let s of this.stars) s.update(dt);
+        this.trail.update(dt);
+        for (let i=this.particles.length-1; i>=0; i--) {
+            this.particles[i].update(dt);
+            if (this.particles[i].life <= 0) this.particles.splice(i,1);
+        }
+
+        // Camera follow (dt'ye göre üstel yumuşatma)
+        const lerp = 1 - Math.pow(0.92, dt);
+        this.camX += (p.x - gameW/2 - this.camX) * lerp;
+        this.camY += (p.y - gameH/2 - this.camY) * lerp;
+
+        // Generate
+        this.generateAhead();
+        this.updateUI();
+    }
+    draw() {
+        // Tam canvas temizle + yıldız alanı (transformsuz — kenar bantları da dolsun)
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.fillStyle = '#020108'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const cw = canvas.width, ch = canvas.height;
+        const parX = this.camX * 0.1 * scale, parY = this.camY * 0.1 * scale;
+        ctx.fillStyle = '#fff';
+        for (let i=0; i<150; i++) {
+            const sx = ((i*137.5 - parX) % cw + cw) % cw;
+            const sy = ((i*89.3 - parY) % ch + ch) % ch;
+            const sz = (i % 3) + 1;
+            const a = 0.3 + (i % 5) * 0.1;
+            ctx.globalAlpha = a;
+            ctx.beginPath(); ctx.arc(sx, sy, sz*0.5*DPR, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // Oyun alanı transformu (contain)
+        ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
+        ctx.save();
+        ctx.translate(-this.camX + gameW/2, -this.camY + gameH/2);
+
+        // Connection lines between nearby stars
+        ctx.strokeStyle = 'rgba(0,100,200,0.08)'; ctx.lineWidth = 1;
+        for (let i=0; i<this.stars.length; i++) {
+            for (let j=i+1; j<this.stars.length; j++) {
+                const d = dist(this.stars[i], this.stars[j]);
+                if (d < 300) {
+                    ctx.beginPath(); ctx.moveTo(this.stars[i].x, this.stars[i].y); ctx.lineTo(this.stars[j].x, this.stars[j].y); ctx.stroke();
+                }
+            }
+        }
+
+        // Aim line
+        if (this.player.star && input.down && this.targetStar) {
+            ctx.strokeStyle = 'rgba(0,255,150,0.4)'; ctx.lineWidth = 2; ctx.setLineDash([8,8]);
+            ctx.beginPath(); ctx.moveTo(this.player.x, this.player.y); ctx.lineTo(this.targetStar.x, this.targetStar.y); ctx.stroke();
+            ctx.setLineDash([]);
+            // Target ring
+            ctx.strokeStyle = 'rgba(0,255,150,0.6)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(this.targetStar.x, this.targetStar.y, this.targetStar.r+15, 0, Math.PI*2); ctx.stroke();
+        }
+
+        // Draw entities
+        for (let c of this.crystals) c.draw(ctx);
+        for (let a of this.asteroids) a.draw(ctx);
+        for (let s of this.stars) s.draw(ctx, this.player);
+        this.trail.draw(ctx);
+
+        // Player
+        if (!this.player.dead) {
+            const p = this.player;
+            ctx.shadowBlur = 25; ctx.shadowColor = '#00f0ff';
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+            // Inner glow
+            const grad = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, p.r*2);
+            grad.addColorStop(0, 'rgba(0,240,255,0.8)'); grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(p.x, p.y, p.r*2, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        // Particles
+        for (let p of this.particles) p.draw(ctx);
+
+        ctx.restore();
+    }
+    loop(now) {
+        // dt'yi 60fps'e normalle: 120Hz ekranda oyun 2x hızlı akmasın
+        if (this.lastTime === undefined) this.lastTime = now;
+        const dt = clamp((now - this.lastTime) / 16.667, 0.25, 2);
+        this.lastTime = now;
+        this.update(dt);
+        this.draw();
+        requestAnimationFrame(this.loop);
+    }
+}
+
+const game = new Game();
+document.getElementById('startBtn').addEventListener('click', () => game.start());
+
+// Prevent double-tap zoom, context menu
+document.addEventListener('dblclick', e => e.preventDefault());
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Test API'si
+window._nebula = { game, input, Star, Asteroid, Crystal };
+</script>
+<script src="../../js/version.js?v=1.44.0"></script>
+<script src="../../js/pwa-back.js?v=1.44.0"></script>
+</body>
+</html>
