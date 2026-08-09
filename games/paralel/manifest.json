@@ -1,0 +1,14 @@
+{
+  "id": "paralel",
+  "title": "Paralel Evren",
+  "description": "Tek dokunuşla boyut değiştir! Ekrana dokununca renk değiştirirsin — aynı renkteki engellerden geçer, farklı renklere çarpınca yok olursun. Refleksini test et, en yüksek skoru kov!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "refleks", "sonsuz koşu", "tek dokunuş", "renk"],
+  "author": "SEmirK Games",
+  "controls": ["Ekrana dokun: boyut (renk) değiştir", "Aynı renkteki engellerden geç"]
+}

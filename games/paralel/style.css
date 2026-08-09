@@ -1,0 +1,144 @@
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+body { 
+    background-color: #0d1117; 
+    color: #c9d1d9; 
+    font-family: 'Courier New', Courier, monospace; 
+    overflow: hidden; 
+    touch-action: none; /* Kaydırmaları tamamen engeller */
+    width: 100vw;
+    height: 100vh;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    pointer-events: none; /* UI katmanının altındaki canvas'a tıklamaya izin verir */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#score-display {
+    position: absolute;
+    top: 30px;
+    font-size: 3rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    transition: color 0.3s ease;
+}
+
+.screen {
+    background: rgba(13, 17, 23, 0.9);
+    padding: 40px;
+    border-radius: 15px;
+    border: 1px solid #30363d;
+    text-align: center;
+    pointer-events: auto;
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.screen.visible {
+    display: flex;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+h1 {
+    font-size: 2rem;
+    letter-spacing: 3px;
+    color: #fff;
+}
+
+p {
+    color: #8b949e;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.highlight {
+    color: #c9d1d9;
+    font-weight: bold;
+}
+
+button {
+    background: #238636;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+    transition: transform 0.1s, background 0.2s;
+}
+
+button:active {
+    transform: scale(0.95);
+    background: #2ea043;
+}
+
+@keyframes popIn {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* ---- SEmirK Games entegrasyonu + iyileştirmeler ---- */
+body { height: 100dvh; }
+
+.back-fab {
+    position: fixed; top: 10px; left: 10px; z-index: 50;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,0.55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; font-size: 20px; font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.25);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    pointer-events: auto;
+}
+
+#score-display { top: max(24px, env(safe-area-inset-top)); }
+
+.best-line {
+    color: #8b949e;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+.best-line span { color: #c9d1d9; font-weight: bold; }
+
+#new-record {
+    color: #f2cc60;
+    font-weight: bold;
+    letter-spacing: 2px;
+    animation: pulse 0.9s ease-in-out infinite;
+}
+.hidden { display: none !important; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+}

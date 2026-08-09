@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Paralel Evren - SEmirK Games</title>
+    <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+    <div id="ui-layer">
+        <div id="score-display">0</div>
+
+        <div id="start-screen" class="screen visible">
+            <h1>PARALEL EVREN</h1>
+            <p>Boyut değiştirmek için ekrana dokun.</p>
+            <p class="highlight">Aynı renkteki engellerden geçebilirsin.<br>Farklı renklere çarparsan yok olursun.</p>
+            <div class="best-line">EN İYİ: <span id="best-start">0</span></div>
+            <button id="start-btn">BAŞLA</button>
+        </div>
+
+        <div id="game-over-screen" class="screen">
+            <h1>SİSTEM ÇÖKTÜ</h1>
+            <p>Skor: <span id="final-score">0</span></p>
+            <div class="best-line">EN İYİ: <span id="best-over">0</span></div>
+            <div id="new-record" class="hidden">✦ YENİ REKOR ✦</div>
+            <button id="restart-btn">TEKRAR DENE</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+    <script src="../../js/version.js?v=1.41.0"></script>
+    <script src="../../js/pwa-back.js?v=1.41.0"></script>
+    <script src="script.js?v=1.41.0"></script>
+</body>
+</html>
