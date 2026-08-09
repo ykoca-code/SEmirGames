@@ -1,0 +1,14 @@
+{
+  "id": "karakutu",
+  "title": "Kara Kutu",
+  "description": "Gizemli sistemi çöz! Düğmelerin ne yaptığı söylenmiyor — deneyerek keşfet. Her bölümde kurallar gizlice değişiyor. Hedef durumu tuttur, 8 sistemi de çöz!",
+  "version": "1.0.0",
+  "category": "logic",
+  "categoryLabel": "Mantık",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["mantık", "bulmaca", "keşif", "deneme", "gizem"],
+  "author": "SEmirK Games",
+  "controls": ["Düğmelere dokun ve ne yaptıklarını keşfet", "Hedefteki renk ve doluluğu tuttur", "↺ düğmesi: sıfırla"]
+}
