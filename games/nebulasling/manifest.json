@@ -1,0 +1,14 @@
+{
+  "id": "nebulasling",
+  "title": "Nebula Sling",
+  "description": "Yerçekimi sapanı! Yıldızın yörüngesinde dön, dokunup bırakınca fırla, yeni yıldızlara yakalan. Kristal topla, kombo yap; asteroidlerden ve kara deliklerden kaç. Sonsuz uzay koşusu!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "uzay", "refleks", "tek dokunuş", "sonsuz", "yörünge"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: hedef yıldızı seç", "Bırak: yörüngeden fırla", "Yeni yıldıza yakalan, kristalleri topla"]
+}
