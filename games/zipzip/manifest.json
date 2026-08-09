@@ -1,0 +1,14 @@
+{
+  "id": "zipzip",
+  "title": "Süper Zıpzıp",
+  "description": "Yan kaydırmalı platform macerası! Zıpzıp ile koş, zıpla, soru bloklarından altın topla, yeşil jölelerin üstüne atla ve her bölümün sonundaki bayrağa ulaş. 3 bölüm!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "platform", "zıplama", "macera", "yan kaydırma"],
+  "author": "SEmirK Games",
+  "controls": ["Dokun: zıpla", "Sürükle: sağa/sola koş", "Klavye: oklar + Space"]
+}

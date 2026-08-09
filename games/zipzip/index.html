@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Süper Zıpzıp — SEmirK Games</title>
+    <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui">
+            <div id="score">SKOR: 0</div>
+            <div id="lives">CAN: 3</div>
+            <div id="level">BÖLÜM: 1</div>
+        </div>
+        <div id="controls">
+            <p>⬅️ ➡️ Yürü | SPACE Zıpla | R Yeniden Başla</p>
+        </div>
+        <div id="gameOver" class="hidden">
+            <h1>GAME OVER</h1>
+            <p>Skorun: <span id="finalScore">0</span></p>
+            <button onclick="game.restart()">TEKRAR OYNA</button>
+        </div>
+        <div id="victory" class="hidden">
+            <h1>🎉 KAZANDIN! 🎉</h1>
+            <p>Tüm seviyeleri tamamladın!</p>
+            <p>Skorun: <span id="victoryScore">0</span></p>
+            <button onclick="game.restart()">TEKRAR OYNA</button>
+        </div>
+    </div>
+    <script src="../../js/version.js?v=1.38.0"></script>
+    <script src="../../js/pwa-back.js?v=1.38.0"></script>
+    <script src="game.js"></script>
+</body>
+</html>
