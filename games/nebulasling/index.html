@@ -205,9 +205,13 @@ function getPos(e) {
     const r = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    // Ekran → sanal oyun alanı → DÜNYA koordinatı (kamera kayması dahil).
+    // Kamera çevirisi yapılmazsa oyuncu ilerledikçe nişan tamamen bozulur.
+    const vx = ((clientX - r.left) * DPR - offsetX) / scale;
+    const vy = ((clientY - r.top) * DPR - offsetY) / scale;
     return {
-        x: (clientX - r.left) * DPR / scale - offsetX / scale,
-        y: (clientY - r.top) * DPR / scale - offsetY / scale
+        x: vx + game.camX,
+        y: vy + game.camY
     };
 }
 function onDown(e) {
@@ -449,6 +453,9 @@ class Game {
         this.stars.push(new Star(500, 500, 50, 3));
         this.player.star = this.stars[0];
         this.player.orbitAngle = 0;
+        // Kamera hemen oyuncuda başlasın (restart'ta eski konumdan sürüklenmesin)
+        this.camX = this.player.x - gameW/2;
+        this.camY = this.player.y - gameH/2;
         this.generateAhead();
         document.getElementById('screen').classList.add('off');
         document.getElementById('tutorialHand').classList.add('show');
@@ -694,7 +701,9 @@ class Game {
         // Oyun alanı transformu (contain)
         ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
         ctx.save();
-        ctx.translate(-this.camX + gameW/2, -this.camY + gameH/2);
+        // camX/camY = görünür alanın sol üst köşesinin dünya koordinatı.
+        // (Eski kod +gameW/2 fazladan ekleyip oyuncuyu köşeye kaydırıyordu.)
+        ctx.translate(-this.camX, -this.camY);
 
         // Connection lines between nearby stars
         ctx.strokeStyle = 'rgba(0,100,200,0.08)'; ctx.lineWidth = 1;
@@ -762,7 +771,7 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 // Test API'si
 window._nebula = { game, input, Star, Asteroid, Crystal };
 </script>
-<script src="../../js/version.js?v=1.44.0"></script>
-<script src="../../js/pwa-back.js?v=1.44.0"></script>
+<script src="../../js/version.js?v=1.44.1"></script>
+<script src="../../js/pwa-back.js?v=1.44.1"></script>
 </body>
 </html>
