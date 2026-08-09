@@ -1,0 +1,14 @@
+{
+  "id": "neonshift",
+  "title": "Neon Shift",
+  "description": "Cyberpunk platform macerası! Koş, çift zıpla, dash at, zamanı yavaşlat. Düşmanları üstlerine atlayarak ez, neon kürelerini topla ve 5. bölümdeki dev boss'u alt et!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "7+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "platform", "cyberpunk", "dash", "boss", "neon"],
+  "author": "SEmirK Games",
+  "controls": ["◀ ▶ / A D: hareket", "▲ / SPACE: zıpla (çift zıplama)", "⚡ / SHIFT: dash", "⏱ / Q: zaman yavaşlat"]
+}
