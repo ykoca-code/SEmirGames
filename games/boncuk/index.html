@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#7ec8f7" />
+  <title>Süper Boncuk — SEmirK Games</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #7ec8f7;
+      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none; -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+    #game { display: block; position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; }
+
+    .back-fab {
+      position: fixed; top: 10px; left: 10px; z-index: 40;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.45); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 20px; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(4px);
+    }
+
+    .hud {
+      position: fixed; top: 8px; left: 54px; right: 8px; z-index: 20;
+      display: flex; gap: 5px; flex-wrap: wrap; pointer-events: none;
+    }
+    .pill {
+      background: rgba(15,17,24,0.7);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px; font-weight: 800; color: #fff;
+      font-variant-numeric: tabular-nums;
+      backdrop-filter: blur(3px);
+    }
+    .pill .lbl { font-size: 9px; color: #cbd5e1; letter-spacing: 0.06em; margin-right: 3px; }
+    .pill.coin { color: #fde047; }
+    .pill.life { color: #f87171; }
+    .pill.time { color: #6ee7b7; }
+
+    .tbtn {
+      position: fixed; z-index: 30;
+      border: 2px solid rgba(255,255,255,0.35);
+      background: rgba(20,24,34,0.5);
+      color: #fff; border-radius: 18px;
+      font-size: 26px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      touch-action: none;
+      backdrop-filter: blur(3px);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tbtn.pressed { background: rgba(245,158,11,0.65); border-color: #fbbf24; }
+    #btnLeft  { left: 14px;  bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 76px; height: 76px; }
+    #btnRight { left: 102px; bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 76px; height: 76px; }
+    #btnJump  { right: 14px; bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 96px; height: 96px; font-size: 17px; background: rgba(22,101,52,0.55); border-radius: 50%; }
+    #btnJump.pressed { background: rgba(34,197,94,0.7); }
+
+    .overlay {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(10,14,22,0.88);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(5px);
+    }
+    .overlay.hidden { display: none; }
+    .panel {
+      background: linear-gradient(180deg, #fef9ec, #fdeecd);
+      border: 3px solid #b45309;
+      border-radius: 16px;
+      padding: 20px;
+      width: min(400px, 100%);
+      max-height: 92vh; overflow-y: auto;
+      text-align: center;
+      color: #431407;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+    }
+    .panel h2 { font-size: 24px; margin-bottom: 8px; color: #b45309; }
+    .panel p  { font-size: 13px; color: #713f12; margin-bottom: 10px; line-height: 1.55; }
+    .statline { font-size: 15px; font-weight: 800; margin: 4px 0; }
+    .row { display: flex; gap: 8px; margin-top: 14px; }
+    .btn {
+      flex: 1;
+      background: #d97706; color: #fff; border: 0;
+      padding: 12px; font-size: 15px; font-weight: 900;
+      border-radius: 12px; cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 3px 0 #92400e;
+    }
+    .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #92400e; }
+    .btn.secondary { background: #a8a29e; box-shadow: 0 3px 0 #57534e; }
+  </style>
+</head>
+<body>
+  <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+  <canvas id="game"></canvas>
+
+  <div class="hud">
+    <span class="pill"><span class="lbl">BÖLÜM</span><span id="hudLevel">1</span></span>
+    <span class="pill"><span class="lbl">SKOR</span><span id="hudScore">0</span></span>
+    <span class="pill coin">🪙 <span id="hudCoins">0</span></span>
+    <span class="pill life">❤ <span id="hudLives">3</span></span>
+    <span class="pill time"><span class="lbl">SÜRE</span><span id="hudTime">200</span></span>
+  </div>
+
+  <div class="tbtn" id="btnLeft">◀</div>
+  <div class="tbtn" id="btnRight">▶</div>
+  <div class="tbtn" id="btnJump">ZIPLA</div>
+
+  <div class="overlay" id="overlay">
+    <div class="panel" id="panel">
+      <h2>🐱 Süper Boncuk</h2>
+      <p>Turuncu kedi Boncuk ile koş ve zıpla!<br>
+      <b>?</b> bloklarına kafa at → altın çıkar. 🐟 balığı ye → büyü!<br>
+      Böcekleri üstlerine zıplayarak ez, dikenli salyangozlardan uzak dur, bayrağa ulaş!</p>
+      <div class="row"><button class="btn" id="startBtn">▶ Başla</button></div>
+    </div>
+  </div>
+
+  <script src="../../js/version.js?v=1.37.0"></script>
+  <script src="../../js/pwa-back.js?v=1.37.0"></script>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // ========================================================================
+    // CONFIG
+    // ========================================================================
+    const TILE = 32;
+    const CFG = {
+      player: {
+        w: 22, hSmall: 28, hBig: 40,
+        accel: 1500, maxRun: 250, frictionGround: 1400, frictionAir: 250,
+        gravity: 2300, jumpVel: 760, jumpCut: 260,
+        coyote: 0.08, buffer: 0.09,
+        stompBounce: 430, invulnSec: 1.6,
+      },
+      enemy: { beetleSpeed: 55, snailSpeed: 38 },
+      time: 200,
+      scores: { coin: 100, blockCoin: 200, stomp: 200, power: 500, flag: 1000 },
+    };
+
+    // ========================================================================
+    // Canvas + DPR
+    // ========================================================================
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    let W = 0, H = 0, DPR = 1;
+    function resize() {
+      DPR = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.floor(W * DPR);
+      canvas.height = Math.floor(H * DPR);
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      ctx.imageSmoothingEnabled = false;
+    }
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("orientationchange", resize, { passive: true });
+    resize();
+
+    // ========================================================================
+    // AUDIO — özgün kısa sentez sesleri (dosyasız)
+    // ========================================================================
+    const SFX = (function () {
+      let actx = null;
+      function ac() {
+        if (!actx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return null;
+          actx = new AC();
+        }
+        if (actx.state === "suspended") actx.resume();
+        return actx;
+      }
+      function tone(freq, dur, opts) {
+        const a = ac(); if (!a) return;
+        opts = opts || {};
+        const o = a.createOscillator(), g = a.createGain();
+        const t0 = a.currentTime + (opts.delay || 0);
+        o.type = opts.type || "square";
+        o.frequency.setValueAtTime(freq, t0);
+        if (opts.slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + opts.slide), t0 + dur);
+        g.gain.setValueAtTime(opts.vol || 0.06, t0);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        o.connect(g); g.connect(a.destination);
+        o.start(t0); o.stop(t0 + dur + 0.02);
+      }
+      return {
+        unlock: ac,
+        jump()  { tone(340, 0.16, { type: "square", slide: 300, vol: 0.05 }); },
+        coin()  { tone(1180, 0.07, { type: "triangle", vol: 0.07 }); tone(1560, 0.14, { type: "triangle", delay: 0.06, vol: 0.07 }); },
+        bump()  { tone(180, 0.08, { type: "triangle", slide: -60 }); },
+        stomp() { tone(240, 0.1, { type: "square", slide: -140, vol: 0.08 }); },
+        power() { [420, 530, 640, 800].forEach((f, i) => tone(f, 0.09, { type: "triangle", delay: i * 0.07, vol: 0.07 })); },
+        hurt()  { tone(200, 0.25, { type: "sawtooth", slide: -120, vol: 0.08 }); },
+        die()   { [520, 400, 300, 200, 140].forEach((f, i) => tone(f, 0.12, { type: "square", delay: i * 0.1, vol: 0.06 })); },
+        // Özgün 6 notalık bitiş cümlesi (kendi melodimiz)
+        clear() { [392, 494, 587, 494, 659, 784].forEach((f, i) => tone(f, 0.14, { type: "triangle", delay: i * 0.11, vol: 0.08 })); },
+      };
+    })();
+
+    // ========================================================================
+    // LEVELS — tamamen özgün düzenler
+    // Legend: '#'=zemin  'B'=tuğla  '?'=altın bloğu  'P'=güç bloğu  'U'=kullanılmış
+    //         'C'=altın  'E'=böcek  'S'=dikenli salyangoz  'F'=bayrak  ' '=boş
+    // ========================================================================
+    const RAW_LEVELS = [
+      { name: "Çayır Yolu", time: 200, rows: [
+        "                                                                                                            ",
+        "                                                                                                            ",
+        "                                                                                                            ",
+        "                    C                                    CCC                                                ",
+        "                                        B?B                                  ?                             ",
+        "              ?                                                                                     F      ",
+        "                          BB?BB               C C                 B?PB                              F      ",
+        "     C                                 ##                                            CC             F      ",
+        "                                      ###         E                     E                           F      ",
+        "                 E              ##   ####     ##########     ###              E     ####      E     F      ",
+        "############################################################################################################",
+        "############################################################################################################",
+      ]},
+      { name: "Tepe Tırmanışı", time: 220, rows: [
+        "                                                                                                                        ",
+        "                                                                                                                        ",
+        "                  CCC                                   C C C                                                           ",
+        "                 B???B                       ##                                     ?                                   ",
+        "                                            ###          BB?BB                                              F          ",
+        "         ?                          C      ####                          ###                                F          ",
+        "                    ##             ###    #####    E                    ####       B?B     CC               F          ",
+        "    C          E   ###      S     ####   ######  #####      C   S      #####                        E       F          ",
+        "############  ##########  ###############################  ####################   #####   ##################F##########",
+        "############  ##########  ###############################  ####################   #####   #####################████####".replace(/█/g,"#"),
+      ]},
+      { name: "Gece Vadisi", time: 240, rows: [
+        "                                                                                                                                ",
+        "                          C                                                                                                     ",
+        "               BB                     P                    CCC                     ?C?                                          ",
+        "                          ##                     BB                   S                          C C                            ",
+        "        ?                ###          ####                ####                 #######                        ?        F       ",
+        "                        ####         ######     E                                              E                       F       ",
+        "    C        E     S   #####        ########  ########      ####### E  ####                ##########    S             F       ",
+        "#########   ###############   ##   #########################################   #######   ###################   #########      #",
+        "#########   ###############   ##   #########################################   #######   ###################   #########      #",
+      ]},
+    ];
+
+    // Haritaları normalize et (satır uzunluklarını eşitle) + varlıkları çıkar
+    function parseLevel(raw) {
+      const width = Math.max(...raw.rows.map(r => r.length));
+      const rows = raw.rows.map(r => r.padEnd(width, " ").split(""));
+      const H_ = rows.length, W_ = width;
+      const enemies = [], coins = [];
+      let flagX = -1, startX = 2;
+      for (let y = 0; y < H_; y++) {
+        for (let x = 0; x < W_; x++) {
+          const ch = rows[y][x];
+          if (ch === "E") { enemies.push({ type: "beetle", x: x * TILE + 5, y: y * TILE + TILE - 24 }); rows[y][x] = " "; }
+          else if (ch === "S") { enemies.push({ type: "snail", x: x * TILE + 4, y: y * TILE + TILE - 22 }); rows[y][x] = " "; }
+          else if (ch === "C") { coins.push({ x: x * TILE + TILE / 2, y: y * TILE + TILE / 2, taken: false }); rows[y][x] = " "; }
+          else if (ch === "F" && flagX < 0) { flagX = x * TILE; }
+        }
+      }
+      return { name: raw.name, time: raw.time, grid: rows, w: W_, h: H_, enemies, coins, flagX, startX };
+    }
+    const LEVELS = RAW_LEVELS.map(parseLevel);
+
+    function solid(ch) { return ch === "#" || ch === "B" || ch === "?" || ch === "P" || ch === "U"; }
+
+    // ========================================================================
+    // GAME STATE
+    // ========================================================================
+    const G = {
+      phase: "menu",            // menu | playing | clear | gameover
+      levelIdx: 0,
+      grid: null, gw: 0, gh: 0,
+      player: null,
+      enemies: [], coins: [], pops: [], powerups: [],
+      score: 0, coinsGot: 0, lives: 3,
+      timeLeft: 0,
+      camX: 0, camY: 0,
+      input: { left: false, right: false, jump: false },
+      jumpHeld: false, jumpBuffered: 0, coyote: 0,
+      lastTs: 0, animT: 0,
+      flagX: 0,
+    };
+
+    function startLevel(idx, keepStats) {
+      G.levelIdx = idx;
+      const L = LEVELS[idx];
+      G.grid = L.grid.map(r => r.slice());   // blok durumları değişebilir (? → U)
+      G.gw = L.w; G.gh = L.h;
+      G.flagX = L.flagX;
+      G.enemies = L.enemies.map(e => ({ ...e, vx: (e.type === "beetle" ? -CFG.enemy.beetleSpeed : -CFG.enemy.snailSpeed), vy: 0, dead: false, squashT: 0 }));
+      G.coins = L.coins.map(c => ({ ...c }));
+      G.pops = []; G.powerups = [];
+      if (!keepStats) { G.score = 0; G.coinsGot = 0; G.lives = 3; }
+      G.timeLeft = L.time;
+      spawnPlayer();
+      G.phase = "playing";
+      G.lastTs = 0;
+      document.getElementById("overlay").classList.add("hidden");
+      updateHUD();
+      requestAnimationFrame(loop);
+    }
+
+    function spawnPlayer() {
+      const L = LEVELS[G.levelIdx];
+      G.player = {
+        x: L.startX * TILE, y: 0,
+        vx: 0, vy: 0,
+        big: false, grounded: false, invuln: 0,
+        facing: 1, runT: 0, dead: false,
+      };
+      // Başlangıç kolonunda zemine yerleştir
+      for (let y = 0; y < G.gh; y++) {
+        if (solid(G.grid[y][L.startX])) { G.player.y = y * TILE - CFG.player.hSmall; break; }
+      }
+      G.camX = 0; G.camY = 0;
+    }
+
+    function pH() { return G.player.big ? CFG.player.hBig : CFG.player.hSmall; }
+
+    // ========================================================================
+    // PHYSICS — tile AABB
+    // ========================================================================
+    function tileAt(px, py) {
+      const tx = Math.floor(px / TILE), ty = Math.floor(py / TILE);
+      if (tx < 0 || tx >= G.gw) return "#";     // yanlar duvar
+      if (ty < 0) return " ";
+      if (ty >= G.gh) return " ";                // alt açık (çukur ölümü)
+      return G.grid[ty][tx];
+    }
+    function setTile(px, py, ch) {
+      const tx = Math.floor(px / TILE), ty = Math.floor(py / TILE);
+      if (tx >= 0 && tx < G.gw && ty >= 0 && ty < G.gh) G.grid[ty][tx] = ch;
+    }
+
+    function rectHitsSolid(x, y, w, h) {
+      const x2 = x + w - 0.01, y2 = y + h - 0.01;
+      for (let px = x; ; px += TILE) {
+        const cx = Math.min(px, x2);
+        for (let py = y; ; py += TILE) {
+          const cy = Math.min(py, y2);
+          if (solid(tileAt(cx, cy))) return { x: cx, y: cy };
+          if (cy >= y2) break;
+        }
+        if (cx >= x2) break;
+      }
+      return null;
+    }
+
+    function hitBlockFromBelow(px, py) {
+      const ch = tileAt(px, py);
+      if (ch === "?") {
+        setTile(px, py, "U");
+        G.score += CFG.scores.blockCoin; G.coinsGot++;
+        G.pops.push({ x: Math.floor(px / TILE) * TILE + TILE / 2, y: Math.floor(py / TILE) * TILE, vy: -260, t: 0 });
+        SFX.coin();
+      } else if (ch === "P") {
+        setTile(px, py, "U");
+        G.powerups.push({ x: Math.floor(px / TILE) * TILE + 4, y: Math.floor(py / TILE) * TILE - 24, vx: 70, vy: 0 });
+        SFX.power();
+      } else if (ch === "B") {
+        if (G.player.big) { setTile(px, py, " "); G.score += 50; SFX.stomp(); }
+        else SFX.bump();
+      } else {
+        SFX.bump();
+      }
+      updateHUD();
+    }
+
+    function stepPlayer(dt) {
+      const p = G.player, K = CFG.player;
+      const h = pH();
+
+      // Yatay girdi
+      const dir = (G.input.right ? 1 : 0) - (G.input.left ? 1 : 0);
+      if (dir !== 0) {
+        p.vx += dir * K.accel * dt;
+        p.facing = dir;
+      } else {
+        const fr = (p.grounded ? K.frictionGround : K.frictionAir) * dt;
+        if (Math.abs(p.vx) <= fr) p.vx = 0;
+        else p.vx -= Math.sign(p.vx) * fr;
+      }
+      p.vx = Math.max(-K.maxRun, Math.min(K.maxRun, p.vx));
+
+      // Zıplama: buffer + coyote + değişken yükseklik
+      if (G.input.jump && !G.jumpHeld) { G.jumpBuffered = K.buffer; G.jumpHeld = true; }
+      if (!G.input.jump) {
+        G.jumpHeld = false;
+        if (p.vy < -K.jumpCut) p.vy = -K.jumpCut;   // erken bırakış → kısa zıplama
+      }
+      if (G.jumpBuffered > 0) G.jumpBuffered -= dt;
+      if (G.coyote > 0) G.coyote -= dt;
+      if (G.jumpBuffered > 0 && (p.grounded || G.coyote > 0)) {
+        p.vy = -K.jumpVel;
+        p.grounded = false;
+        G.jumpBuffered = 0; G.coyote = 0;
+        SFX.jump();
+      }
+
+      // Yerçekimi
+      p.vy += K.gravity * dt;
+      p.vy = Math.min(p.vy, 900);
+
+      // X ekseni hareket + çözüm
+      p.x += p.vx * dt;
+      let hit = rectHitsSolid(p.x, p.y, K.w, h);
+      if (hit) {
+        if (p.vx > 0) p.x = Math.floor((p.x + K.w) / TILE) * TILE - K.w - 0.01;
+        else if (p.vx < 0) p.x = (Math.floor(p.x / TILE) + 1) * TILE + 0.01;
+        p.vx = 0;
+      }
+
+      // Y ekseni hareket + çözüm
+      p.y += p.vy * dt;
+      hit = rectHitsSolid(p.x, p.y, K.w, h);
+      if (hit) {
+        if (p.vy > 0) {
+          p.y = Math.floor((p.y + h) / TILE) * TILE - h - 0.01;
+          p.vy = 0;
+          if (!p.grounded) p.grounded = true;
+        } else if (p.vy < 0) {
+          // Kafa vuruşu: bloğu tetikle (orta üst nokta)
+          hitBlockFromBelow(p.x + K.w / 2, p.y);
+          p.y = (Math.floor(p.y / TILE) + 1) * TILE + 0.01;
+          p.vy = 0;
+        }
+      } else if (p.grounded) {
+        // Zeminden ayrıldık mı? (coyote başlat)
+        const below = rectHitsSolid(p.x, p.y + 2, K.w, h);
+        if (!below) { p.grounded = false; G.coyote = K.coyote; }
+      }
+
+      if (p.grounded && Math.abs(p.vx) > 20) p.runT += dt * 10;
+      if (p.invuln > 0) p.invuln -= dt;
+
+      // Çukura düşme
+      if (p.y > G.gh * TILE + 60) killPlayer();
+
+      // Bayrak
+      if (p.x + K.w / 2 >= G.flagX) levelClear();
+    }
+
+    function hurtPlayer() {
+      const p = G.player;
+      if (p.invuln > 0) return;
+      if (p.big) {
+        p.big = false;
+        p.invuln = CFG.player.invulnSec;
+        SFX.hurt();
+      } else {
+        killPlayer();
+      }
+    }
+
+    function killPlayer() {
+      if (G.player.dead) return;
+      G.player.dead = true;
+      G.lives--;
+      SFX.die();
+      updateHUD();
+      if (G.lives <= 0) { gameOver(); return; }
+      setTimeout(() => { if (G.phase === "playing") spawnPlayer(); }, 700);
+    }
+
+    // ========================================================================
+    // ENEMIES / COINS / POWERUPS
+    // ========================================================================
+    function stepEnemies(dt) {
+      const p = G.player, K = CFG.player, h = pH();
+      for (const e of G.enemies) {
+        if (e.dead) { e.squashT += dt; continue; }
+        const ew = e.type === "beetle" ? 24 : 26, eh = e.type === "beetle" ? 20 : 22;
+        // Yerçekimi + zemin
+        e.vy = (e.vy || 0) + 2000 * dt;
+        e.y += e.vy * dt;
+        let ghit = rectHitsSolid(e.x, e.y, ew, eh);
+        if (ghit && e.vy > 0) { e.y = Math.floor((e.y + eh) / TILE) * TILE - eh - 0.01; e.vy = 0; }
+        // Yürüyüş + duvar dönüşü
+        e.x += e.vx * dt;
+        if (rectHitsSolid(e.x, e.y, ew, eh)) {
+          e.x -= e.vx * dt;
+          e.vx = -e.vx;
+        }
+        // Oyuncu ile temas
+        if (p.dead) continue;
+        if (p.x < e.x + ew && p.x + K.w > e.x && p.y < e.y + eh && p.y + h > e.y) {
+          const stomping = p.vy > 60 && (p.y + h) < (e.y + eh * 0.7);
+          if (stomping && e.type === "beetle") {
+            e.dead = true; e.squashT = 0;
+            p.vy = -CFG.player.stompBounce;
+            G.score += CFG.scores.stomp;
+            SFX.stomp();
+            updateHUD();
+          } else {
+            hurtPlayer();
+          }
+        }
+      }
+      G.enemies = G.enemies.filter(e => !e.dead || e.squashT < 0.5);
+    }
+
+    function stepPickups(dt) {
+      const p = G.player, K = CFG.player, h = pH();
+      // Altınlar
+      for (const c of G.coins) {
+        if (c.taken) continue;
+        if (Math.abs(p.x + K.w / 2 - c.x) < 22 && Math.abs(p.y + h / 2 - c.y) < 26) {
+          c.taken = true;
+          G.score += CFG.scores.coin; G.coinsGot++;
+          SFX.coin();
+          updateHUD();
+        }
+      }
+      // Blok altın popları
+      for (let i = G.pops.length - 1; i >= 0; i--) {
+        const pp = G.pops[i];
+        pp.t += dt; pp.y += pp.vy * dt; pp.vy += 900 * dt;
+        if (pp.t > 0.5) G.pops.splice(i, 1);
+      }
+      // Balık güç-yükseltmesi (yerde kayar)
+      for (let i = G.powerups.length - 1; i >= 0; i--) {
+        const f = G.powerups[i];
+        f.vy += 1800 * dt;
+        f.y += f.vy * dt;
+        if (rectHitsSolid(f.x, f.y, 24, 18) && f.vy > 0) {
+          f.y = Math.floor((f.y + 18) / TILE) * TILE - 18 - 0.01; f.vy = 0;
+        }
+        f.x += f.vx * dt;
+        if (rectHitsSolid(f.x, f.y, 24, 18)) { f.x -= f.vx * dt; f.vx = -f.vx; }
+        if (p.x < f.x + 24 && p.x + K.w > f.x && p.y < f.y + 18 && p.y + h > f.y) {
+          G.powerups.splice(i, 1);
+          if (!p.big) {
+            p.big = true;
+            p.y -= (CFG.player.hBig - CFG.player.hSmall);
+          }
+          G.score += CFG.scores.power;
+          SFX.power();
+          updateHUD();
+        }
+        if (f.y > G.gh * TILE + 80) G.powerups.splice(i, 1);
+      }
+    }
+
+    // ========================================================================
+    // FLOW
+    // ========================================================================
+    function levelClear() {
+      if (G.phase !== "playing") return;
+      G.phase = "clear";
+      G.score += CFG.scores.flag + Math.floor(G.timeLeft) * 5;
+      SFX.clear();
+      const last = G.levelIdx >= LEVELS.length - 1;
+      const panel = document.getElementById("panel");
+      panel.innerHTML =
+        '<h2>' + (last ? "🏆 Oyunu Bitirdin!" : "🚩 Bölüm Tamam!") + '</h2>' +
+        '<div class="statline">Skor: ' + G.score + '</div>' +
+        '<div class="statline">🪙 Altın: ' + G.coinsGot + '</div>' +
+        '<div class="row">' +
+        (last
+          ? '<button class="btn" id="menuBtn">🔄 Baştan Oyna</button>'
+          : '<button class="btn" id="nextBtn">Sonraki Bölüm →</button>') +
+        '</div>';
+      document.getElementById("overlay").classList.remove("hidden");
+      const n = document.getElementById("nextBtn");
+      if (n) n.addEventListener("click", () => startLevel(G.levelIdx + 1, true));
+      const m = document.getElementById("menuBtn");
+      if (m) m.addEventListener("click", () => startLevel(0, false));
+      updateHUD();
+    }
+
+    function gameOver() {
+      G.phase = "gameover";
+      const panel = document.getElementById("panel");
+      panel.innerHTML =
+        '<h2>💔 Oyun Bitti</h2>' +
+        '<div class="statline">Skor: ' + G.score + '</div>' +
+        '<div class="row"><button class="btn" id="retryBtn">🔄 Tekrar Dene</button></div>';
+      document.getElementById("overlay").classList.remove("hidden");
+      document.getElementById("retryBtn").addEventListener("click", () => startLevel(G.levelIdx, false));
+    }
+
+    // ========================================================================
+    // RENDER — tüm sprite'lar canvas'ta çizilir (özgün tasarım)
+    // ========================================================================
+    function updateCam() {
+      const p = G.player;
+      const targetX = p.x + CFG.player.w / 2 - W / 2;
+      G.camX += (targetX - G.camX) * 0.12;
+      G.camX = Math.max(0, Math.min(G.camX, G.gw * TILE - W));
+      const targetY = p.y + pH() / 2 - H * 0.55;
+      G.camY += (targetY - G.camY) * 0.08;
+      G.camY = Math.max(-TILE * 2, Math.min(G.camY, G.gh * TILE - H + TILE));
+    }
+
+    function render() {
+      // Gökyüzü (bölüme göre ton)
+      const skies = [["#7ec8f7", "#c8ecff"], ["#6db3ea", "#bfe4ff"], ["#2b3a67", "#5a6fa8"]];
+      const [c1, c2] = skies[G.levelIdx] || skies[0];
+      const grd = ctx.createLinearGradient(0, 0, 0, H);
+      grd.addColorStop(0, c1); grd.addColorStop(1, c2);
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // Paralaks bulutlar + tepeler
+      ctx.fillStyle = G.levelIdx === 2 ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.85)";
+      for (let i = 0; i < 6; i++) {
+        const cx = ((i * 340 - G.camX * 0.3) % (W + 400) + W + 400) % (W + 400) - 200;
+        const cy = 50 + (i % 3) * 45;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 42, 15, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx + 30, cy - 8, 30, 13, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = G.levelIdx === 2 ? "#1f2b4d" : "#5cb85c";
+      for (let i = 0; i < 5; i++) {
+        const hx = ((i * 520 - G.camX * 0.5) % (W + 700) + W + 700) % (W + 700) - 350;
+        ctx.beginPath();
+        ctx.ellipse(hx, H - 40 + G.camY * 0.1, 180, 90, 0, Math.PI, 0);
+        ctx.fill();
+      }
+
+      ctx.save();
+      ctx.translate(-Math.floor(G.camX), -Math.floor(G.camY));
+
+      // Tile'lar (görünür aralık)
+      const x0 = Math.max(0, Math.floor(G.camX / TILE) - 1);
+      const x1 = Math.min(G.gw - 1, Math.ceil((G.camX + W) / TILE) + 1);
+      for (let ty = 0; ty < G.gh; ty++) {
+        for (let tx = x0; tx <= x1; tx++) {
+          const ch = G.grid[ty][tx];
+          if (ch === " " || ch === "F") continue;
+          drawTile(ch, tx * TILE, ty * TILE, tileAt(tx * TILE + 1, (ty - 1) * TILE + 1));
+        }
+      }
+
+      // Bayrak
+      if (G.flagX >= 0) drawFlag(G.flagX);
+
+      // Altınlar
+      for (const c of G.coins) {
+        if (c.taken) continue;
+        drawCoin(c.x, c.y + Math.sin(G.animT * 4 + c.x) * 3);
+      }
+      for (const pp of G.pops) drawCoin(pp.x, pp.y);
+
+      // Balık güç-yükseltmesi
+      for (const f of G.powerups) drawFish(f.x, f.y, f.vx > 0 ? 1 : -1);
+
+      // Düşmanlar
+      for (const e of G.enemies) {
+        if (e.type === "beetle") drawBeetle(e);
+        else drawSnail(e);
+      }
+
+      // Oyuncu (invuln'da yanıp söner)
+      if (!G.player.dead && (G.player.invuln <= 0 || Math.floor(G.animT * 12) % 2 === 0)) {
+        drawCat(G.player);
+      }
+
+      ctx.restore();
+    }
+
+    function drawTile(ch, x, y, above) {
+      if (ch === "#") {
+        ctx.fillStyle = "#8a5a2b";
+        ctx.fillRect(x, y, TILE, TILE);
+        ctx.fillStyle = "rgba(0,0,0,0.12)";
+        ctx.fillRect(x + 2, y + 8, TILE - 4, 2);
+        ctx.fillRect(x + 6, y + 20, TILE - 12, 2);
+        if (!solid(above)) {                       // üstü açıksa çim
+          ctx.fillStyle = G.levelIdx === 2 ? "#3f4d7a" : "#6fc46f";
+          ctx.fillRect(x, y, TILE, 7);
+        }
+      } else if (ch === "B") {
+        ctx.fillStyle = "#c97b3a";
+        ctx.fillRect(x, y, TILE, TILE);
+        ctx.strokeStyle = "rgba(0,0,0,0.35)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x + 1, y + 1, TILE - 2, TILE - 2);
+        ctx.beginPath();
+        ctx.moveTo(x, y + TILE / 2); ctx.lineTo(x + TILE, y + TILE / 2);
+        ctx.moveTo(x + TILE / 2, y); ctx.lineTo(x + TILE / 2, y + TILE / 2);
+        ctx.stroke();
+      } else if (ch === "?" || ch === "P") {
+        ctx.fillStyle = "#f4b942";
+        ctx.fillRect(x, y, TILE, TILE);
+        ctx.strokeStyle = "#a16207";
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(x + 2, y + 2, TILE - 4, TILE - 4);
+        ctx.fillStyle = "#7a4b00";
+        ctx.font = "bold 20px Arial";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(ch === "P" ? "!" : "?", x + TILE / 2, y + TILE / 2 + 1);
+      } else if (ch === "U") {
+        ctx.fillStyle = "#9b9186";
+        ctx.fillRect(x, y, TILE, TILE);
+        ctx.strokeStyle = "rgba(0,0,0,0.3)";
+        ctx.strokeRect(x + 2, y + 2, TILE - 4, TILE - 4);
+      }
+    }
+
+    function drawFlag(fx) {
+      // Direk: bayrak kolonunda zemine kadar
+      let groundY = G.gh * TILE;
+      const tx = Math.floor(fx / TILE);
+      for (let y = 0; y < G.gh; y++) if (solid(G.grid[y][tx])) { groundY = y * TILE; break; }
+      const topY = groundY - TILE * 6;
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillRect(fx + TILE / 2 - 3, topY, 6, groundY - topY);
+      ctx.beginPath();
+      ctx.arc(fx + TILE / 2, topY, 7, 0, Math.PI * 2);
+      ctx.fillStyle = "#fbbf24"; ctx.fill();
+      ctx.fillStyle = "#ef4444";
+      ctx.beginPath();
+      ctx.moveTo(fx + TILE / 2 + 3, topY + 6);
+      ctx.lineTo(fx + TILE / 2 + 34, topY + 16);
+      ctx.lineTo(fx + TILE / 2 + 3, topY + 27);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawCoin(x, y) {
+      ctx.fillStyle = "#fde047";
+      ctx.strokeStyle = "#a16207";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(x, y, 8, 10, 0, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = "#facc15";
+      ctx.beginPath();
+      ctx.ellipse(x, y, 4, 6, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    function drawFish(x, y, dir) {
+      ctx.save();
+      ctx.translate(x + 12, y + 9);
+      ctx.scale(dir, 1);
+      ctx.fillStyle = "#38bdf8";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 11, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-9, 0); ctx.lineTo(-16, -6); ctx.lineTo(-16, 6);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#0c4a6e";
+      ctx.beginPath(); ctx.arc(5, -2, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
+    function drawBeetle(e) {
+      const w = 24, h = 20;
+      ctx.save();
+      ctx.translate(e.x + w / 2, e.y + h);
+      if (e.dead) { ctx.scale(1.3, 0.35); }
+      ctx.fillStyle = "#65a30d";
+      ctx.beginPath();
+      ctx.ellipse(0, -h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#3f6212"; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -h); ctx.lineTo(0, 0);
+      ctx.stroke();
+      if (!e.dead) {
+        ctx.fillStyle = "#1f2937";
+        ctx.beginPath(); ctx.arc(-5, -h / 2 - 2, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(5, -h / 2 - 2, 2, 0, Math.PI * 2); ctx.fill();
+        // Bacaklar (yürüme animasyonu)
+        const ph = Math.sin(G.animT * 14) * 2;
+        ctx.fillStyle = "#3f6212";
+        ctx.fillRect(-9, -2 + ph, 5, 3);
+        ctx.fillRect(4, -2 - ph, 5, 3);
+      }
+      ctx.restore();
+    }
+
+    function drawSnail(e) {
+      const w = 26, h = 22;
+      ctx.save();
+      ctx.translate(e.x + w / 2, e.y + h);
+      // Dikenli kabuk
+      ctx.fillStyle = "#7c3aed";
+      ctx.beginPath();
+      ctx.arc(2, -h / 2, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#4c1d95";
+      for (let i = 0; i < 5; i++) {
+        const a = -Math.PI / 2 + (i - 2) * 0.55;
+        const sx = 2 + Math.cos(a) * 10, sy = -h / 2 + Math.sin(a) * 10;
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(2 + Math.cos(a) * 16, -h / 2 + Math.sin(a) * 16);
+        ctx.lineTo(2 + Math.cos(a + 0.2) * 10, -h / 2 + Math.sin(a + 0.2) * 10);
+        ctx.closePath(); ctx.fill();
+      }
+      // Gövde
+      ctx.fillStyle = "#c4b5fd";
+      ctx.beginPath();
+      ctx.ellipse(-8, -4, 7, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#1f2937";
+      ctx.beginPath(); ctx.arc(-12, -6, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
+    function drawCat(p) {
+      const w = CFG.player.w, h = pH();
+      ctx.save();
+      ctx.translate(p.x + w / 2, p.y + h);
+      ctx.scale(p.facing, 1);
+      const bodyH = h * 0.55, headR = h * 0.28;
+      // Kuyruk
+      ctx.strokeStyle = "#f59e0b"; ctx.lineWidth = 5; ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(-w / 2, -bodyH * 0.5);
+      ctx.quadraticCurveTo(-w, -bodyH * 0.9 + Math.sin(G.animT * 6) * 3, -w * 0.8, -bodyH * 1.3);
+      ctx.stroke();
+      // Gövde
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(-w / 2, -bodyH, w, bodyH, 6) : ctx.rect(-w / 2, -bodyH, w, bodyH);
+      ctx.fill();
+      // Bacaklar
+      if (p.grounded && Math.abs(p.vx) > 20) {
+        const ph2 = Math.sin(p.runT) * 3;
+        ctx.fillStyle = "#d97706";
+        ctx.fillRect(-w / 2 + 2, -5 + ph2, 7, 5);
+        ctx.fillRect(w / 2 - 9, -5 - ph2, 7, 5);
+      } else {
+        ctx.fillStyle = "#d97706";
+        ctx.fillRect(-w / 2 + 2, -5, 7, 5);
+        ctx.fillRect(w / 2 - 9, -5, 7, 5);
+      }
+      // Kafa
+      const hy = -bodyH - headR + 3;
+      ctx.fillStyle = "#fbbf24";
+      ctx.beginPath(); ctx.arc(0, hy, headR, 0, Math.PI * 2); ctx.fill();
+      // Kulaklar
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath();
+      ctx.moveTo(-headR * 0.7, hy - headR * 0.5); ctx.lineTo(-headR, hy - headR * 1.4); ctx.lineTo(-headR * 0.2, hy - headR * 0.9);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(headR * 0.7, hy - headR * 0.5); ctx.lineTo(headR, hy - headR * 1.4); ctx.lineTo(headR * 0.2, hy - headR * 0.9);
+      ctx.closePath(); ctx.fill();
+      // Yüz
+      ctx.fillStyle = "#1f2937";
+      ctx.beginPath(); ctx.arc(headR * 0.35, hy - 1, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(-headR * 0.15, hy - 1, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "#1f2937"; ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(headR * 0.1, hy + 4);
+      ctx.quadraticCurveTo(headR * 0.35, hy + 6, headR * 0.6, hy + 4);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // ========================================================================
+    // LOOP
+    // ========================================================================
+    function loop(ts) {
+      if (G.phase !== "playing") return;
+      if (!G.lastTs) G.lastTs = ts;
+      const dt = Math.min(0.04, (ts - G.lastTs) / 1000);
+      G.lastTs = ts;
+      G.animT += dt;
+
+      G.timeLeft -= dt;
+      if (G.timeLeft <= 0) { G.timeLeft = 0; killPlayer(); G.timeLeft = LEVELS[G.levelIdx].time; }
+
+      if (!G.player.dead) {
+        stepPlayer(dt);
+        stepEnemies(dt);
+        stepPickups(dt);
+      }
+      if (G.phase !== "playing") return;
+      updateCam();
+      render();
+      updateHUD();
+      requestAnimationFrame(loop);
+    }
+
+    // ========================================================================
+    // UI / INPUT
+    // ========================================================================
+    function updateHUD() {
+      document.getElementById("hudLevel").textContent = (G.levelIdx + 1) + "/" + LEVELS.length;
+      document.getElementById("hudScore").textContent = G.score;
+      document.getElementById("hudCoins").textContent = G.coinsGot;
+      document.getElementById("hudLives").textContent = G.lives;
+      document.getElementById("hudTime").textContent = Math.ceil(G.timeLeft);
+    }
+
+    function bindBtn(id, key) {
+      const el = document.getElementById(id);
+      const on = (e) => { e.preventDefault(); G.input[key] = true; el.classList.add("pressed"); SFX.unlock(); };
+      const off = (e) => { if (e) e.preventDefault(); G.input[key] = false; el.classList.remove("pressed"); };
+      el.addEventListener("touchstart", on, { passive: false });
+      el.addEventListener("touchend", off, { passive: false });
+      el.addEventListener("touchcancel", off, { passive: false });
+      el.addEventListener("mousedown", on);
+      el.addEventListener("mouseup", off);
+      el.addEventListener("mouseleave", () => off());
+    }
+    bindBtn("btnLeft", "left");
+    bindBtn("btnRight", "right");
+    bindBtn("btnJump", "jump");
+
+    const KEYS = { ArrowLeft: "left", ArrowRight: "right", ArrowUp: "jump", " ": "jump", w: "jump" };
+    window.addEventListener("keydown", (e) => {
+      const k = KEYS[e.key];
+      if (k) { e.preventDefault(); G.input[k] = true; SFX.unlock(); }
+    });
+    window.addEventListener("keyup", (e) => {
+      const k = KEYS[e.key];
+      if (k) G.input[k] = false;
+    });
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+      SFX.unlock();
+      startLevel(0, false);
+    });
+
+    // Test harness API
+    window._boncuk = {
+      G, CFG, LEVELS, TILE,
+      startLevel, stepPlayer, stepEnemies, stepPickups, spawnPlayer,
+      rectHitsSolid, tileAt, setTile, solid, hurtPlayer, killPlayer, pH,
+      setInput(k, v) { G.input[k] = v; },
+    };
+  })();
+  </script>
+</body>
+</html>

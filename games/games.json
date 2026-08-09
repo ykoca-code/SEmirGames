@@ -638,6 +638,24 @@
         "fizik",
         "sürüş"
       ]
+    },
+    {
+      "id": "boncuk",
+      "title": "Süper Boncuk",
+      "description": "Klasik yan kaydırmalı platform! Kedi Boncuk ile koş, zıpla, blokları kafanla kır, böcekleri ez, balığı ye ve büyü. 3 özgün bölüm, bayrağa ulaş!",
+      "category": "arcade",
+      "categoryLabel": "Arcade",
+      "ageRating": "4+",
+      "thumbnail": "games/boncuk/thumbnail.svg",
+      "path": "games/boncuk/index.html",
+      "tags": [
+        "arcade",
+        "platform",
+        "zıplama",
+        "kedi",
+        "macera",
+        "yan kaydırma"
+      ]
     }
   ]
 }
