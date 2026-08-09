@@ -1,0 +1,14 @@
+{
+  "id": "boncuk",
+  "title": "Süper Boncuk",
+  "description": "Klasik yan kaydırmalı platform macerası! Turuncu kedi Boncuk ile koş, zıpla, blokları kafanla kır, böcekleri ezerek geç ve bayrağa ulaş. 3 özgün bölüm!",
+  "version": "1.0.0",
+  "category": "arcade",
+  "categoryLabel": "Arcade",
+  "ageRating": "4+",
+  "thumbnail": "thumbnail.svg",
+  "entry": "index.html",
+  "tags": ["arcade", "platform", "zıplama", "kedi", "macera", "yan kaydırma"],
+  "author": "SEmirK Games",
+  "controls": ["Sol: ◀ ▶ koş", "Sağ: ZIPLA (basılı tut = yüksek zıpla)", "Klavye: oklar + Space"]
+}

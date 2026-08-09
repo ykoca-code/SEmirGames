@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7ec8f7"/>
+      <stop offset="1" stop-color="#c8ecff"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" fill="url(#sky)"/>
+  <!-- bulutlar -->
+  <g fill="#ffffff" opacity="0.9">
+    <ellipse cx="50" cy="40" rx="22" ry="10"/>
+    <ellipse cx="180" cy="60" rx="18" ry="8"/>
+  </g>
+  <!-- tepeler -->
+  <ellipse cx="40" cy="205" rx="60" ry="30" fill="#5cb85c"/>
+  <ellipse cx="210" cy="210" rx="70" ry="35" fill="#4a9e4a"/>
+  <!-- zemin -->
+  <rect x="0" y="200" width="240" height="40" fill="#8a5a2b"/>
+  <rect x="0" y="200" width="240" height="8" fill="#6fc46f"/>
+  <!-- bloklar -->
+  <g stroke="rgba(0,0,0,0.35)" stroke-width="1.5">
+    <rect x="96" y="110" width="28" height="28" rx="4" fill="#f4b942"/>
+    <rect x="128" y="110" width="28" height="28" rx="4" fill="#c97b3a"/>
+  </g>
+  <text x="110" y="131" font-family="Helvetica,Arial,sans-serif" font-size="18" font-weight="900" text-anchor="middle" fill="#7a4b00">?</text>
+  <!-- coin -->
+  <circle cx="142" cy="85" r="9" fill="#fde047" stroke="#a16207" stroke-width="2"/>
+  <!-- Boncuk (turuncu kedi) zıplıyor -->
+  <g transform="translate(60,140)">
+    <ellipse cx="0" cy="26" rx="16" ry="4" fill="rgba(0,0,0,0.2)"/>
+    <rect x="-14" y="-10" width="28" height="24" rx="8" fill="#f59e0b"/>
+    <circle cx="0" cy="-18" r="13" fill="#fbbf24"/>
+    <polygon points="-10,-26 -14,-38 -4,-30" fill="#f59e0b"/>
+    <polygon points="10,-26 14,-38 4,-30" fill="#f59e0b"/>
+    <polygon points="-10,-28 -12,-34 -6,-30" fill="#fda4af"/>
+    <polygon points="10,-28 12,-34 6,-30" fill="#fda4af"/>
+    <circle cx="-5" cy="-19" r="2" fill="#1f2937"/>
+    <circle cx="5" cy="-19" r="2" fill="#1f2937"/>
+    <path d="M -3 -13 Q 0 -10 3 -13" stroke="#1f2937" stroke-width="1.5" fill="none"/>
+    <path d="M 13 4 Q 26 0 24 -12" stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <rect x="-12" y="12" width="8" height="6" rx="3" fill="#d97706"/>
+    <rect x="4" y="12" width="8" height="6" rx="3" fill="#d97706"/>
+  </g>
+  <!-- böcek düşman -->
+  <g transform="translate(180,190)">
+    <ellipse cx="0" cy="0" rx="13" ry="9" fill="#65a30d"/>
+    <circle cx="-5" cy="-3" r="2" fill="#1f2937"/>
+    <circle cx="5" cy="-3" r="2" fill="#1f2937"/>
+    <rect x="-11" y="7" width="5" height="3" fill="#3f6212"/>
+    <rect x="6" y="7" width="5" height="3" fill="#3f6212"/>
+  </g>
+  <!-- bayrak -->
+  <g transform="translate(222,120)">
+    <rect x="-2" y="0" width="4" height="80" fill="#94a3b8"/>
+    <polygon points="2,4 26,12 2,20" fill="#ef4444"/>
+  </g>
+  <!-- başlık -->
+  <g transform="translate(8,8)">
+    <rect width="122" height="24" rx="5" fill="rgba(0,0,0,0.6)"/>
+    <text x="61" y="17" font-family="Helvetica,Arial,sans-serif" font-size="12" font-weight="900" text-anchor="middle" fill="#fbbf24">SÜPER BONCUK</text>
+  </g>
+</svg>
