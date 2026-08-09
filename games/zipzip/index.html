@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Süper Zıpzıp — SEmirK Games</title>
     <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg">
     <link rel="stylesheet" href="style.css">
@@ -31,8 +31,11 @@
             <button onclick="game.restart()">TEKRAR OYNA</button>
         </div>
     </div>
-    <script src="../../js/version.js?v=1.38.0"></script>
-    <script src="../../js/pwa-back.js?v=1.38.0"></script>
+    <div class="tbtn" id="btnLeft" aria-label="Sola yürü">◀</div>
+    <div class="tbtn" id="btnRight" aria-label="Sağa yürü">▶</div>
+    <div class="tbtn" id="btnJump" aria-label="Zıpla">ZIPLA</div>
+    <script src="../../js/version.js?v=1.39.0"></script>
+    <script src="../../js/pwa-back.js?v=1.39.0"></script>
     <script src="game.js"></script>
 </body>
 </html>
