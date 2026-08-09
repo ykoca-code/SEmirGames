@@ -41,11 +41,54 @@ body {
   padding: 0;
   font-family: var(--font-sans);
   color: var(--color-text);
-  background: var(--color-bg);
+  /* Çocuk dostu (5-10 yaş) canlı gökyüzü degradesi */
+  background: linear-gradient(160deg, #d9f2ff 0%, #ede4ff 32%, #ffe6f2 65%, #fff3d1 100%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: contain;
 }
+
+/* ==========================================================================
+   Eğlenceli arka plan — yüzen oyun balonları (performans: CSS-only,
+   pointer-events yok, içerik kartları üstte kalır)
+   ========================================================================== */
+.bg-fun {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bg-fun span {
+  position: absolute;
+  bottom: -80px;
+  font-size: 38px;
+  opacity: 0.32;
+  animation: floatUp linear infinite;
+}
+.bg-fun span:nth-child(1)  { left: 4%;  font-size: 44px; animation-duration: 26s; animation-delay: 0s; }
+.bg-fun span:nth-child(2)  { left: 14%; font-size: 34px; animation-duration: 32s; animation-delay: -8s; }
+.bg-fun span:nth-child(3)  { left: 24%; font-size: 28px; animation-duration: 22s; animation-delay: -15s; }
+.bg-fun span:nth-child(4)  { left: 33%; font-size: 46px; animation-duration: 36s; animation-delay: -4s; }
+.bg-fun span:nth-child(5)  { left: 43%; font-size: 32px; animation-duration: 28s; animation-delay: -20s; }
+.bg-fun span:nth-child(6)  { left: 52%; font-size: 40px; animation-duration: 34s; animation-delay: -12s; }
+.bg-fun span:nth-child(7)  { left: 61%; font-size: 30px; animation-duration: 24s; animation-delay: -6s; }
+.bg-fun span:nth-child(8)  { left: 70%; font-size: 36px; animation-duration: 30s; animation-delay: -18s; }
+.bg-fun span:nth-child(9)  { left: 78%; font-size: 42px; animation-duration: 27s; animation-delay: -2s; }
+.bg-fun span:nth-child(10) { left: 86%; font-size: 30px; animation-duration: 33s; animation-delay: -25s; }
+.bg-fun span:nth-child(11) { left: 92%; font-size: 38px; animation-duration: 25s; animation-delay: -10s; }
+.bg-fun span:nth-child(12) { left: 8%;  font-size: 26px; animation-duration: 38s; animation-delay: -30s; }
+@keyframes floatUp {
+  0%   { transform: translateY(0) rotate(-6deg); }
+  50%  { transform: translateY(-55vh) rotate(6deg); }
+  100% { transform: translateY(-115vh) rotate(-4deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-fun span { animation: none; opacity: 0.15; bottom: auto; top: calc(8% * var(--i, 1)); }
+}
+/* İçerik katmanları balonların üstünde */
+.site-header, main.container, footer, .games-section { position: relative; z-index: 1; }
 
 a {
   color: inherit;

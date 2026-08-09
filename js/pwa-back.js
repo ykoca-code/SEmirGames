@@ -26,13 +26,14 @@
 
   // Only intercept on a game page — catalog should let the system handle
   // back normally (so the user can close the PWA from there).
-  var inGame = /\/games\/[^/]+\//.test(location.pathname);
+  // kule-kur kök dizinde yaşayan tek oyun — o da kapsanmalı
+  var inGame = /\/(games\/[^/]+|kule-kur)\//.test(location.pathname);
   if (!inGame) return;
 
   function catalogHref() {
-    // games/<id>/(...)?  →  parent of /games/ is the catalog root
-    var m = location.pathname.match(/^(.*\/)games\/[^/]+\/.*$/);
-    return (m ? m[1] : "../../") + "index.html";
+    // games/<id>/... veya kule-kur/... → üst dizin katalog köküdür
+    var m = location.pathname.match(/^(.*\/)(games\/[^/]+|kule-kur)\/.*$/);
+    return (m ? m[1] : "../") + "index.html";
   }
 
   // Push a sentinel state so the first back press pops this entry instead

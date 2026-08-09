@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0f172a" />
   <title>Burnunla Yakala — SEmirK Games</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
@@ -219,8 +219,8 @@
 
   <div class="input-hint" id="inputHint">Kafanı oynat veya parmağını sürükle</div>
 
-  <script src="../../js/version.js?v=1.44.1"></script>
-  <script src="../../js/pwa-back.js?v=1.44.1"></script>
+  <script src="../../js/version.js?v=1.45.0"></script>
+  <script src="../../js/pwa-back.js?v=1.45.0"></script>
 
   <script>
   (function () {
@@ -294,34 +294,102 @@
       }
     }
 
-    // Skin filter: YCbCr ten aralığı (kaynak: yaygın skin-detection literatürü)
-    // Cr in [133,173] AND Cb in [77,127] AND Y > 60
-    function trackFaceFromVideo() {
+    // Ten filtresi: varsayılan literatür aralığı + KALİBRASYONDA kişiye özel aralık.
+    // Sabit eşikler loş/sarı ışıkta yüzü kaçırıyor, ten-benzeri arka planları
+    // (ahşap, bej duvar) yüz sanıyordu — kalibrasyonda ekran ortasındaki yüzden
+    // gerçek Cb/Cr örneklenip kişiye ve ışığa özel aralık türetilir.
+    let skinRange = null; // {crLo, crHi, cbLo, cbHi, yLo}
+    let lastFace = null, faceMisses = 0;
+
+    function ycbcr(r, g, b) {
+      return {
+        Y:  0.299 * r + 0.587 * g + 0.114 * b,
+        Cb: 128 - 0.168736 * r - 0.331264 * g + 0.5 * b,
+        Cr: 128 + 0.5 * r - 0.418688 * g - 0.081312 * b
+      };
+    }
+    function grabFrame() {
       if (!video.videoWidth || !video.videoHeight) return null;
-      // Aynalama → mirror with negative scale and translate
       procCtx.save();
       procCtx.translate(procW, 0);
       procCtx.scale(-1, 1);
       procCtx.drawImage(video, 0, 0, procW, procH);
       procCtx.restore();
-      const img = procCtx.getImageData(0, 0, procW, procH);
-      const d = img.data;
-      let sumX = 0, sumY = 0, count = 0;
-      for (let y = 0; y < procH; y++) {
-        for (let x = 0; x < procW; x++) {
+      return procCtx.getImageData(0, 0, procW, procH).data;
+    }
+    // Kalibrasyon: orta kutudan (yüzün beklendiği bölge) ten örnekle
+    function sampleSkinFromCenter() {
+      const d = grabFrame();
+      if (!d) return null;
+      const crs = [], cbs = [], ys = [];
+      for (let y = Math.floor(procH * 0.2); y < procH * 0.8; y++) {
+        for (let x = Math.floor(procW * 0.3); x < procW * 0.7; x++) {
           const i = (y * procW + x) * 4;
-          const r = d[i], g = d[i + 1], b = d[i + 2];
-          // YCbCr conversion
-          const Y  = 0.299 * r + 0.587 * g + 0.114 * b;
-          const Cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-          const Cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-          if (Y > 60 && Cr >= 133 && Cr <= 173 && Cb >= 77 && Cb <= 127) {
-            sumX += x; sumY += y; count++;
-          }
+          const c = ycbcr(d[i], d[i+1], d[i+2]);
+          crs.push(c.Cr); cbs.push(c.Cb); ys.push(c.Y);
         }
       }
-      if (count < 30) return null;        // çok az piksel, yüz yok kabul et
-      return { x: sumX / count / procW, y: sumY / count / procH, area: count / (procW * procH) };
+      crs.sort((a,b)=>a-b); cbs.sort((a,b)=>a-b); ys.sort((a,b)=>a-b);
+      const med = (arr) => arr[Math.floor(arr.length / 2)];
+      return { cr: med(crs), cb: med(cbs), y: med(ys) };
+    }
+    function setSkinRangeFromSamples(samples) {
+      if (!samples.length) { skinRange = null; return; }
+      const med = (key) => {
+        const v = samples.map(s => s[key]).sort((a,b)=>a-b);
+        return v[Math.floor(v.length / 2)];
+      };
+      const cr = med('cr'), cb = med('cb'), yv = med('y');
+      skinRange = {
+        crLo: cr - 16, crHi: cr + 16,
+        cbLo: cb - 16, cbHi: cb + 16,
+        yLo: Math.max(25, yv * 0.35)
+      };
+    }
+    function isSkin(r, g, b) {
+      const c = ycbcr(r, g, b);
+      if (skinRange) {
+        return c.Y > skinRange.yLo &&
+               c.Cr >= skinRange.crLo && c.Cr <= skinRange.crHi &&
+               c.Cb >= skinRange.cbLo && c.Cb <= skinRange.cbHi;
+      }
+      return c.Y > 60 && c.Cr >= 133 && c.Cr <= 173 && c.Cb >= 77 && c.Cb <= 127;
+    }
+    function scanRegion(d, x0, x1, y0, y1) {
+      let sumX = 0, sumY = 0, count = 0;
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+          const i = (y * procW + x) * 4;
+          if (isSkin(d[i], d[i+1], d[i+2])) { sumX += x; sumY += y; count++; }
+        }
+      }
+      return { sumX, sumY, count };
+    }
+    function trackFaceFromVideo() {
+      const d = grabFrame();
+      if (!d) return null;
+      let r;
+      if (lastFace) {
+        // Önce son bilinen konum çevresinde ara (arka plan sızıntısını azaltır)
+        const cx = Math.round(lastFace.x * procW), cy = Math.round(lastFace.y * procH);
+        const win = 16;
+        r = scanRegion(d,
+          Math.max(0, cx - win), Math.min(procW, cx + win),
+          Math.max(0, cy - win), Math.min(procH, cy + win));
+        if (r.count < 20) r = scanRegion(d, 0, procW, 0, procH); // pencerede yok → tam tara
+      } else {
+        r = scanRegion(d, 0, procW, 0, procH);
+      }
+      if (r.count < 25) {
+        // Kısa kayıplarda son konumu koru (takip titremesin/kopmasın)
+        faceMisses++;
+        if (lastFace && faceMisses < 20) return lastFace;
+        lastFace = null;
+        return null;
+      }
+      faceMisses = 0;
+      lastFace = { x: r.sumX / r.count / procW, y: r.sumY / r.count / procH, area: r.count / (procW * procH) };
+      return lastFace;
     }
 
     /* ===== Game ===== */
@@ -333,7 +401,12 @@
       let n = 3;
       cnt.textContent = String(n);
       const samples = [];
+      const skinSamples = [];
       const interval = setInterval(() => {
+        // Kişiye özel ten rengi örnekle (ışık koşuluna uyum)
+        const sk = sampleSkinFromCenter();
+        if (sk) skinSamples.push(sk);
+        setSkinRangeFromSamples(skinSamples);
         const f = trackFaceFromVideo();
         if (f) samples.push(f.x);
       }, 80);
@@ -344,6 +417,7 @@
           clearInterval(tick);
           clearInterval(interval);
           calibBox.classList.add("hidden");
+          setSkinRangeFromSamples(skinSamples);
           if (samples.length >= 5) {
             state.faceBaseline = samples.reduce((a, b) => a + b, 0) / samples.length;
           } else {
