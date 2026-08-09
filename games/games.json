@@ -1,661 +1,678 @@
 {
-  "categories": [
-    {
-      "id": "all",
-      "label": "Tümü"
-    },
-    {
-      "id": "puzzle",
-      "label": "Bulmaca"
-    },
-    {
-      "id": "logic",
-      "label": "Mantık"
-    },
-    {
-      "id": "arcade",
-      "label": "Arcade"
-    },
-    {
-      "id": "board",
-      "label": "Masa Oyunu"
-    },
-    {
-      "id": "educational",
-      "label": "Eğitici"
-    }
-  ],
-  "ageGroups": [
-    {
-      "id": "all",
-      "label": "Tüm Yaşlar"
-    },
-    {
-      "id": "4+",
-      "label": "4+"
-    },
-    {
-      "id": "7+",
-      "label": "7+"
-    },
-    {
-      "id": "12+",
-      "label": "12+"
-    },
-    {
-      "id": "16+",
-      "label": "16+"
-    }
-  ],
-  "games": [
-    {
-      "id": "sudoku",
-      "title": "Sudoku",
-      "description": "Klasik 9x9 mantık bulmacası. Her satır, sütun ve 3x3 kutuda 1-9 rakamlarını bir kez kullan.",
-      "category": "logic",
-      "categoryLabel": "Mantık",
-      "ageRating": "7+",
-      "thumbnail": "games/sudoku/thumbnail.svg",
-      "path": "games/sudoku/index.html",
-      "tags": [
-        "bulmaca",
-        "sudoku",
-        "zeka",
-        "mantık"
-      ]
-    },
-    {
-      "id": "tetris",
-      "title": "Tetris",
-      "description": "Klasik blok yığma oyunu. Düşen parçaları döndürerek tam satırlar oluştur.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "7+",
-      "thumbnail": "games/tetris/thumbnail.svg",
-      "path": "games/tetris/index.html",
-      "tags": [
-        "arcade",
-        "tetris",
-        "klasik",
-        "blok"
-      ]
-    },
-    {
-      "id": "2048",
-      "title": "2048",
-      "description": "Aynı sayıları birleştirerek 2048'e ulaşmaya çalış.",
-      "category": "puzzle",
-      "categoryLabel": "Bulmaca",
-      "ageRating": "7+",
-      "thumbnail": "games/2048/thumbnail.svg",
-      "path": "games/2048/index.html",
-      "tags": [
-        "bulmaca",
-        "2048",
-        "sayı",
-        "klasik"
-      ]
-    },
-    {
-      "id": "memory",
-      "title": "Hafıza",
-      "description": "Kartları çevir, eşleşen sembolleri bul. Hafızanı geliştir!",
-      "category": "educational",
-      "categoryLabel": "Eğitici",
-      "ageRating": "4+",
-      "thumbnail": "games/memory/thumbnail.svg",
-      "path": "games/memory/index.html",
-      "tags": [
-        "hafıza",
-        "eşleştirme",
-        "konsantrasyon",
-        "çocuk"
-      ]
-    },
-    {
-      "id": "slonky",
-      "title": "Slonky",
-      "description": "Topu düşür, çivilere çarpa çarpa yüksek puanlı kutuya isabet ettir. 10 topla en yüksek skoru yapmaya çalış.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/slonky/thumbnail.svg",
-      "path": "games/slonky/index.html",
-      "tags": [
-        "arcade",
-        "plinko",
-        "top",
-        "şans",
-        "fizik"
-      ]
-    },
-    {
-      "id": "monster",
-      "title": "Canavar Eşleştir",
-      "description": "Komşu canavarları yer değiştir, 3 veya daha fazla aynı türü yan yana getir, patlat ve puan kazan!",
-      "category": "puzzle",
-      "categoryLabel": "Bulmaca",
-      "ageRating": "4+",
-      "thumbnail": "games/monster/thumbnail.svg",
-      "path": "games/monster/index.html",
-      "tags": [
-        "bulmaca",
-        "match-3",
-        "eşleştirme",
-        "canavar"
-      ]
-    },
-    {
-      "id": "emoji",
-      "title": "Emoji Quiz",
-      "description": "Emoji ipuçlarından kelimeyi tahmin et. Türk yemekleri, şehirleri, filmleri, deyimleri ve daha fazlası!",
-      "category": "educational",
-      "categoryLabel": "Eğitici",
-      "ageRating": "7+",
-      "thumbnail": "games/emoji/thumbnail.svg",
-      "path": "games/emoji/index.html",
-      "tags": [
-        "bulmaca",
-        "kelime",
-        "emoji",
-        "tahmin",
-        "eğlence"
-      ]
-    },
-    {
-      "id": "snake",
-      "title": "Yılan",
-      "description": "Klasik yılan oyunu. Yemleri ye, büyü, duvarlara ve kendine çarpma!",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/snake/thumbnail.svg",
-      "path": "games/snake/index.html",
-      "tags": [
-        "arcade",
-        "klasik",
-        "yılan",
-        "snake"
-      ]
-    },
-    {
-      "id": "mines",
-      "title": "Mayın Tarlası",
-      "description": "Klasik mantık bulmacası. Mayınlara dokunmadan tüm güvenli kareleri aç!",
-      "category": "logic",
-      "categoryLabel": "Mantık",
-      "ageRating": "7+",
-      "thumbnail": "games/mines/thumbnail.svg",
-      "path": "games/mines/index.html",
-      "tags": [
-        "mantık",
-        "bulmaca",
-        "mayın",
-        "minesweeper"
-      ]
-    },
-    {
-      "id": "english",
-      "title": "İngilizce Kelimeler",
-      "description": "İlkokul seviyesi İngilizce kelime oyunu. Resme bak, kelimenin Türkçesini seç!",
-      "category": "educational",
-      "categoryLabel": "Eğitici",
-      "ageRating": "4+",
-      "thumbnail": "games/english/thumbnail.svg",
-      "path": "games/english/index.html",
-      "tags": [
-        "eğitici",
-        "ingilizce",
-        "kelime",
-        "çocuk"
-      ]
-    },
-    {
-      "id": "xox",
-      "title": "XOX",
-      "description": "Klasik 3 taş yan yana getirme oyunu. Bilgisayara karşı veya arkadaşınla oyna.",
-      "category": "board",
-      "categoryLabel": "Masa Oyunu",
-      "ageRating": "4+",
-      "thumbnail": "games/xox/thumbnail.svg",
-      "path": "games/xox/index.html",
-      "tags": [
-        "masa",
-        "klasik",
-        "xox",
-        "tic-tac-toe"
-      ]
-    },
-    {
-      "id": "flags",
-      "title": "Bayrak Bilmece",
-      "description": "Bayrağı gör, hangi ülkenin olduğunu bul. 80+ ülke!",
-      "category": "educational",
-      "categoryLabel": "Eğitici",
-      "ageRating": "7+",
-      "thumbnail": "games/flags/thumbnail.svg",
-      "path": "games/flags/index.html",
-      "tags": [
-        "eğitici",
-        "bayrak",
-        "ülke",
-        "coğrafya"
-      ]
-    },
-    {
-      "id": "capitals",
-      "title": "Başkent Bilmece",
-      "description": "Ülkenin bayrağını gör, başkentini bul. Coğrafya öğrenmenin en eğlenceli yolu!",
-      "category": "educational",
-      "categoryLabel": "Eğitici",
-      "ageRating": "7+",
-      "thumbnail": "games/capitals/thumbnail.svg",
-      "path": "games/capitals/index.html",
-      "tags": [
-        "eğitici",
-        "başkent",
-        "coğrafya"
-      ]
-    },
-    {
-      "id": "worldle",
-      "title": "Sıcak Soğuk Ülke",
-      "description": "Bilgisayar bir ülke seçer. Her tahminde mesafe ve yön söylenir. 10 hakla bul!",
-      "category": "educational",
-      "categoryLabel": "Eğitici",
-      "ageRating": "10+",
-      "thumbnail": "games/worldle/thumbnail.svg",
-      "path": "games/worldle/index.html",
-      "tags": [
-        "eğitici",
-        "ülke",
-        "coğrafya",
-        "tahmin"
-      ]
-    },
-    {
-      "id": "target",
-      "title": "Hedef Sayı",
-      "description": "Tabloda rastgele rakamlar var. Bilgisayar bir hedef söyler. Komşu kareleri seçerek topladığında hedefe ulaşırsan o kadar puan kazanırsın!",
-      "category": "logic",
-      "categoryLabel": "Mantık",
-      "ageRating": "7+",
-      "thumbnail": "games/target/thumbnail.svg",
-      "path": "games/target/index.html",
-      "tags": [
-        "mantık",
-        "matematik",
-        "iki-kişilik",
-        "toplama"
-      ]
-    },
-    {
-      "id": "pong",
-      "title": "Pong",
-      "description": "Klasik masa tenisi! Paleti hareket ettir, topu kaçırma. Bilgisayara karşı veya 2 kişilik oyna.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/pong/thumbnail.svg",
-      "path": "games/pong/index.html",
-      "tags": [
-        "arcade",
-        "klasik",
-        "pong",
-        "masa tenisi"
-      ]
-    },
-    {
-      "id": "wheel",
-      "title": "Çekiliş Çarkı",
-      "description": "İsimleri çarka koy, döndür. 101 Okey masası, takım kurma veya kim oynayacak gibi çekilişler için pratik araç!",
-      "category": "board",
-      "categoryLabel": "Masa Oyunu",
-      "ageRating": "4+",
-      "thumbnail": "games/wheel/thumbnail.svg",
-      "path": "games/wheel/index.html",
-      "tags": [
-        "çekiliş",
-        "çark",
-        "101 okey",
-        "araç",
-        "rastgele"
-      ]
-    },
-    {
-      "id": "dama",
-      "title": "Dama",
-      "description": "Türk daması — 2 kişilik klasik strateji oyunu. Düz hareket, zorunlu yiyiş, son sıraya ulaşan taş 'Dame' olur!",
-      "category": "board",
-      "categoryLabel": "Masa Oyunu",
-      "ageRating": "7+",
-      "thumbnail": "games/dama/thumbnail.svg",
-      "path": "games/dama/index.html",
-      "tags": [
-        "masa",
-        "strateji",
-        "dama",
-        "iki-kişilik",
-        "klasik"
-      ]
-    },
-    {
-      "id": "scooter",
-      "title": "Scooter Yarışı",
-      "description": "Hiç bitmeyen kaçış oyunu! Scooter ile şeritlere kay, altınları topla, engellerden zıpla. Ne kadar uzağa gidebilirsin?",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/scooter/thumbnail.svg",
-      "path": "games/scooter/index.html",
-      "tags": [
-        "arcade",
-        "endless runner",
-        "scooter",
-        "kaçış",
-        "altın"
-      ]
-    },
-    {
-      "id": "bricks",
-      "title": "Tuğla Patlat",
-      "description": "Klasik tuğla kırma! Bombalar, çoklu top, uzun palet ve daha fazla bonus. Tüm tuğlaları parçala, bir sonraki seviyeye geç!",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/bricks/thumbnail.svg",
-      "path": "games/bricks/index.html",
-      "tags": [
-        "arcade",
-        "brick",
-        "breakout",
-        "power-up",
-        "tuğla"
-      ]
-    },
-    {
-      "id": "wolf",
-      "title": "Kurt Maceraları",
-      "description": "Sevimli bir kurt ormanda yıldızları toplayarak seviyeleri tamamlıyor. Zıpla, kaç, topla ve çık!",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/wolf/thumbnail.svg",
-      "path": "games/wolf/index.html",
-      "tags": [
-        "3d",
-        "platformer",
-        "macera",
-        "çocuk",
-        "kurt"
-      ]
-    },
-    {
-      "id": "tower",
-      "title": "Kule Kur",
-      "description": "Vinç sağa sola sallanırken tam doğru anda bırak! Bloklar üst üste binsin, kule yükselsin. 20 seviye, her seviyede vinç hızlanır.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/tower/thumbnail.svg",
-      "path": "games/tower/index.html",
-      "tags": [
-        "arcade",
-        "kule",
-        "tower",
-        "blok",
-        "denge",
-        "zamanlama"
-      ]
-    },
-    {
-      "id": "runner",
-      "title": "Sınavdan Kaçış",
-      "description": "Chrome Dino tarzı sonsuz koşu! Kitaplardan, sınav kağıtlarından ve bütünleme tabelalarından zıplayarak kaç. Hızlanırsın, dikkatli ol!",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/runner/thumbnail.svg",
-      "path": "games/runner/index.html",
-      "tags": [
-        "arcade",
-        "endless runner",
-        "dino",
-        "okul",
-        "zıplama"
-      ]
-    },
-    {
-      "id": "towerultra",
-      "title": "Kule Kur Ultra",
-      "description": "Sarkaç gibi sallanan blokları tam zamanında bırak, gökdeleni kat kat yükselt! 3D bina blokları, 3 can ve sonsuz tırmanış.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/towerultra/thumbnail.svg",
-      "path": "games/towerultra/index.html",
-      "tags": [
-        "arcade",
-        "kule",
-        "tower",
-        "3d",
-        "pendulum",
-        "sarkaç",
-        "bina"
-      ]
-    },
-    {
-      "id": "zip",
-      "title": "Sırayla Bağla",
-      "description": "Numaralı hücreleri sırayla birleştir ama tek çizgide tüm hücreleri ziyaret et! 50 bölüm, kademeli zorluk.",
-      "category": "puzzle",
-      "categoryLabel": "Bulmaca",
-      "ageRating": "7+",
-      "thumbnail": "games/zip/thumbnail.svg",
-      "path": "games/zip/index.html",
-      "tags": [
-        "puzzle",
-        "bulmaca",
-        "mantık",
-        "yol",
-        "hamilton"
-      ]
-    },
-    {
-      "id": "cargo",
-      "title": "Gezegenler Arası Kurye",
-      "description": "Güneş sisteminde uzay kargo simülasyonu! Kütleçekimi kullan, yakıtın bitmeden hedef gezegene yumuşak in. Kazandığın kredilerle gemini geliştir.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "7+",
-      "thumbnail": "games/cargo/thumbnail.svg",
-      "path": "games/cargo/index.html",
-      "tags": [
-        "arcade",
-        "uzay",
-        "fizik",
-        "kütleçekim",
-        "kargo",
-        "simülasyon"
-      ]
-    },
-    {
-      "id": "ecocity",
-      "title": "Kayıp Şehir",
-      "description": "Karton kutu içinde gizli bir şehir kur! Atıkları topla, ayrıştır, evleri ve enerjiyi stratejik yerleştir. Kirliliği düşür, nüfusu büyüt.",
-      "category": "educational",
-      "categoryLabel": "Eğitici",
-      "ageRating": "7+",
-      "thumbnail": "games/ecocity/thumbnail.svg",
-      "path": "games/ecocity/index.html",
-      "tags": [
-        "şehir",
-        "strateji",
-        "geri dönüşüm",
-        "kaynak yönetimi",
-        "çocuk",
-        "eğitici"
-      ]
-    },
-    {
-      "id": "facecatch",
-      "title": "Burnunla Yakala",
-      "description": "Kameran açık, kafanı sağa-sola eğ → sepet seni takip etsin! Sağlıklı meyveleri topla, fast-food ve bombadan kaç. Model indirme yok, tarayıcı içinde çalışır.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "7+",
-      "thumbnail": "games/facecatch/thumbnail.svg",
-      "path": "games/facecatch/index.html",
-      "tags": [
-        "arcade",
-        "kamera",
-        "yüz takibi",
-        "refleks",
-        "sağlıklı beslenme"
-      ]
-    },
-    {
-      "id": "sliceit",
-      "title": "Portakal Orda Kal",
-      "description": "Önce meyveni seç! Kameran açılır, meyve önüne gelir, bıçak sağa sola gider. Göz kırpınca (veya ekrana dokununca) bıçağın olduğu noktadan keser. 60 saniyede maksimum dilim!",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "7+",
-      "thumbnail": "games/sliceit/thumbnail.svg",
-      "path": "games/sliceit/index.html",
-      "tags": [
-        "arcade",
-        "kamera",
-        "göz kırpma",
-        "meyve kesme",
-        "refleks"
-      ]
-    },
-    {
-      "id": "okeytro",
-      "title": "OKEYTRO",
-      "description": "Okey 101 taşlarıyla roguelike puan oyunu. Per ve serilerle barajları geç, dükkândan gösterge taşları topla, boss ellerini alt et!",
-      "category": "board",
-      "categoryLabel": "Masa Oyunu",
-      "ageRating": "12+",
-      "thumbnail": "games/okeytro/thumbnail.svg",
-      "path": "games/okeytro/index.html",
-      "tags": [
-        "okey",
-        "roguelike",
-        "strateji",
-        "masa",
-        "puan",
-        "balatro"
-      ]
-    },
-    {
-      "id": "okeytro-gemini",
-      "title": "Okeytro Klasik",
-      "description": "Okey + roguelike deste kurma! Seri, per ve çift açarak barajı geç. Jokerler topla, dükkândan güçlen, boss ellerini alt et. Ne kadar yüksek anteye çıkabilirsin?",
-      "category": "board",
-      "categoryLabel": "Masa Oyunu",
-      "ageRating": "7+",
-      "thumbnail": "games/okeytro-gemini/thumbnail.svg",
-      "path": "games/okeytro-gemini/index.html",
-      "tags": [
-        "okey",
-        "roguelike",
-        "balatro",
-        "taş",
-        "strateji",
-        "deste kurma"
-      ]
-    },
-    {
-      "id": "kule-kur",
-      "title": "Kule Kur Premium",
-      "description": "Klasik kule istifleme, premium sürüm! İzometrik 2.5D bloklar, perfect/kombo sistemi, değişen gökyüzü (gün batımı → gece → uzay), parçacık efektleri ve sentezlenmiş sesler.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "kule-kur/thumbnail.svg",
-      "path": "kule-kur/index.html",
-      "tags": [
-        "arcade",
-        "stack",
-        "kule",
-        "istifleme",
-        "refleks",
-        "premium"
-      ]
-    },
-    {
-      "id": "labirent",
-      "title": "Labirent Kaçışı",
-      "description": "Tilki ile labirentten kaç! Yıldızları topla, kilitli kapıları matematikle aç, canavardan kaç — güç alırsan onu sen ye. 20 bölüm, artan zorluk.",
-      "category": "educational",
-      "categoryLabel": "Eğitici",
-      "ageRating": "7+",
-      "thumbnail": "games/labirent/thumbnail.svg",
-      "path": "games/labirent/index.html",
-      "tags": [
-        "labirent",
-        "matematik",
-        "eğitici",
-        "macera",
-        "çocuk",
-        "bulmaca"
-      ]
-    },
-    {
-      "id": "kumboyama",
-      "title": "Kum Boyama",
-      "description": "Parmağınla renkli kum dök! Kum yer çekimiyle akar, yığılır ve tepe oluşturur. Gökkuşağı fırçasıyla rengârenk desenler yap. Rahatlatıcı kum sanatı.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/kumboyama/thumbnail.svg",
-      "path": "games/kumboyama/index.html",
-      "tags": [
-        "kum",
-        "boyama",
-        "rahatlatıcı",
-        "sanat",
-        "gökkuşağı",
-        "fizik"
-      ]
-    },
-    {
-      "id": "driftpark",
-      "title": "Drift Park",
-      "description": "Fizik tabanlı top-down drift & park! El freniyle kay, lastik izi bırak, dar alanlara park et. 3 bölüm: sürücü kursu, paralel park, AVM otoparkı.",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "7+",
-      "thumbnail": "games/driftpark/thumbnail.svg",
-      "path": "games/driftpark/index.html",
-      "tags": [
-        "arcade",
-        "araba",
-        "drift",
-        "park",
-        "fizik",
-        "sürüş"
-      ]
-    },
-    {
-      "id": "boncuk",
-      "title": "Süper Boncuk",
-      "description": "Klasik yan kaydırmalı platform! Kedi Boncuk ile koş, zıpla, blokları kafanla kır, böcekleri ez, balığı ye ve büyü. 3 özgün bölüm, bayrağa ulaş!",
-      "category": "arcade",
-      "categoryLabel": "Arcade",
-      "ageRating": "4+",
-      "thumbnail": "games/boncuk/thumbnail.svg",
-      "path": "games/boncuk/index.html",
-      "tags": [
-        "arcade",
-        "platform",
-        "zıplama",
-        "kedi",
-        "macera",
-        "yan kaydırma"
-      ]
-    }
-  ]
+ "categories": [
+  {
+   "id": "all",
+   "label": "Tümü"
+  },
+  {
+   "id": "puzzle",
+   "label": "Bulmaca"
+  },
+  {
+   "id": "logic",
+   "label": "Mantık"
+  },
+  {
+   "id": "arcade",
+   "label": "Arcade"
+  },
+  {
+   "id": "board",
+   "label": "Masa Oyunu"
+  },
+  {
+   "id": "educational",
+   "label": "Eğitici"
+  }
+ ],
+ "ageGroups": [
+  {
+   "id": "all",
+   "label": "Tüm Yaşlar"
+  },
+  {
+   "id": "4+",
+   "label": "4+"
+  },
+  {
+   "id": "7+",
+   "label": "7+"
+  },
+  {
+   "id": "12+",
+   "label": "12+"
+  },
+  {
+   "id": "16+",
+   "label": "16+"
+  }
+ ],
+ "games": [
+  {
+   "id": "sudoku",
+   "title": "Sudoku",
+   "description": "Klasik 9x9 mantık bulmacası. Her satır, sütun ve 3x3 kutuda 1-9 rakamlarını bir kez kullan.",
+   "category": "logic",
+   "categoryLabel": "Mantık",
+   "ageRating": "7+",
+   "thumbnail": "games/sudoku/thumbnail.svg",
+   "path": "games/sudoku/index.html",
+   "tags": [
+    "bulmaca",
+    "sudoku",
+    "zeka",
+    "mantık"
+   ]
+  },
+  {
+   "id": "tetris",
+   "title": "Tetris",
+   "description": "Klasik blok yığma oyunu. Düşen parçaları döndürerek tam satırlar oluştur.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "7+",
+   "thumbnail": "games/tetris/thumbnail.svg",
+   "path": "games/tetris/index.html",
+   "tags": [
+    "arcade",
+    "tetris",
+    "klasik",
+    "blok"
+   ]
+  },
+  {
+   "id": "2048",
+   "title": "2048",
+   "description": "Aynı sayıları birleştirerek 2048'e ulaşmaya çalış.",
+   "category": "puzzle",
+   "categoryLabel": "Bulmaca",
+   "ageRating": "7+",
+   "thumbnail": "games/2048/thumbnail.svg",
+   "path": "games/2048/index.html",
+   "tags": [
+    "bulmaca",
+    "2048",
+    "sayı",
+    "klasik"
+   ]
+  },
+  {
+   "id": "memory",
+   "title": "Hafıza",
+   "description": "Kartları çevir, eşleşen sembolleri bul. Hafızanı geliştir!",
+   "category": "educational",
+   "categoryLabel": "Eğitici",
+   "ageRating": "4+",
+   "thumbnail": "games/memory/thumbnail.svg",
+   "path": "games/memory/index.html",
+   "tags": [
+    "hafıza",
+    "eşleştirme",
+    "konsantrasyon",
+    "çocuk"
+   ]
+  },
+  {
+   "id": "slonky",
+   "title": "Slonky",
+   "description": "Topu düşür, çivilere çarpa çarpa yüksek puanlı kutuya isabet ettir. 10 topla en yüksek skoru yapmaya çalış.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/slonky/thumbnail.svg",
+   "path": "games/slonky/index.html",
+   "tags": [
+    "arcade",
+    "plinko",
+    "top",
+    "şans",
+    "fizik"
+   ]
+  },
+  {
+   "id": "monster",
+   "title": "Canavar Eşleştir",
+   "description": "Komşu canavarları yer değiştir, 3 veya daha fazla aynı türü yan yana getir, patlat ve puan kazan!",
+   "category": "puzzle",
+   "categoryLabel": "Bulmaca",
+   "ageRating": "4+",
+   "thumbnail": "games/monster/thumbnail.svg",
+   "path": "games/monster/index.html",
+   "tags": [
+    "bulmaca",
+    "match-3",
+    "eşleştirme",
+    "canavar"
+   ]
+  },
+  {
+   "id": "emoji",
+   "title": "Emoji Quiz",
+   "description": "Emoji ipuçlarından kelimeyi tahmin et. Türk yemekleri, şehirleri, filmleri, deyimleri ve daha fazlası!",
+   "category": "educational",
+   "categoryLabel": "Eğitici",
+   "ageRating": "7+",
+   "thumbnail": "games/emoji/thumbnail.svg",
+   "path": "games/emoji/index.html",
+   "tags": [
+    "bulmaca",
+    "kelime",
+    "emoji",
+    "tahmin",
+    "eğlence"
+   ]
+  },
+  {
+   "id": "snake",
+   "title": "Yılan",
+   "description": "Klasik yılan oyunu. Yemleri ye, büyü, duvarlara ve kendine çarpma!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/snake/thumbnail.svg",
+   "path": "games/snake/index.html",
+   "tags": [
+    "arcade",
+    "klasik",
+    "yılan",
+    "snake"
+   ]
+  },
+  {
+   "id": "mines",
+   "title": "Mayın Tarlası",
+   "description": "Klasik mantık bulmacası. Mayınlara dokunmadan tüm güvenli kareleri aç!",
+   "category": "logic",
+   "categoryLabel": "Mantık",
+   "ageRating": "7+",
+   "thumbnail": "games/mines/thumbnail.svg",
+   "path": "games/mines/index.html",
+   "tags": [
+    "mantık",
+    "bulmaca",
+    "mayın",
+    "minesweeper"
+   ]
+  },
+  {
+   "id": "english",
+   "title": "İngilizce Kelimeler",
+   "description": "İlkokul seviyesi İngilizce kelime oyunu. Resme bak, kelimenin Türkçesini seç!",
+   "category": "educational",
+   "categoryLabel": "Eğitici",
+   "ageRating": "4+",
+   "thumbnail": "games/english/thumbnail.svg",
+   "path": "games/english/index.html",
+   "tags": [
+    "eğitici",
+    "ingilizce",
+    "kelime",
+    "çocuk"
+   ]
+  },
+  {
+   "id": "xox",
+   "title": "XOX",
+   "description": "Klasik 3 taş yan yana getirme oyunu. Bilgisayara karşı veya arkadaşınla oyna.",
+   "category": "board",
+   "categoryLabel": "Masa Oyunu",
+   "ageRating": "4+",
+   "thumbnail": "games/xox/thumbnail.svg",
+   "path": "games/xox/index.html",
+   "tags": [
+    "masa",
+    "klasik",
+    "xox",
+    "tic-tac-toe"
+   ]
+  },
+  {
+   "id": "flags",
+   "title": "Bayrak Bilmece",
+   "description": "Bayrağı gör, hangi ülkenin olduğunu bul. 80+ ülke!",
+   "category": "educational",
+   "categoryLabel": "Eğitici",
+   "ageRating": "7+",
+   "thumbnail": "games/flags/thumbnail.svg",
+   "path": "games/flags/index.html",
+   "tags": [
+    "eğitici",
+    "bayrak",
+    "ülke",
+    "coğrafya"
+   ]
+  },
+  {
+   "id": "capitals",
+   "title": "Başkent Bilmece",
+   "description": "Ülkenin bayrağını gör, başkentini bul. Coğrafya öğrenmenin en eğlenceli yolu!",
+   "category": "educational",
+   "categoryLabel": "Eğitici",
+   "ageRating": "7+",
+   "thumbnail": "games/capitals/thumbnail.svg",
+   "path": "games/capitals/index.html",
+   "tags": [
+    "eğitici",
+    "başkent",
+    "coğrafya"
+   ]
+  },
+  {
+   "id": "worldle",
+   "title": "Sıcak Soğuk Ülke",
+   "description": "Bilgisayar bir ülke seçer. Her tahminde mesafe ve yön söylenir. 10 hakla bul!",
+   "category": "educational",
+   "categoryLabel": "Eğitici",
+   "ageRating": "10+",
+   "thumbnail": "games/worldle/thumbnail.svg",
+   "path": "games/worldle/index.html",
+   "tags": [
+    "eğitici",
+    "ülke",
+    "coğrafya",
+    "tahmin"
+   ]
+  },
+  {
+   "id": "target",
+   "title": "Hedef Sayı",
+   "description": "Tabloda rastgele rakamlar var. Bilgisayar bir hedef söyler. Komşu kareleri seçerek topladığında hedefe ulaşırsan o kadar puan kazanırsın!",
+   "category": "logic",
+   "categoryLabel": "Mantık",
+   "ageRating": "7+",
+   "thumbnail": "games/target/thumbnail.svg",
+   "path": "games/target/index.html",
+   "tags": [
+    "mantık",
+    "matematik",
+    "iki-kişilik",
+    "toplama"
+   ]
+  },
+  {
+   "id": "pong",
+   "title": "Pong",
+   "description": "Klasik masa tenisi! Paleti hareket ettir, topu kaçırma. Bilgisayara karşı veya 2 kişilik oyna.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/pong/thumbnail.svg",
+   "path": "games/pong/index.html",
+   "tags": [
+    "arcade",
+    "klasik",
+    "pong",
+    "masa tenisi"
+   ]
+  },
+  {
+   "id": "wheel",
+   "title": "Çekiliş Çarkı",
+   "description": "İsimleri çarka koy, döndür. 101 Okey masası, takım kurma veya kim oynayacak gibi çekilişler için pratik araç!",
+   "category": "board",
+   "categoryLabel": "Masa Oyunu",
+   "ageRating": "4+",
+   "thumbnail": "games/wheel/thumbnail.svg",
+   "path": "games/wheel/index.html",
+   "tags": [
+    "çekiliş",
+    "çark",
+    "101 okey",
+    "araç",
+    "rastgele"
+   ]
+  },
+  {
+   "id": "dama",
+   "title": "Dama",
+   "description": "Türk daması — 2 kişilik klasik strateji oyunu. Düz hareket, zorunlu yiyiş, son sıraya ulaşan taş 'Dame' olur!",
+   "category": "board",
+   "categoryLabel": "Masa Oyunu",
+   "ageRating": "7+",
+   "thumbnail": "games/dama/thumbnail.svg",
+   "path": "games/dama/index.html",
+   "tags": [
+    "masa",
+    "strateji",
+    "dama",
+    "iki-kişilik",
+    "klasik"
+   ]
+  },
+  {
+   "id": "scooter",
+   "title": "Scooter Yarışı",
+   "description": "Hiç bitmeyen kaçış oyunu! Scooter ile şeritlere kay, altınları topla, engellerden zıpla. Ne kadar uzağa gidebilirsin?",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/scooter/thumbnail.svg",
+   "path": "games/scooter/index.html",
+   "tags": [
+    "arcade",
+    "endless runner",
+    "scooter",
+    "kaçış",
+    "altın"
+   ]
+  },
+  {
+   "id": "bricks",
+   "title": "Tuğla Patlat",
+   "description": "Klasik tuğla kırma! Bombalar, çoklu top, uzun palet ve daha fazla bonus. Tüm tuğlaları parçala, bir sonraki seviyeye geç!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/bricks/thumbnail.svg",
+   "path": "games/bricks/index.html",
+   "tags": [
+    "arcade",
+    "brick",
+    "breakout",
+    "power-up",
+    "tuğla"
+   ]
+  },
+  {
+   "id": "wolf",
+   "title": "Kurt Maceraları",
+   "description": "Sevimli bir kurt ormanda yıldızları toplayarak seviyeleri tamamlıyor. Zıpla, kaç, topla ve çık!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/wolf/thumbnail.svg",
+   "path": "games/wolf/index.html",
+   "tags": [
+    "3d",
+    "platformer",
+    "macera",
+    "çocuk",
+    "kurt"
+   ]
+  },
+  {
+   "id": "tower",
+   "title": "Kule Kur",
+   "description": "Vinç sağa sola sallanırken tam doğru anda bırak! Bloklar üst üste binsin, kule yükselsin. 20 seviye, her seviyede vinç hızlanır.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/tower/thumbnail.svg",
+   "path": "games/tower/index.html",
+   "tags": [
+    "arcade",
+    "kule",
+    "tower",
+    "blok",
+    "denge",
+    "zamanlama"
+   ]
+  },
+  {
+   "id": "runner",
+   "title": "Sınavdan Kaçış",
+   "description": "Chrome Dino tarzı sonsuz koşu! Kitaplardan, sınav kağıtlarından ve bütünleme tabelalarından zıplayarak kaç. Hızlanırsın, dikkatli ol!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/runner/thumbnail.svg",
+   "path": "games/runner/index.html",
+   "tags": [
+    "arcade",
+    "endless runner",
+    "dino",
+    "okul",
+    "zıplama"
+   ]
+  },
+  {
+   "id": "towerultra",
+   "title": "Kule Kur Ultra",
+   "description": "Sarkaç gibi sallanan blokları tam zamanında bırak, gökdeleni kat kat yükselt! 3D bina blokları, 3 can ve sonsuz tırmanış.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/towerultra/thumbnail.svg",
+   "path": "games/towerultra/index.html",
+   "tags": [
+    "arcade",
+    "kule",
+    "tower",
+    "3d",
+    "pendulum",
+    "sarkaç",
+    "bina"
+   ]
+  },
+  {
+   "id": "zip",
+   "title": "Sırayla Bağla",
+   "description": "Numaralı hücreleri sırayla birleştir ama tek çizgide tüm hücreleri ziyaret et! 50 bölüm, kademeli zorluk.",
+   "category": "puzzle",
+   "categoryLabel": "Bulmaca",
+   "ageRating": "7+",
+   "thumbnail": "games/zip/thumbnail.svg",
+   "path": "games/zip/index.html",
+   "tags": [
+    "puzzle",
+    "bulmaca",
+    "mantık",
+    "yol",
+    "hamilton"
+   ]
+  },
+  {
+   "id": "cargo",
+   "title": "Gezegenler Arası Kurye",
+   "description": "Güneş sisteminde uzay kargo simülasyonu! Kütleçekimi kullan, yakıtın bitmeden hedef gezegene yumuşak in. Kazandığın kredilerle gemini geliştir.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "7+",
+   "thumbnail": "games/cargo/thumbnail.svg",
+   "path": "games/cargo/index.html",
+   "tags": [
+    "arcade",
+    "uzay",
+    "fizik",
+    "kütleçekim",
+    "kargo",
+    "simülasyon"
+   ]
+  },
+  {
+   "id": "ecocity",
+   "title": "Kayıp Şehir",
+   "description": "Karton kutu içinde gizli bir şehir kur! Atıkları topla, ayrıştır, evleri ve enerjiyi stratejik yerleştir. Kirliliği düşür, nüfusu büyüt.",
+   "category": "educational",
+   "categoryLabel": "Eğitici",
+   "ageRating": "7+",
+   "thumbnail": "games/ecocity/thumbnail.svg",
+   "path": "games/ecocity/index.html",
+   "tags": [
+    "şehir",
+    "strateji",
+    "geri dönüşüm",
+    "kaynak yönetimi",
+    "çocuk",
+    "eğitici"
+   ]
+  },
+  {
+   "id": "facecatch",
+   "title": "Burnunla Yakala",
+   "description": "Kameran açık, kafanı sağa-sola eğ → sepet seni takip etsin! Sağlıklı meyveleri topla, fast-food ve bombadan kaç. Model indirme yok, tarayıcı içinde çalışır.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "7+",
+   "thumbnail": "games/facecatch/thumbnail.svg",
+   "path": "games/facecatch/index.html",
+   "tags": [
+    "arcade",
+    "kamera",
+    "yüz takibi",
+    "refleks",
+    "sağlıklı beslenme"
+   ]
+  },
+  {
+   "id": "sliceit",
+   "title": "Portakal Orda Kal",
+   "description": "Önce meyveni seç! Kameran açılır, meyve önüne gelir, bıçak sağa sola gider. Göz kırpınca (veya ekrana dokununca) bıçağın olduğu noktadan keser. 60 saniyede maksimum dilim!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "7+",
+   "thumbnail": "games/sliceit/thumbnail.svg",
+   "path": "games/sliceit/index.html",
+   "tags": [
+    "arcade",
+    "kamera",
+    "göz kırpma",
+    "meyve kesme",
+    "refleks"
+   ]
+  },
+  {
+   "id": "okeytro",
+   "title": "OKEYTRO",
+   "description": "Okey 101 taşlarıyla roguelike puan oyunu. Per ve serilerle barajları geç, dükkândan gösterge taşları topla, boss ellerini alt et!",
+   "category": "board",
+   "categoryLabel": "Masa Oyunu",
+   "ageRating": "12+",
+   "thumbnail": "games/okeytro/thumbnail.svg",
+   "path": "games/okeytro/index.html",
+   "tags": [
+    "okey",
+    "roguelike",
+    "strateji",
+    "masa",
+    "puan",
+    "balatro"
+   ]
+  },
+  {
+   "id": "okeytro-gemini",
+   "title": "Okeytro Klasik",
+   "description": "Okey + roguelike deste kurma! Seri, per ve çift açarak barajı geç. Jokerler topla, dükkândan güçlen, boss ellerini alt et. Ne kadar yüksek anteye çıkabilirsin?",
+   "category": "board",
+   "categoryLabel": "Masa Oyunu",
+   "ageRating": "7+",
+   "thumbnail": "games/okeytro-gemini/thumbnail.svg",
+   "path": "games/okeytro-gemini/index.html",
+   "tags": [
+    "okey",
+    "roguelike",
+    "balatro",
+    "taş",
+    "strateji",
+    "deste kurma"
+   ]
+  },
+  {
+   "id": "kule-kur",
+   "title": "Kule Kur Premium",
+   "description": "Klasik kule istifleme, premium sürüm! İzometrik 2.5D bloklar, perfect/kombo sistemi, değişen gökyüzü (gün batımı → gece → uzay), parçacık efektleri ve sentezlenmiş sesler.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "kule-kur/thumbnail.svg",
+   "path": "kule-kur/index.html",
+   "tags": [
+    "arcade",
+    "stack",
+    "kule",
+    "istifleme",
+    "refleks",
+    "premium"
+   ]
+  },
+  {
+   "id": "labirent",
+   "title": "Labirent Kaçışı",
+   "description": "Tilki ile labirentten kaç! Yıldızları topla, kilitli kapıları matematikle aç, canavardan kaç — güç alırsan onu sen ye. 20 bölüm, artan zorluk.",
+   "category": "educational",
+   "categoryLabel": "Eğitici",
+   "ageRating": "7+",
+   "thumbnail": "games/labirent/thumbnail.svg",
+   "path": "games/labirent/index.html",
+   "tags": [
+    "labirent",
+    "matematik",
+    "eğitici",
+    "macera",
+    "çocuk",
+    "bulmaca"
+   ]
+  },
+  {
+   "id": "kumboyama",
+   "title": "Kum Boyama",
+   "description": "Parmağınla renkli kum dök! Kum yer çekimiyle akar, yığılır ve tepe oluşturur. Gökkuşağı fırçasıyla rengârenk desenler yap. Rahatlatıcı kum sanatı.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/kumboyama/thumbnail.svg",
+   "path": "games/kumboyama/index.html",
+   "tags": [
+    "kum",
+    "boyama",
+    "rahatlatıcı",
+    "sanat",
+    "gökkuşağı",
+    "fizik"
+   ]
+  },
+  {
+   "id": "driftpark",
+   "title": "Drift Park",
+   "description": "Fizik tabanlı top-down drift & park! El freniyle kay, lastik izi bırak, dar alanlara park et. 3 bölüm: sürücü kursu, paralel park, AVM otoparkı.",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "7+",
+   "thumbnail": "games/driftpark/thumbnail.svg",
+   "path": "games/driftpark/index.html",
+   "tags": [
+    "arcade",
+    "araba",
+    "drift",
+    "park",
+    "fizik",
+    "sürüş"
+   ]
+  },
+  {
+   "id": "boncuk",
+   "title": "Süper Boncuk",
+   "description": "Klasik yan kaydırmalı platform! Kedi Boncuk ile koş, zıpla, blokları kafanla kır, böcekleri ez, balığı ye ve büyü. 3 özgün bölüm, bayrağa ulaş!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/boncuk/thumbnail.svg",
+   "path": "games/boncuk/index.html",
+   "tags": [
+    "arcade",
+    "platform",
+    "zıplama",
+    "kedi",
+    "macera",
+    "yan kaydırma"
+   ]
+  },
+  {
+   "id": "zipzip",
+   "title": "Süper Zıpzıp",
+   "description": "Yan kaydırmalı platform macerası! Zıpzıp ile koş, zıpla, soru bloklarından altın topla, jölelerin üstüne atla ve bayrağa ulaş. 3 bölüm!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "4+",
+   "thumbnail": "games/zipzip/thumbnail.svg",
+   "path": "games/zipzip/index.html",
+   "tags": [
+    "arcade",
+    "platform",
+    "zıplama",
+    "macera",
+    "yan kaydırma"
+   ]
+  }
+ ]
 }
