@@ -24,10 +24,13 @@ function resizeCanvas() {
     canvas.height = H * dpr;
     // canvas.width ataması dönüşümü sıfırlar; tek seferlik ölçekle
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    if (gameState !== 'playing') {
-        player.y = H / 2;
-        drawScene();
+    // Oyuncu her zaman yeni merkezde; engeller yeni ekran kenarlarına yeniden demirlenir
+    player.y = H / 2;
+    for (const obs of obstacles) {
+        obs.height = (H / 2) + (player.size / 2) + Math.random() * 40;
+        obs.y = obs.isTop ? 0 : H - obs.height;
     }
+    initStars();
 }
 
 // Oyun Değişkenleri
@@ -36,9 +39,10 @@ let score = 0;
 let best = 0;
 try { best = parseInt(localStorage.getItem('paralel_best'), 10) || 0; } catch (e) { best = 0; }
 let baseSpeed = 6;
+const MAX_SPEED = 22; // üstü hem insan refleksiyle oynanamaz hem de AABB tünellemesi riski doğurur
 let currentSpeed = baseSpeed;
 let frameCount = 0;
-let animationId;
+let framesSinceSpawn = 0;
 
 // Renk Temaları (Boyutlar)
 const DIMENSIONS = [
@@ -130,6 +134,7 @@ function initGame() {
     score = 0;
     currentSpeed = baseSpeed;
     frameCount = 0;
+    framesSinceSpawn = 0;
     obstacles = [];
     particles = [];
     currentDim = 0;
@@ -144,9 +149,7 @@ function initGame() {
     newRecordEl.classList.add('hidden');
 
     gameState = 'playing';
-    cancelAnimationFrame(animationId);
     ac(); // ses bağlamını kullanıcı jestiyle uyandır
-    loop();
 }
 
 // ---- Boyut değiştirme (tek dokunuş) ----
@@ -162,7 +165,10 @@ function switchDimension() {
 
 // ---- Dokunma dinleyicileri ----
 window.addEventListener('pointerdown', (e) => {
-    if (e.target.tagName === 'BUTTON') return;
+    // Çoklu dokunuşta ikinci parmak switch'i geri almasın
+    if (e.isPrimary === false) return;
+    // Buton ve bağlantılara (geri oku) dokunmak boyut değiştirmesin
+    if (e.target.closest && e.target.closest('button, a')) return;
     switchDimension();
 });
 startBtn.addEventListener('click', initGame);
@@ -170,9 +176,11 @@ restartBtn.addEventListener('click', initGame);
 window.addEventListener('resize', resizeCanvas);
 
 // ---- Engel oluşturma ----
+// Her engel oyuncu şeridini TAMAMEN kapatır: yanlış renk = kesin ölüm,
+// doğru renk = kesin geçiş. Rastgele "değip değmeme" adaletsizliği yok.
 function spawnObstacle() {
     const isTop = Math.random() > 0.5;
-    const height = (H / 2) - (player.size / 2) + (Math.random() * 40 - 20);
+    const height = (H / 2) + (player.size / 2) + Math.random() * 40;
     const typeDim = Math.random() > 0.5 ? 0 : 1;
     obstacles.push({
         x: W + 50,
@@ -180,6 +188,7 @@ function spawnObstacle() {
         width: 40,
         height: height,
         dim: typeDim,
+        isTop: isTop,
         passed: false
     });
 }
@@ -219,19 +228,15 @@ function gameOver() {
     }, 500);
 }
 
-// ---- Ana döngü ----
+// ---- Ana döngü (tek, sürekli döngü: menüde de yıldızlar akar) ----
 function loop() {
     if (gameState === 'playing') {
         update();
-        drawScene();
-        animationId = requestAnimationFrame(loop);
-    } else if (gameState === 'gameover') {
-        updateParticlesOnly();
-        drawScene();
-        if (particles.length > 0) {
-            animationId = requestAnimationFrame(loop);
-        }
+    } else {
+        updateAmbient();
     }
+    drawScene();
+    requestAnimationFrame(loop);
 }
 
 function updateStars() {
@@ -241,7 +246,8 @@ function updateStars() {
     }
 }
 
-function updateParticlesOnly() {
+// Menü ve oyun-sonu ekranlarında arka planı canlı tutar
+function updateAmbient() {
     for (let i = particles.length - 1; i >= 0; i--) {
         particles[i].x += particles[i].vx;
         particles[i].y += particles[i].vy;
@@ -254,12 +260,19 @@ function updateParticlesOnly() {
 function update() {
     frameCount++;
 
-    // Zorluk artışı
-    if (frameCount % 600 === 0) currentSpeed += 1;
+    // Zorluk artışı (üst sınırlı)
+    if (frameCount % 600 === 0) currentSpeed = Math.min(MAX_SPEED, currentSpeed + 1);
 
-    // Engel üretimi (hıza göre sıklık)
-    let spawnRate = Math.max(40, 100 - (currentSpeed * 2));
-    if (frameCount % Math.floor(spawnRate) === 0) spawnObstacle();
+    // Engel üretimi: sayaç tabanlı — hız değişse bile iki engel arasında
+    // her zaman en az spawnRate kare (≥40 kare ≈ 0.7 sn) tepki süresi kalır.
+    // (frameCount % spawnRate kullanmak, hız artış anında eski/yeni aralık
+    // katları çakışınca 2 engeli üst üste doğurup kaçınılmaz ölüm yaratıyordu.)
+    framesSinceSpawn++;
+    const spawnRate = Math.max(40, 100 - (currentSpeed * 2));
+    if (framesSinceSpawn >= spawnRate) {
+        spawnObstacle();
+        framesSinceSpawn = 0;
+    }
 
     updateStars();
 
@@ -364,6 +377,7 @@ window._paralel = {
     get score() { return score; },
     get best() { return best; },
     get dim() { return currentDim; },
+    get speed() { return currentSpeed; },
     get obstacles() { return obstacles; },
     get particles() { return particles; },
     player,
@@ -374,5 +388,4 @@ window._paralel = {
 player.y = H / 2;
 bestStart.innerText = best;
 resizeCanvas();
-initStars();
-drawScene();
+loop();
