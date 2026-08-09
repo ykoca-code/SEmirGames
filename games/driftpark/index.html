@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#1b1e26" />
   <title>Drift Park — SEmirK Games</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg" />
@@ -66,8 +66,29 @@
       -webkit-tap-highlight-color: transparent;
     }
     .tbtn.pressed { background: rgba(124,58,237,0.65); border-color: #a78bfa; }
-    #btnLeft  { left: 14px;  bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 74px; height: 74px; }
-    #btnRight { left: 100px; bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 74px; height: 74px; }
+    /* Direksiyon joystick'i: yatay sürükle → analog dönüş (az sürükle = hafif, çok = keskin) */
+    #steerPad {
+      position: fixed; z-index: 30;
+      left: 14px; bottom: calc(20px + env(safe-area-inset-bottom,0px));
+      width: 170px; height: 84px;
+      border-radius: 42px;
+      border: 2px solid rgba(255,255,255,0.25);
+      background: rgba(30,34,46,0.55);
+      backdrop-filter: blur(3px);
+      display: flex; align-items: center; justify-content: center;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #steerPad.active { border-color: #a78bfa; background: rgba(124,58,237,0.35); }
+    #steerKnob {
+      width: 62px; height: 62px; border-radius: 50%;
+      background: rgba(124,58,237,0.75);
+      border: 2px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      transition: transform 0.08s linear;
+      pointer-events: none;
+    }
     #btnGas   { right: 14px; bottom: calc(96px + env(safe-area-inset-bottom,0px)); width: 78px; height: 66px; font-size: 15px; background: rgba(22,101,52,0.55); }
     #btnBrake { right: 14px; bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 78px; height: 66px; font-size: 15px; background: rgba(127,29,29,0.55); }
     #btnHand  { right: 100px; bottom: calc(20px + env(safe-area-inset-bottom,0px)); width: 66px; height: 66px; font-size: 13px; background: rgba(146,64,14,0.55); }
@@ -132,8 +153,7 @@
     <span class="pill crash"><span class="lbl">ÇARPMA</span><span id="hudCrash">0</span></span>
   </div>
 
-  <div class="tbtn" id="btnLeft">◀</div>
-  <div class="tbtn" id="btnRight">▶</div>
+  <div id="steerPad"><div id="steerKnob">🕹️</div></div>
   <div class="tbtn" id="btnGas">GAZ</div>
   <div class="tbtn" id="btnBrake">FREN</div>
   <div class="tbtn" id="btnHand">EL<br>FRENİ</div>
@@ -149,8 +169,8 @@
     </div>
   </div>
 
-  <script src="../../js/version.js?v=1.44.1"></script>
-  <script src="../../js/pwa-back.js?v=1.44.1"></script>
+  <script src="../../js/version.js?v=1.45.0"></script>
+  <script src="../../js/pwa-back.js?v=1.45.0"></script>
 
   <script>
   (function () {
@@ -423,7 +443,7 @@
       smoke: [],
       peds: [],                   // {x,y,...path}
       cam: { x: 0, y: 0, zoom: 1 },
-      input: { left: false, right: false, gas: false, brake: false, hand: false },
+      input: { left: false, right: false, gas: false, brake: false, hand: false, steerAnalog: 0 },
       lastTs: 0,
       elapsed: 0,
       stars: JSON.parse(localStorage.getItem("driftpark_stars") || "[0,0,0]"),
@@ -475,7 +495,8 @@
       c.vF = Math.max(-K.maxRev, Math.min(K.maxSpeed, c.vF));
 
       // Direksiyon: hızla orantılı; el freni dönüşü keskinleştirir
-      const steer = (inp.right ? 1 : 0) - (inp.left ? 1 : 0);
+      // Analog joystick öncelikli; klavye okları ikili değer olarak çalışmaya devam eder
+      const steer = inp.steerAnalog !== 0 ? inp.steerAnalog : (inp.right ? 1 : 0) - (inp.left ? 1 : 0);
       const speedFrac = Math.max(-1, Math.min(1, c.vF / K.maxSpeed * 2.2));
       const handBoost = inp.hand ? 1.45 : 1;
       c.angularVel = steer * K.turnRate * speedFrac * handBoost;
@@ -941,8 +962,28 @@
       el.addEventListener("mouseup", off);
       el.addEventListener("mouseleave", () => off());
     }
-    bindBtn("btnLeft", "left");
-    bindBtn("btnRight", "right");
+    // Direksiyon joystick'i — yatay sürükleme, analog (-1..1)
+    (function bindSteerPad() {
+      const pad = document.getElementById("steerPad");
+      const knob = document.getElementById("steerKnob");
+      function setSteer(v) {
+        G.input.steerAnalog = Math.max(-1, Math.min(1, v));
+        knob.style.transform = "translateX(" + (G.input.steerAnalog * 48) + "px)";
+        pad.classList.toggle("active", G.input.steerAnalog !== 0);
+      }
+      function calc(clientX) {
+        const r = pad.getBoundingClientRect();
+        return (clientX - (r.left + r.width / 2)) / (r.width * 0.32);
+      }
+      pad.addEventListener("touchstart", (e) => { e.preventDefault(); SFX.unlock(); setSteer(calc(e.targetTouches[0].clientX)); }, { passive: false });
+      pad.addEventListener("touchmove",  (e) => { e.preventDefault(); if (e.targetTouches.length) setSteer(calc(e.targetTouches[0].clientX)); }, { passive: false });
+      pad.addEventListener("touchend",   (e) => { e.preventDefault(); if (!e.targetTouches.length) setSteer(0); }, { passive: false });
+      pad.addEventListener("touchcancel", () => setSteer(0));
+      let mouseDown = false;
+      pad.addEventListener("mousedown", (e) => { mouseDown = true; SFX.unlock(); setSteer(calc(e.clientX)); });
+      window.addEventListener("mousemove", (e) => { if (mouseDown) setSteer(calc(e.clientX)); });
+      window.addEventListener("mouseup", () => { if (mouseDown) { mouseDown = false; setSteer(0); } });
+    })();
     bindBtn("btnGas", "gas");
     bindBtn("btnBrake", "brake");
     bindBtn("btnHand", "hand");

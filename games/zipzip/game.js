@@ -478,6 +478,42 @@ class Game {
                 "G...E...........E...G",
                 "G..BBB.........BBB..G",
                 "GGGGGGGGGGGGGGGGGGGGG"
+            ],
+            // Level 4
+            [
+                "GGGGGGGGGGGGGGGGGGGG",
+                "G.........C.........G",
+                "G.......BBBBB.......G",
+                "G...???.......???...G",
+                "G...................G",
+                "G....E.........E....G",
+                "G..BBBB.......BBBB..G",
+                "G...................G",
+                "G.........E.........G",
+                "G........BBBB.......G",
+                "G..E.............E..G",
+                "G.BBB...........BBB.G",
+                "G......E....E.......G",
+                "G....BBBB..BBBB.....G",
+                "GGGGGGGGGGGGGGGGGGGGG"
+            ],
+            // Level 5 — final
+            [
+                "GGGGGGGGGGGGGGGGGGGG",
+                "G.C....???....C.....G",
+                "GBBB..........BBB...G",
+                "G...................G",
+                "G....E....E....E....G",
+                "G..BBBB..BBB..BBBB..G",
+                "G...................G",
+                "G...................G",
+                "G..E.....E......E...G",
+                "G.BBB...BBB....BBB..G",
+                "G...................G",
+                "G....E.......E......G",
+                "G...BBBB....BBBB....G",
+                "G........E..........G",
+                "GGGGGGGGGGGGGGGGGGGGG"
             ]
         ];
 
@@ -545,7 +581,7 @@ class Game {
 
     nextLevel() {
         this.level++;
-        if (this.level > 3) {
+        if (this.level > 5) {
             this.state = 'victory';
             document.getElementById('victoryScore').textContent = this.score;
             document.getElementById('victory').classList.remove('hidden');
