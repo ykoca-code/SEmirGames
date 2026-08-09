@@ -16,7 +16,9 @@ html, body {
 }
 #gameWrap {
     position:relative;
-    width:100vw; height:100vh;
+    width:100vw;
+    height:100vh;
+    height:100dvh; /* iOS PWA: 100vh görünür alandan taşar */
     display:flex; justify-content:center; align-items:center;
 }
 canvas {
@@ -29,7 +31,7 @@ canvas {
     pointer-events:none; z-index:10;
 }
 #hud {
-    position:absolute; top:12px; left:12px; right:12px;
+    position:absolute; top:calc(12px + env(safe-area-inset-top, 0px)); left:12px; right:12px;
     display:flex; justify-content:space-between; align-items:center;
     color:#0ff; font-size:14px; font-weight:700; letter-spacing:2px;
     text-shadow:0 0 10px #0ff, 0 0 20px #0ff;
@@ -37,7 +39,7 @@ canvas {
 #hud span { display:inline-block; }
 #hud .val { color:#ff0080; margin-left:4px; text-shadow:0 0 10px #ff0080; }
 #energyBar {
-    position:absolute; top:42px; left:12px; width:160px; height:6px;
+    position:absolute; top:calc(42px + env(safe-area-inset-top, 0px)); left:12px; width:160px; height:6px;
     background:rgba(0,255,255,0.15); border-radius:3px; overflow:hidden;
     border:1px solid rgba(0,255,255,0.3);
 }
@@ -46,7 +48,7 @@ canvas {
     box-shadow:0 0 10px #0ff; transition:width 0.15s ease;
 }
 #comboText {
-    position:absolute; top:60px; left:12px;
+    position:absolute; top:calc(60px + env(safe-area-inset-top, 0px)); left:12px;
     color:#ffd700; font-size:18px; font-weight:900;
     text-shadow:0 0 15px #ffd700; opacity:0; transition:opacity 0.3s;
 }
@@ -74,8 +76,10 @@ canvas {
 }
 .btn:hover { background:rgba(0,255,255,0.15); box-shadow:0 0 30px rgba(0,255,255,0.4), inset 0 0 20px rgba(0,255,255,0.2); transform:scale(1.05); }
 #touchControls {
-    position:absolute; bottom:15px; left:0; width:100%;
-    display:none; justify-content:space-between; padding:0 20px;
+    /* fixed + safe-area: iOS PWA'da home çubuğunun altına taşmasın */
+    position:fixed; bottom:calc(15px + env(safe-area-inset-bottom, 0px)); left:0; width:100%;
+    display:none; justify-content:space-between;
+    padding:0 max(20px, env(safe-area-inset-left, 0px)) 0 max(20px, env(safe-area-inset-right, 0px));
     pointer-events:auto; z-index:15;
 }
 .touchBtn {
@@ -90,7 +94,7 @@ canvas {
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
 @media(pointer:coarse){ #touchControls{display:flex;} }
 .back-fab {
-    position:fixed; top:10px; left:10px; z-index:30;
+    position:fixed; top:calc(10px + env(safe-area-inset-top, 0px)); left:10px; z-index:30;
     width:36px; height:36px; border-radius:50%;
     background:rgba(0,0,0,0.55); color:#0ff;
     display:flex; align-items:center; justify-content:center;
@@ -949,7 +953,7 @@ window._neon = {
     get timeScale() { return timeScale; }
 };
 </script>
-<script src="../../js/version.js?v=1.42.1"></script>
-<script src="../../js/pwa-back.js?v=1.42.1"></script>
+<script src="../../js/version.js?v=1.42.2"></script>
+<script src="../../js/pwa-back.js?v=1.42.2"></script>
 </body>
 </html>

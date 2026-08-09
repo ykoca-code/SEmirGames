@@ -99,6 +99,7 @@ body.snake-page { overflow: hidden; }
 .overlay-content p { margin: 0 0 14px; color: #cbd5e1; font-size: 14px; white-space: pre-line; }
 
 .touch-controls {
+  margin-bottom: env(safe-area-inset-bottom, 0px); /* iOS PWA home çubuğu payı */
   display: grid;
   grid-template-columns: 60px 60px 60px;
   grid-template-rows: 56px 56px;
