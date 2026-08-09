@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Kara Kutu - SEmirK Games</title>
+    <link rel="icon" type="image/svg+xml" href="../../assets/icons/logo.svg">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../../index.html" class="back-fab" aria-label="Tüm Oyunlar">←</a>
+    <div id="game-container">
+        <header>
+            <div class="level-info" id="level-info">Bölüm 01/08</div>
+            <div class="target-container">
+                <span>Hedef:</span>
+                <svg id="target-svg" viewBox="0 0 100 100" width="30" height="30">
+                    <circle cx="50" cy="50" r="45" fill="#1e1e1e" stroke="#333" stroke-width="4" stroke-dasharray="8 8"/>
+                    <circle id="target-fill" cx="50" cy="50" r="45" fill="#58a6ff"/>
+                </svg>
+                <span id="target-pct">%100</span>
+            </div>
+        </header>
+
+        <main>
+            <div id="main-shape">
+                <svg viewBox="0 0 100 100">
+                    <!-- Arka plan gösterge halkası -->
+                    <circle cx="50" cy="50" r="45" fill="#1e1e1e" stroke="#333" stroke-width="2" stroke-dasharray="4 4"/>
+                    <!-- Dolum animasyonlu asıl şekil -->
+                    <circle id="shape-fill" cx="50" cy="50" r="0" fill="#ff7b72"/>
+                </svg>
+            </div>
+            <div id="feedback-message">Sistemi çöz...</div>
+            <div id="move-counter">Hamle: 0</div>
+        </main>
+
+        <div class="controls">
+            <!-- Buton 1 -->
+            <button class="control-btn" id="btn-1" aria-label="Düğme 1">
+                <svg viewBox="0 0 24 24" width="28" height="28"><circle cx="12" cy="12" r="8" stroke="#fff" stroke-width="2" fill="none"/></svg>
+            </button>
+            <!-- Buton 2 -->
+            <button class="control-btn" id="btn-2" aria-label="Düğme 2">
+                <svg viewBox="0 0 24 24" width="28" height="28"><polygon points="12,4 20,20 4,20" stroke="#fff" stroke-width="2" fill="none"/></svg>
+            </button>
+            <!-- Buton 3 -->
+            <button class="control-btn" id="btn-3" aria-label="Düğme 3">
+                <svg viewBox="0 0 24 24" width="28" height="28"><rect x="6" y="6" width="12" height="12" stroke="#fff" stroke-width="2" fill="none"/></svg>
+            </button>
+            <!-- Sıfırlama Butonu -->
+            <button class="control-btn reset-btn" id="btn-reset" aria-label="Sıfırla">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" fill="#aaa"/></svg>
+            </button>
+        </div>
+    </div>
+    <script src="../../js/version.js?v=1.40.0"></script>
+    <script src="../../js/pwa-back.js?v=1.40.0"></script>
+    <script src="script.js?v=1.40.0"></script>
+</body>
+</html>

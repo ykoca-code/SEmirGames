@@ -1,0 +1,211 @@
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-tap-highlight-color: transparent;
+}
+
+body { 
+    background-color: #0d1117; 
+    color: #c9d1d9; 
+    font-family: 'Courier New', Courier, monospace; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    overflow: hidden; 
+    touch-action: manipulation; /* Mobilde çift tıklama zoomunu engeller */
+}
+
+#game-container { 
+    width: 100%; 
+    max-width: 420px; 
+    height: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    padding: 30px 20px; 
+}
+
+header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding-bottom: 20px; 
+    border-bottom: 1px solid #30363d; 
+}
+
+.level-info { 
+    font-weight: bold; 
+    color: #8b949e; 
+    letter-spacing: 2px; 
+    font-size: 1.1em;
+}
+
+.target-container { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    font-size: 0.9em;
+    color: #8b949e;
+}
+
+#target-shape { 
+    width: 24px; 
+    height: 24px; 
+    background-color: #58a6ff; /* Hedef renk (Mavi) */
+    border-radius: 50%; 
+    border: 2px solid #c9d1d9;
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.4);
+}
+
+main { 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+#main-shape { 
+    width: 220px; 
+    height: 220px; 
+    margin-bottom: 40px; 
+    position: relative;
+}
+
+#main-shape svg { 
+    width: 100%; 
+    height: 100%; 
+    filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+}
+
+#shape-fill { 
+    transition: r 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), fill 0.3s ease; 
+}
+
+#feedback-message { 
+    height: 20px; 
+    color: #8b949e; 
+    text-transform: uppercase; 
+    font-size: 0.85em; 
+    letter-spacing: 1.5px; 
+}
+
+.controls { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 12px; 
+    padding-top: 25px; 
+    border-top: 1px solid #30363d; 
+}
+
+.control-btn { 
+    background: #161b22; 
+    border: 1px solid #30363d; 
+    border-radius: 12px; 
+    padding: 18px 0; 
+    cursor: pointer; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    transition: all 0.1s ease;
+}
+
+.control-btn:active { 
+    background: #21262d; 
+    transform: scale(0.92); 
+    border-color: #8b949e;
+}
+
+.reset-btn {
+    background: #21262d;
+}
+
+.success-overlay {
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(35, 134, 54, 0.95);
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    opacity: 0; 
+    pointer-events: none; 
+    transition: opacity 0.6s ease;
+    z-index: 100;
+}
+
+.success-overlay.visible { 
+    opacity: 1; 
+    pointer-events: auto; 
+}
+
+.success-overlay h1 { 
+    font-size: 2.2em; 
+    margin-bottom: 15px; 
+    color: #fff;
+    letter-spacing: 2px;
+}
+
+.success-overlay p { 
+    color: #e6ffed;
+    font-size: 1.1em;
+}
+
+/* Titreşim efekti sınıfı */
+.shake {
+    animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+    40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+/* ---- SEmirK Games entegrasyonu + iyileştirmeler ---- */
+body { height: 100dvh; }
+
+.back-fab {
+    position: fixed; top: 10px; left: 10px; z-index: 200;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,0.55); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; font-size: 20px; font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.25);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+header { padding-left: 44px; }
+
+#target-svg circle { transition: r 0.3s ease, fill 0.3s ease; }
+#target-pct { font-size: 0.85em; color: #8b949e; }
+
+#shape-fill { transition: r 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), fill 0.3s ease; }
+
+#move-counter {
+    margin-top: 10px;
+    color: #484f58;
+    font-size: 0.75em;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.success-overlay button {
+    margin-top: 30px;
+    padding: 14px 32px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #0d1117;
+    background: #e6ffed;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.success-overlay button:active { transform: scale(0.95); }
+
+.controls { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
