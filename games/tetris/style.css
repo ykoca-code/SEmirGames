@@ -145,6 +145,7 @@ body.tetris-page {
 
 /* ---------- Touch controls ---------- */
 .touch-controls {
+  margin-bottom: env(safe-area-inset-bottom, 0px); /* iOS PWA home çubuğu payı */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
