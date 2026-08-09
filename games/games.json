@@ -707,6 +707,24 @@
     "tek dokunuş",
     "renk"
    ]
+  },
+  {
+   "id": "neonshift",
+   "title": "Neon Shift",
+   "description": "Cyberpunk platform macerası! Koş, çift zıpla, dash at, zamanı yavaşlat. Düşmanları ez, neon küreleri topla, 5. bölümdeki boss'u alt et!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "7+",
+   "thumbnail": "games/neonshift/thumbnail.svg",
+   "path": "games/neonshift/index.html",
+   "tags": [
+    "arcade",
+    "platform",
+    "cyberpunk",
+    "dash",
+    "boss",
+    "neon"
+   ]
   }
  ]
 }
