@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200">
+  <rect width="320" height="200" fill="#0d1117"/>
+  <!-- yıldız alanı -->
+  <g fill="#8b949e" opacity="0.6">
+    <rect x="30" y="30" width="2" height="2"/>
+    <rect x="90" y="60" width="1.5" height="1.5"/>
+    <rect x="200" y="24" width="2" height="2"/>
+    <rect x="260" y="50" width="1.5" height="1.5"/>
+    <rect x="150" y="150" width="2" height="2"/>
+    <rect x="60" y="170" width="1.5" height="1.5"/>
+    <rect x="290" y="130" width="2" height="2"/>
+  </g>
+  <!-- kırmızı üst engel -->
+  <g>
+    <rect x="120" y="0" width="34" height="72" fill="#ff7b72"/>
+    <rect x="136" y="0" width="2" height="72" fill="#fff"/>
+  </g>
+  <!-- mavi alt engel -->
+  <g>
+    <rect x="210" y="120" width="34" height="80" fill="#58a6ff"/>
+    <rect x="226" y="120" width="2" height="80" fill="#fff"/>
+  </g>
+  <!-- oyuncu karesi (mavi, geçiş halinde) -->
+  <g>
+    <rect x="48" y="80" width="40" height="40" rx="3" fill="#58a6ff"/>
+    <rect x="56" y="88" width="24" height="24" rx="2" fill="#0d1117"/>
+  </g>
+  <!-- geçiş partikülleri -->
+  <g fill="#58a6ff">
+    <circle cx="70" cy="66" r="2.5"/>
+    <circle cx="96" cy="78" r="2"/>
+    <circle cx="60" cy="132" r="2"/>
+    <circle cx="92" cy="124" r="2.5"/>
+  </g>
+  <!-- başlık -->
+  <text x="160" y="185" font-family="Courier New, monospace" font-size="17" font-weight="bold" fill="#c9d1d9" text-anchor="middle" letter-spacing="3">PARALEL EVREN</text>
+</svg>

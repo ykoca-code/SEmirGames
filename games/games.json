@@ -690,6 +690,23 @@
     "deneme",
     "gizem"
    ]
+  },
+  {
+   "id": "paralel",
+   "title": "Paralel Evren",
+   "description": "Tek dokunuşla boyut değiştir! Aynı renkteki engellerden geç, farklı renklere çarpma. Refleks tabanlı sonsuz koşu — en yüksek skoru kov!",
+   "category": "arcade",
+   "categoryLabel": "Arcade",
+   "ageRating": "7+",
+   "thumbnail": "games/paralel/thumbnail.svg",
+   "path": "games/paralel/index.html",
+   "tags": [
+    "arcade",
+    "refleks",
+    "sonsuz koşu",
+    "tek dokunuş",
+    "renk"
+   ]
   }
  ]
 }
