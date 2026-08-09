@@ -10,5 +10,5 @@
   "entry": "index.html",
   "tags": ["arcade", "platform", "zıplama", "macera", "yan kaydırma"],
   "author": "SEmirK Games",
-  "controls": ["Dokun: zıpla", "Sürükle: sağa/sola koş", "Klavye: oklar + Space"]
+  "controls": ["◀ ▶ butonları: yürü", "ZIPLA butonu: zıpla", "Klavye: oklar + Space"]
 }

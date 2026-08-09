@@ -16,24 +16,25 @@ document.addEventListener('keydown', (e) => {
 });
 document.addEventListener('keyup', (e) => keys[e.code] = false);
 
-// Touch controls for mobile
-let touchStartX = 0;
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    touchStartX = e.touches[0].clientX;
-    keys['Space'] = true;
-});
-canvas.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    keys['Space'] = false;
-});
-canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    const touchX = e.touches[0].clientX;
-    const diff = touchX - touchStartX;
-    keys['ArrowLeft'] = diff < -30;
-    keys['ArrowRight'] = diff > 30;
-});
+// Touch controls for mobile: on-screen buttons drive the same keys object
+function bindTouchBtn(id, code) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const on = (e) => { e.preventDefault(); keys[code] = true; el.classList.add('pressed'); };
+    const off = (e) => { e.preventDefault(); keys[code] = false; el.classList.remove('pressed'); };
+    el.addEventListener('touchstart', on, { passive: false });
+    el.addEventListener('touchend', off, { passive: false });
+    el.addEventListener('touchcancel', off, { passive: false });
+    el.addEventListener('mousedown', on);
+    el.addEventListener('mouseup', off);
+    el.addEventListener('mouseleave', (e) => { keys[code] = false; el.classList.remove('pressed'); });
+}
+bindTouchBtn('btnLeft', 'ArrowLeft');
+bindTouchBtn('btnRight', 'ArrowRight');
+bindTouchBtn('btnJump', 'Space');
+// Stop the page from scrolling/zooming while touching the canvas
+canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
 class Particle {
     constructor(x, y, color, type = 'sparkle') {
