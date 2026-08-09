@@ -39,7 +39,8 @@
         return r.json();
       })
       .then((data) => {
-        state.games = Array.isArray(data.games) ? data.games : [];
+        // En son eklenen oyun en üstte: games.json'a yeni oyunlar sona eklenir
+        state.games = (Array.isArray(data.games) ? data.games : []).slice().reverse();
         state.categories = Array.isArray(data.categories) ? data.categories : [];
         state.ageGroups = Array.isArray(data.ageGroups) ? data.ageGroups : [];
 

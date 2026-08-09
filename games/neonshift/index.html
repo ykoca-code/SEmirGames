@@ -78,19 +78,30 @@ canvas {
 #touchControls {
     /* fixed + safe-area: iOS PWA'da home çubuğunun altına taşmasın */
     position:fixed; bottom:calc(15px + env(safe-area-inset-bottom, 0px)); left:0; width:100%;
-    display:none; justify-content:space-between;
+    display:none; justify-content:space-between; align-items:flex-end;
     padding:0 max(20px, env(safe-area-inset-left, 0px)) 0 max(20px, env(safe-area-inset-right, 0px));
     pointer-events:auto; z-index:15;
 }
 .touchBtn {
-    width:70px; height:70px; border-radius:50%;
+    width:74px; height:74px; border-radius:50%;
     background:rgba(0,255,255,0.1); border:2px solid rgba(0,255,255,0.4);
     color:#0ff; font-size:24px; display:flex; justify-content:center; align-items:center;
     user-select:none; -webkit-user-select:none; touch-action:none;
     text-shadow:0 0 10px #0ff;
 }
 .touchBtn:active { background:rgba(0,255,255,0.3); transform:scale(0.95); }
-#touchRight { display:flex; gap:15px; }
+#touchLeft { display:flex; gap:16px; align-items:flex-end; }
+/* Sağ küme: ZIPLA büyük ve en sağ altta (başparmağın doğal konumu),
+   dash hemen solunda, az kullanılan zaman yavaşlatma küçük ve üstte */
+#touchRight { display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+#touchRight .trRow { display:flex; gap:14px; align-items:flex-end; }
+.touchBtn.small { width:54px; height:54px; font-size:18px; opacity:0.85; }
+.touchBtn.big {
+    width:96px; height:96px; font-size:32px;
+    background:rgba(255,0,128,0.12); border-color:rgba(255,0,128,0.5);
+    color:#ff0080; text-shadow:0 0 10px #ff0080;
+}
+.touchBtn.big:active { background:rgba(255,0,128,0.3); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
 @media(pointer:coarse){ #touchControls{display:flex;} }
 .back-fab {
@@ -129,14 +140,16 @@ canvas {
     <button class="btn" id="startBtn">BAŞLAT</button>
 </div>
 <div id="touchControls">
-    <div style="display:flex; gap:15px;">
+    <div id="touchLeft">
         <div class="touchBtn" id="tLeft">◀</div>
         <div class="touchBtn" id="tRight">▶</div>
     </div>
     <div id="touchRight">
-        <div class="touchBtn" id="tJump">▲</div>
-        <div class="touchBtn" id="tDash">⚡</div>
-        <div class="touchBtn" id="tSlow">⏱</div>
+        <div class="touchBtn small" id="tSlow">⏱</div>
+        <div class="trRow">
+            <div class="touchBtn" id="tDash">⚡</div>
+            <div class="touchBtn big" id="tJump">▲</div>
+        </div>
     </div>
 </div>
 </div>
@@ -953,7 +966,7 @@ window._neon = {
     get timeScale() { return timeScale; }
 };
 </script>
-<script src="../../js/version.js?v=1.42.2"></script>
-<script src="../../js/pwa-back.js?v=1.42.2"></script>
+<script src="../../js/version.js?v=1.43.0"></script>
+<script src="../../js/pwa-back.js?v=1.43.0"></script>
 </body>
 </html>
