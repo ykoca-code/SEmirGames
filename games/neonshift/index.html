@@ -184,7 +184,11 @@ function resize() {
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
     W = 960; H = 600;
-    canvas.width = W; canvas.height = H;
+    // Yüksek DPI (Retina/4K) ekranlarda netlik: fiziksel çözünürlük dpr ile çarpılır,
+    // çizim mantığı W×H (960×600) mantıksal koordinatlarda kalır
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     SCALE = w / W;
 }
 window.addEventListener('resize', resize);
@@ -945,7 +949,7 @@ window._neon = {
     get timeScale() { return timeScale; }
 };
 </script>
-<script src="../../js/version.js?v=1.42.0"></script>
-<script src="../../js/pwa-back.js?v=1.42.0"></script>
+<script src="../../js/version.js?v=1.42.1"></script>
+<script src="../../js/pwa-back.js?v=1.42.1"></script>
 </body>
 </html>
